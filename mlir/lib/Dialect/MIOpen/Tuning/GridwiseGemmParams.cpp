@@ -356,11 +356,30 @@ LogicalResult PopulateParamsXDL::populatePaddingKernelDerived(
 
 LogicalResult PopulateParamsXDL::paramsFromCtx(
     ConvolutionContext &ctx, int64_t blockSizeOverride,
-    InitParamsXDL &validParams, DerivedParams &gemmADerivedParam,
-    DerivedParams &gemmBDerivedParam, int64_t &blockSize, int64_t &gridSize) {
+    const std::string &perfConfig, InitParamsXDL &validParams,
+    DerivedParams &gemmADerivedParam, DerivedParams &gemmBDerivedParam,
+    int64_t &blockSize, int64_t &gridSize) {
 
   GemmSize gemmSize;
   obtainGemmSize(ctx, gemmSize);
+
+  if (!perfConfig.empty()) {
+    // Under two scenarios can we receive a perfConfig:
+    // 1. This is tuning mode
+    // 2. This is running mode and we have succeeded with a perfdb load
+    bool isValidPerfConfig = validParams.deserialize(perfConfig);
+    if (isValidPerfConfig) {
+      LLVM_DEBUG(llvm::dbgs() << "DB load succeed: ");
+      validParams.visit(validParams,
+                        [](auto &arg) { llvm::dbgs() << arg << ","; });
+      LLVM_DEBUG(llvm::dbgs() << "\n");
+      return populateDerived(ctx, validParams, gemmSize, gemmADerivedParam,
+                             gemmBDerivedParam, blockSize, gridSize);
+    } else {
+      // Signal the client if perfCofnig is passed in but is invalid
+      return failure();
+    }
+  }
 
 #if __MLIR_ENABLE_SQLITE__
   std::string solverId;
