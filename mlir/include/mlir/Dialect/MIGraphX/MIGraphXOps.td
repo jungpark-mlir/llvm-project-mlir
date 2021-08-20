@@ -128,7 +128,7 @@ def MIGraphX_ConvolutionOp :
                    Confined<I64ArrayAttr, [ArrayCount<2>]>:$padding,
                    Confined<I64ArrayAttr, [ArrayCount<2>]>:$stride,
                    Confined<I64ArrayAttr, [ArrayCount<2>]>:$dilation,
-                   I32Attr:$group,
+                   I64Attr:$group,
                    PaddingModeAttr:$padding_mode
                    )>,
 	  Results<(outs AnyRankedTensor:$output)> {	  
@@ -168,7 +168,7 @@ def MIGraphX_BatchNormOp :
 
                    F32Attr:$epsilon,
                    F32Attr:$momentum,
-                   I32Attr:$bn_mode
+                   I64Attr:$bn_mode
                    )>,
 	  Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "batch_norm_inference";
@@ -212,10 +212,10 @@ def MIGraphX_PoolingOp :
     Arguments<(ins AnyRankedTensor:$input,
 
                    StrAttr:$mode,
-                   Confined<I32ArrayAttr, [ArrayCount<2>]>:$padding,
-                   Confined<I32ArrayAttr, [ArrayCount<2>]>:$stride,
-                   Confined<I32ArrayAttr, [ArrayCount<2>]>:$length,
-                   I32Attr:$ceil_mode
+                   Confined<I64ArrayAttr, [ArrayCount<2>]>:$padding,
+                   Confined<I64ArrayAttr, [ArrayCount<2>]>:$stride,
+                   Confined<I64ArrayAttr, [ArrayCount<2>]>:$length,
+                   I64Attr:$ceil_mode
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "Pooling operation";
@@ -227,7 +227,7 @@ def MIGraphX_PoolingOp :
 def MIGraphX_FlattenOp :
     MIGraphX_Op<"flatten">,
     Arguments<(ins AnyRankedTensor:$input,
-                   I32Attr:$axis
+                   I64Attr:$axis
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "Flatten tensor";
@@ -267,7 +267,7 @@ def MIGraphX_ReshapeOp :
 def MIGraphX_MultiBroadcastOp :
     MIGraphX_Op<"multibroadcast">,
     Arguments<(ins AnyRankedTensor:$input,
-                   I32ArrayAttr:$ouput_lens
+                   I64ArrayAttr:$ouput_lens
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "Broadcast tensor in multiple dimensions";
@@ -281,8 +281,8 @@ def MIGraphX_DotOp :
     Arguments<(ins AnyRankedTensor:$input,
                    AnyRankedTensor:$a,
                    AnyRankedTensor:$b,
-                   I32Attr:$alpha,
-                   I32Attr:$beta
+                   I64Attr:$alpha,
+                   I64Attr:$beta
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "Broadcast tensor in multiple dimensions";
@@ -294,7 +294,7 @@ def MIGraphX_DotOp :
 def MIGraphX_ConstantOp :
     MIGraphX_Op<"constant">,
     Arguments<(ins OptionalAttr<ElementsAttr>:$value,
-                   OptionalAttr<I32ArrayAttr>:$shape,
+                   OptionalAttr<I64ArrayAttr>:$shape,
                    OptionalAttr<TypeAttr>:$type
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
@@ -302,6 +302,9 @@ def MIGraphX_ConstantOp :
   let description = [{
     The `migraphx.constant` op. Should be able to represent everything from literals.
   }];
+
+  let assemblyFormat = "attr-dict `:` `->` type($output)";
+  let verifier = [{ return success(); }];
 }
 
 //--------- Execution layer Ops

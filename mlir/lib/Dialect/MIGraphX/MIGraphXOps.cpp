@@ -164,29 +164,6 @@ static LogicalResult verify(DotOp op) {
   return success();
 }
 
-//===----------------------------------------------------------------------===//
-// ConstantOp
-//===----------------------------------------------------------------------===//
-static ParseResult parseConstantOp(OpAsmParser &parser, OperationState &result) {
-  SmallVector<OpAsmParser::OperandType, 2> ops;
-  SmallVector<Type, 2> types;
-  return failure(
-      parser.parseOperandList(ops, OpAsmParser::Delimiter::Paren) ||
-      parser.parseOptionalAttrDict(result.attributes) ||
-      parser.parseColonTypeList(types) ||
-      parser.resolveOperands(ops, types, parser.getNameLoc(), result.operands));
-}
-
-static void print(OpAsmPrinter &p, migraphx::ConstantOp op) {
-  p << op.getOperationName() << "()";
-  p.printOptionalAttrDict(op.getAttrs());
-  p << " : " << op.getType();
-}
-
-static LogicalResult verify(migraphx::ConstantOp op) {
-  return success();
-}
-
 //namespace mlir {
 
 #define GET_OP_CLASSES
