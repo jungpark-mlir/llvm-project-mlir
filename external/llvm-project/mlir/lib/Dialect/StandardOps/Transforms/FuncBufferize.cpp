@@ -43,7 +43,7 @@ struct FuncBufferizePass : public FuncBufferizeBase<FuncBufferizePass> {
 
     populateBranchOpInterfaceAndReturnOpTypeConversionPattern(patterns, context,
                                                               typeConverter);
-    target.addLegalOp<ModuleOp, ModuleTerminatorOp, TensorLoadOp, GPU_ReturnOp,
+    target.addLegalOp<ModuleOp, ModuleTerminatorOp, TensorLoadOp, gpu::ReturnOp,
                       TensorToMemrefOp>();
     target.addDynamicallyLegalOp<ReturnOp>(
         [&](ReturnOp op) { return typeConverter.isLegal(op); });
