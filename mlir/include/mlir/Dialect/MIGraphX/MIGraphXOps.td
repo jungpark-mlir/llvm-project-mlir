@@ -125,16 +125,16 @@ def MIGraphX_ConvolutionOp :
     Arguments<(ins AnyRankedTensor:$input,
                    AnyRankedTensor:$filter,
 
-                   Confined<I64ArrayAttr, [ArrayCount<2>]>:$padding,
-                   Confined<I64ArrayAttr, [ArrayCount<2>]>:$stride,
-                   Confined<I64ArrayAttr, [ArrayCount<2>]>:$dilation,
+                   I64ArrayAttr:$padding,
+                   I64ArrayAttr:$stride,
+                   I64ArrayAttr:$dilation,
                    I64Attr:$group,
                    PaddingModeAttr:$padding_mode
                    )>,
 	  Results<(outs AnyRankedTensor:$output)> {	  
-  let summary = "2D convolution forward";
+  let summary = "convolution forward";
   let description = [{
-    The `migraphx.convolution` op computes 2D convolution forward.
+    The `migraphx.convolution` op computes convolution forward.
   }];
   let builders = [
     OpBuilderDAG<(ins "::mlir::Value":$input, "::mlir::Value":$filter, "::mlir::ArrayAttr":$padding,
@@ -212,9 +212,9 @@ def MIGraphX_PoolingOp :
     Arguments<(ins AnyRankedTensor:$input,
 
                    StrAttr:$mode,
-                   Confined<I64ArrayAttr, [ArrayCount<2>]>:$padding,
-                   Confined<I64ArrayAttr, [ArrayCount<2>]>:$stride,
-                   Confined<I64ArrayAttr, [ArrayCount<2>]>:$length,
+                   I64ArrayAttr:$padding,
+                   I64ArrayAttr:$stride,
+                   I64ArrayAttr:$length,
                    I64Attr:$ceil_mode
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
