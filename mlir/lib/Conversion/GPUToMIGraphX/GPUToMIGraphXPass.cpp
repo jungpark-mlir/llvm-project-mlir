@@ -1,4 +1,4 @@
-//===- TosaToMIGraphXPass.cpp - Lowering Tosa to MIGraphX Dialect -------------===//
+//===- GPUToMIGraphXPass.cpp - Lowering GPU to MIGraphX Dialect -------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -6,16 +6,13 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This transformation pass legalizes Tosa operations to the MIGraphX dialect.
+// This transformation pass legalizes GPU operations to the MIGraphX dialect.
 //
 //===----------------------------------------------------------------------===//
 
 #include "../PassDetail.h"
-#include "mlir/Conversion/TosaToMIGraphX/TosaToMIGraphX.h"
+#include "mlir/Conversion/GPUToMIGraphX/GPUToMIGraphX.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
-#include "mlir/Dialect/Tosa/Transforms/PassDetail.h"
-#include "mlir/Dialect/Tosa/Transforms/Passes.h"
-#include "mlir/Dialect/Tosa/Utils/QuantUtils.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Transforms/DialectConversion.h"
@@ -55,9 +52,9 @@ public:
 
 } // namespace
 
-std::unique_ptr<Pass> mlir::tosa::createTosaToMIGraphXRandom() {
-  return std::make_unique<TosaToMIGraphXRandom>();
+std::unique_ptr<Pass> mlir::migraphx::createGPUToMIGraphX() {
+  return std::make_unique<GPUToMIGraphX>();
 }
-void mlir::tosa::addTosaToMIGraphXRandomPasses(OpPassManager &pm) {
-  pm.addNestedPass<FuncOp>(createTosaToMIGraphXRandom());
+void mlir::migraphx::addGPUToMIGraphXPasses(OpPassManager &pm) {
+  pm.addNestedPass<FuncOp>(createGPUToMIGraphX());
 }
