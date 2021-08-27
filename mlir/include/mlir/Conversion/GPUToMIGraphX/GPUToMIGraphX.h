@@ -27,7 +27,7 @@ std::unique_ptr<Pass> createGPUToMIGraphX();
 void addGPUToMIGraphXPasses(OpPassManager &pm);
 
 /// Populates conversion passes from TOSA dialect to MIOpen dialect.
-void populateGPUToMIGraphXConversionPatterns(MLIRContext *context,
+void populateFuncToCOBJPatterns(MLIRContext *context,
                                             OwningRewritePatternList *patterns);
 
 } // namespace tosa
