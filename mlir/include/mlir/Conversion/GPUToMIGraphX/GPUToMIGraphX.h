@@ -15,6 +15,8 @@
 #define MLIR_CONVERSION_GPUTOMIGRAPHX_GPUTOMIGRAPHX_H
 
 #include "mlir/Pass/Pass.h"
+#include "mlir/IR/PatternMatch.h"
+#include "mlir/Dialect/MIGraphX/MIGraphXOps.h"
 
 namespace mlir {
 namespace migraphx {
