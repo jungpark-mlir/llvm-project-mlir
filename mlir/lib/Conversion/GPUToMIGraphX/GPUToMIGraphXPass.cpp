@@ -22,7 +22,7 @@ using namespace mlir;
 namespace {
 
 struct FuncToCOBJ
-    : public FuncToCOBJPatternBase<FuncToCOBJPattern> {
+    : public FuncToCOBJPatternBase<FuncToCOBJ> {
 public:
   void getDependentDialects(DialectRegistry &registry) const override {
     registry.insert<migraphx::MIGraphXDialect, StandardOpsDialect, gpu::GPUDialect>();
