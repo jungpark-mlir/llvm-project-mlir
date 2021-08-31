@@ -13,6 +13,7 @@
 #include "../PassDetail.h"
 #include "mlir/Conversion/GPUToMIGraphX/GPUToMIGraphX.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
+#include "mlir/Dialect/GPU/GPUDialect.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Transforms/DialectConversion.h"
@@ -31,7 +32,7 @@ public:
   void runOnFunction() override {
     OwningRewritePatternList patterns;
     ConversionTarget target(getContext());
-    target.addLegalDialect<migraphx::MIGraphXDialect, StandardOpsDialect>();
+    target.addLegalDialect<migraphx::MIGraphXDialect, StandardOpsDialect, gpu::GPUDialect>();
     target.addIllegalOp<FuncOp>();
 /*
     target.addDynamicallyLegalOp<FuncOp>([&](FuncOp op) {
