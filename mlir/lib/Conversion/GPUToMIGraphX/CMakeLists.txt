@@ -7,7 +7,7 @@ add_mlir_conversion_library(MLIRGPUToMIGraphX
   ${MLIR_MAIN_INCLUDE_DIR}/mlir/IR
 
   DEPENDS
-  MLIRConversionPassIncGen
+  MLIRMIOpenConversionPassIncGen
   
   LINK_LIBS PUBLIC
   MLIRIR
