@@ -32,7 +32,6 @@ public:
     OwningRewritePatternList patterns;
     ConversionTarget target(getContext());
     target.addLegalDialect<migraphx::MIGraphXDialect, StandardOpsDialect>();
-    target.addLegalDialect<gpu::GPUDialect>();
     target.addIllegalOp<FuncOp>();
 /*
     target.addDynamicallyLegalOp<FuncOp>([&](FuncOp op) {
