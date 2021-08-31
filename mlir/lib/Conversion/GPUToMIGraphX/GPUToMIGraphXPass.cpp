@@ -22,7 +22,7 @@ using namespace mlir;
 namespace {
 
 struct GPUToMIGraphX
-    : public GPUToMIGraphXPatternBase<GPUToMIGraphX> {
+    : public GPUToMIGraphXBase<GPUToMIGraphX> {
 public:
   void getDependentDialects(DialectRegistry &registry) const override {
     registry.insert<migraphx::MIGraphXDialect, StandardOpsDialect, gpu::GPUDialect>();
