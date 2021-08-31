@@ -73,7 +73,7 @@ def TosaToMIOpen : FunctionPass<"tosa-to-miopen"> {
 // GPUToMIGraphX
 //===----------------------------------------------------------------------===//
 
-def FuncToCOBJ : FunctionPass<"func-to-mixr-cobj"> {
+def GPUToMIGraphX : FunctionPass<"gpu-to-migraphx"> {
   let summary = "Lower fused gpu launch to MIGraphX code object";
   let description = [{
     Pass that converts func operations with gpu.launch to MIGraphX operation.
