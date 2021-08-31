@@ -31,7 +31,8 @@ public:
   void runOnFunction() override {
     OwningRewritePatternList patterns;
     ConversionTarget target(getContext());
-    target.addLegalDialect<migraphx::MIGraphXDialect, StandardOpsDialect, gpu::GPUDialect>();
+    target.addLegalDialect<migraphx::MIGraphXDialect, StandardOpsDialect>();
+    target.addLegalDialect<gpu::GPUDialect>();
     target.addIllegalOp<FuncOp>();
 /*
     target.addDynamicallyLegalOp<FuncOp>([&](FuncOp op) {
