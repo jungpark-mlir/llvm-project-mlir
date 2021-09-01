@@ -35,9 +35,9 @@ public:
       shapeAttr.push_back(rewriter.getI32IntegerAttr(dim));
     }
 
-    auto callOp = dyn_cast<CallOp>(op);
+    auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
     ValueRange args({});
-    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, callOp->getCallee(), args);
+    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, fnAttr, args);
     //cop->setAttr("kernel",
 //                 );
     rewriter.replaceOp(op, cop->getResults());
