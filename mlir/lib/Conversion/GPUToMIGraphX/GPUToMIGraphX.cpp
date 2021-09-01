@@ -19,9 +19,9 @@
 using namespace mlir;
 
 namespace {
-class FuncToCOBJPattern : public OpRewritePattern<FuncOp> {
+class FuncToCOBJPattern : public OpRewritePattern<CallOp> {
 public:
-  using OpRewritePattern<FuncOp>::OpRewritePattern;
+  using OpRewritePattern<CallOp>::OpRewritePattern;
 
   LogicalResult
   matchAndRewrite(CallOp op,
