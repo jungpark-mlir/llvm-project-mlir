@@ -37,8 +37,6 @@ public:
 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
     SmallVector<Value, 8> operands(op.getOperands());
-    auto operandsRef = llvm::makeArrayRef(operands);
-    ValueRange args({});
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
     cop->setAttr("kernel", fnAttr);
 
@@ -57,7 +55,8 @@ public:
                  rewriter.getArrayAttr(ArrayRef<Attribute>(globalSizeAttr.begin(), globalSizeAttr.end())));
     cop->setAttr("localSize",
                  rewriter.getArrayAttr(ArrayRef<Attribute>(localSizeAttr.begin(), localSizeAttr.end())));
-    
+    rewriter.setInsertionPoint(op);
+    auto resultAlloc = rewriter.create<AllocOp>(loc, resultType, op->sizes());
     rewriter.replaceOp(op, cop->getResults());
 
     return success();
