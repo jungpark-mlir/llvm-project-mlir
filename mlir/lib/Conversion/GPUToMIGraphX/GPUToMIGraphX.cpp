@@ -28,13 +28,15 @@ public:
                   PatternRewriter &rewriter) const override {
     auto loc = op->getLoc();
     auto results = op->getResults();
-    auto resultType = results[0].getType().template cast<ShapedType>();
+    auto resultType = results[0].getType().template cast<MemRefType>();
+  
+    /*
     auto shape = resultType.getShape();
     SmallVector<IntegerAttr, 5> shapeAttr;
     for(auto dim: shape){
       shapeAttr.push_back(rewriter.getI32IntegerAttr(dim));
     }
-
+*/
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
     SmallVector<Value, 8> operands(op.getOperands());
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
