@@ -37,6 +37,9 @@ public:
       shapeAttr.push_back(rewriter.getI32IntegerAttr(dim));
     }
 */
+    rewriter.setInsertionPoint(op);
+    auto resultAlloc = rewriter.create<AllocOp>(loc, resultType);
+    
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
     SmallVector<Value, 8> operands(op.getOperands());
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
@@ -57,8 +60,7 @@ public:
                  rewriter.getArrayAttr(ArrayRef<Attribute>(globalSizeAttr.begin(), globalSizeAttr.end())));
     cop->setAttr("localSize",
                  rewriter.getArrayAttr(ArrayRef<Attribute>(localSizeAttr.begin(), localSizeAttr.end())));
-    rewriter.setInsertionPoint(op);
-    auto resultAlloc = rewriter.create<AllocOp>(loc, resultType);
+
     rewriter.replaceOp(op, cop->getResults());
 
     return success();
