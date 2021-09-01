@@ -24,7 +24,7 @@ public:
   using OpRewritePattern<FuncOp>::OpRewritePattern;
 
   LogicalResult
-  matchAndRewrite(FuncOp op,
+  matchAndRewrite(CallOp op,
                   PatternRewriter &rewriter) const override {
     auto loc = op->getLoc();
     auto results = op->getResults();
