@@ -39,6 +39,9 @@ public:
     ValueRange args({});
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, args);
     cop->setAttr("kernel", fnAttr);
+    cop->setAttr("globalSize", rewriter.getI32IntegerAttr(1024));
+    cop->setAttr("localSize", rewriter.getI32IntegerAttr(128));
+    
     rewriter.replaceOp(op, cop->getResults());
 
     return success();
