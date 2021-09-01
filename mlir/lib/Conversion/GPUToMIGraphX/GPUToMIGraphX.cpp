@@ -39,8 +39,22 @@ public:
     ValueRange args({});
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, args);
     cop->setAttr("kernel", fnAttr);
-    cop->setAttr("globalSize", rewriter.getI64IntegerAttr(1024));
-    cop->setAttr("localSize", rewriter.getI64IntegerAttr(128));
+
+    SmallVector<IntegerAttr, 5> globalSizeAttr;
+    SmallVector<IntegerAttr, 5> localSizeAttr;
+
+    globalSizeAttr.push_back(rewriter.getI64IntegerAttr(4));
+    globalSizeAttr.push_back(rewriter.getI64IntegerAttr(4));
+    globalSizeAttr.push_back(rewriter.getI64IntegerAttr(128));
+    
+    localSizeAttr.push_back(rewriter.getI64IntegerAttr(1));
+    localSizeAttr.push_back(rewriter.getI64IntegerAttr(1));
+    localSizeAttr.push_back(rewriter.getI64IntegerAttr(32));
+    
+    cop->setAttr("globalSize",
+                 rewriter.getArrayAttr(ArrayRef<Attribute>(globalSizeAttr.begin(), globalSizeAttr.end())));
+    cop->setAttr("localSize",
+                 rewriter.getArrayAttr(ArrayRef<Attribute>(localSizeAttr.begin(), localSizeAttr.end())));
     
     rewriter.replaceOp(op, cop->getResults());
 
