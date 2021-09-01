@@ -36,7 +36,7 @@ public:
     }
 
     ValueRange args({});
-    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, args);
+    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, op->getCallee(), args);
     //cop->setAttr("kernel",
 //                 );
     rewriter.replaceOp(op, cop->getResults());
