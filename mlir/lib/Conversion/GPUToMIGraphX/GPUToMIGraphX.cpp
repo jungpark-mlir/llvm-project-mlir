@@ -56,7 +56,7 @@ public:
     cop->setAttr("localSize",
                  rewriter.getArrayAttr(ArrayRef<Attribute>(localSizeAttr.begin(), localSizeAttr.end())));
     rewriter.setInsertionPoint(op);
-    auto resultAlloc = rewriter.create<AllocOp>(loc, resultType, op->sizes());
+    auto resultAlloc = rewriter.create<AllocOp>(loc, resultType);
     rewriter.replaceOp(op, cop->getResults());
 
     return success();
