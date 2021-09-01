@@ -35,8 +35,9 @@ public:
       shapeAttr.push_back(rewriter.getI32IntegerAttr(dim));
     }
 
+    auto callOp = dyn_cast<CallOp>(op);
     ValueRange args({});
-    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, op->getCallee(), args);
+    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, callOp->getCallee(), args);
     //cop->setAttr("kernel",
 //                 );
     rewriter.replaceOp(op, cop->getResults());
