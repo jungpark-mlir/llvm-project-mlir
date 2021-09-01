@@ -37,9 +37,8 @@ public:
 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
     ValueRange args({});
-    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, fnAttr, args);
-    //cop->setAttr("kernel",
-//                 );
+    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, args);
+    cop->setAttr("kernel", fnAttr);
     rewriter.replaceOp(op, cop->getResults());
 
     return success();
