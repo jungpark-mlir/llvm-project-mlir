@@ -56,12 +56,12 @@ public:
       auto gridSize = Lop.getGridSizeOperandValues();
       auto blockSize = Lop.getBlockSizeOperandValues();
 
-      globalSizeAttr.push_back(gridSize.z.getAttrOfType<IntegerAttr>("value"));
-      globalSizeAttr.push_back(gridSize.y.getAttrOfType<IntegerAttr>("value"));
-      globalSizeAttr.push_back(gridSize.x.getAttrOfType<IntegerAttr>("value"));
-      localSizeAttr.push_back(blockSize.z.getAttrOfType<IntegerAttr>("value"));
-      localSizeAttr.push_back(blockSize.y.getAttrOfType<IntegerAttr>("value"));
-      localSizeAttr.push_back(blockSize.x.getAttrOfType<IntegerAttr>("value"));
+      globalSizeAttr.push_back((gridSize.z)->getAttrOfType<IntegerAttr>("value"));
+      globalSizeAttr.push_back((gridSize.y)->getAttrOfType<IntegerAttr>("value"));
+      globalSizeAttr.push_back((gridSize.x)->getAttrOfType<IntegerAttr>("value"));
+      localSizeAttr.push_back((blockSize.z)->getAttrOfType<IntegerAttr>("value"));
+      localSizeAttr.push_back((blockSize.y)->getAttrOfType<IntegerAttr>("value"));
+      localSizeAttr.push_back((blockSize.x)->getAttrOfType<IntegerAttr>("value"));
     });
 
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
