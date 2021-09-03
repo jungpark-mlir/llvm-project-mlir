@@ -51,13 +51,16 @@ public:
         return;
       }
 
-      //               Index:$gridSizeX, Index:$gridSizeY, Index:$gridSizeZ,               Index:$blockSizeX, Index:$blockSizeY, Index:$blockSizeZ,
-      globalSizeAttr.push_back(Lop->getAttrOfType<IntegerAttr>("gridSizeZ"));
-      globalSizeAttr.push_back(Lop->getAttrOfType<IntegerAttr>("gridSizeY"));
-      globalSizeAttr.push_back(Lop->getAttrOfType<IntegerAttr>("gridSizeX"));
-      localSizeAttr.push_back(Lop->getAttrOfType<IntegerAttr>("blockSizeZ"));
-      localSizeAttr.push_back(Lop->getAttrOfType<IntegerAttr>("blockSizeY"));
-      localSizeAttr.push_back(Lop->getAttrOfType<IntegerAttr>("blockSizeX"));
+      // x, y, z
+      KernelDim3 gridSizes = Lop->getGridSizeOperandValues();
+      KernelDim3 blockSizes = Lop->getBlockSizeOperandValues();
+
+      globalSizeAttr.push_back(gridSize.z->getAttrOfType<IntegerAttr>("value"));
+      globalSizeAttr.push_back(gridSize.y->getAttrOfType<IntegerAttr>("value"));
+      globalSizeAttr.push_back(gridSize.x->getAttrOfType<IntegerAttr>("value"));
+      localSizeAttr.push_back(blockSize.z->getAttrOfType<IntegerAttr>("value"));
+      localSizeAttr.push_back(blockSize.y->getAttrOfType<IntegerAttr>("value"));
+      localSizeAttr.push_back(blockSize.x->getAttrOfType<IntegerAttr>("value"));
     });
 
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
