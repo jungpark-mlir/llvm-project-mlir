@@ -64,7 +64,7 @@ public:
       localSizeAttr.push_back(rewriter.getI64IntegerAttr((((blockSize.y.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
       localSizeAttr.push_back(rewriter.getI64IntegerAttr((((blockSize.x.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
 
-      auto kernelRefAttr = op->getAttrOfType<SymbolRefAttr>("kernel");
+      auto kernelRefAttr = Lop->getAttrOfType<SymbolRefAttr>("kernel");
       cop->setAttr("kernel", kernelRefAttr);
     });
 
