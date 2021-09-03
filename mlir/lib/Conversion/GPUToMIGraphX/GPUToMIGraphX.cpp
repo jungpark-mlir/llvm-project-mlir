@@ -46,9 +46,11 @@ public:
     auto fusedFuncOp =
       op->getParentOfType<ModuleOp>().lookupSymbol<FuncOp>(fnAttr.getValue());
     fusedFuncOp.walk([&](Operation *Lop) {
-      llvm::errs()<< "visiting op : " << Lop->getName().getStringRef() << "\n";
-      if (!isa<gpu::LaunchOp>(Lop))
+      if (!isa<gpu::LaunchFuncOp>(Lop)) {
+        llvm::errs()<< "visiting op : " << Lop->getName().getStringRef() << "\n";
         return;
+      }
+
       //               Index:$gridSizeX, Index:$gridSizeY, Index:$gridSizeZ,               Index:$blockSizeX, Index:$blockSizeY, Index:$blockSizeZ,
       globalSizeAttr.push_back(Lop->getAttrOfType<IntegerAttr>("gridSizeZ"));
       globalSizeAttr.push_back(Lop->getAttrOfType<IntegerAttr>("gridSizeY"));
