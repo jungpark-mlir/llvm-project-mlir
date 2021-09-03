@@ -50,12 +50,12 @@ public:
       if (!isa<gpu::LaunchOp>(Lop))
         return;
       //               Index:$gridSizeX, Index:$gridSizeY, Index:$gridSizeZ,               Index:$blockSizeX, Index:$blockSizeY, Index:$blockSizeZ,
-      globalSizeAttr.push_back(Lop->getAttr("gridSizeZ");
-      globalSizeAttr.push_back(Lop->getAttr("gridSizeY");
-      globalSizeAttr.push_back(Lop->getAttr("gridSizeX");
-      localSizeAttr.push_back(Lop->getAttr("blockSizeZ");
-      localSizeAttr.push_back(Lop->getAttr("blockSizeY");
-      localSizeAttr.push_back(Lop->getAttr("blockSizeX");
+      globalSizeAttr.push_back(Lop->getAttr("gridSizeZ"));
+      globalSizeAttr.push_back(Lop->getAttr("gridSizeY"));
+      globalSizeAttr.push_back(Lop->getAttr("gridSizeX"));
+      localSizeAttr.push_back(Lop->getAttr("blockSizeZ"));
+      localSizeAttr.push_back(Lop->getAttr("blockSizeY"));
+      localSizeAttr.push_back(Lop->getAttr("blockSizeX"));
     });
 
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
