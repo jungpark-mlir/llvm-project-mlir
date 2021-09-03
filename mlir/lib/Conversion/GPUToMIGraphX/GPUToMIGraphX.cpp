@@ -38,8 +38,8 @@ public:
     SmallVector<Value, 8> operands(op.getOperands());
     operands.push_back(resultAlloc);
 
-    //auto fusedFuncOp = op->getCallee();
-    // Try to find the referenced function.
+    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
+
     SmallVector<IntegerAttr, 5> globalSizeAttr;
     SmallVector<IntegerAttr, 5> localSizeAttr;
 
@@ -63,10 +63,10 @@ public:
       localSizeAttr.push_back(rewriter.getI64IntegerAttr((((blockSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
       localSizeAttr.push_back(rewriter.getI64IntegerAttr((((blockSize.y.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
       localSizeAttr.push_back(rewriter.getI64IntegerAttr((((blockSize.x.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
-    });
 
-    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
-    cop->setAttr("kernel", fnAttr);
+      auto kernelRefAttr = op->getAttrOfType<SymbolRefAttr>("kernel");
+      cop->setAttr("kernel", kernelRefAttr);
+    });
 
 /*
     globalSizeAttr.push_back(rewriter.getI64IntegerAttr(4));
