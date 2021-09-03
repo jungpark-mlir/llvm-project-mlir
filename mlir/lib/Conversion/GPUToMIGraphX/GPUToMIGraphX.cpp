@@ -54,7 +54,8 @@ public:
     for (Region &region : op.getRegions()) {
       region.walk([&](Operation *Lop) {
         llvm::errs()<< "visiting op : " << Lop->getName().getStringRef() << "\n";
-    });
+      });
+    }
 
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
     cop->setAttr("kernel", fnAttr);
