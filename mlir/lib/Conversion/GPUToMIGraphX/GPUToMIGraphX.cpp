@@ -56,12 +56,12 @@ public:
       auto gridSize = Lop.getGridSizeOperandValues();
       auto blockSize = Lop.getBlockSizeOperandValues();
 
-      globalSizeAttr.push_back(((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
-      globalSizeAttr.push_back(((gridSize.y.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
-      globalSizeAttr.push_back(((gridSize.x.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
-      localSizeAttr.push_back(((blockSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
-      localSizeAttr.push_back(((blockSize.y.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
-      localSizeAttr.push_back(((blockSize.x.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
+      globalSizeAttr.push_back(((gridSize.z.getDefiningOp())->getAttrOfType<I64IntegerAttr>("value")));
+      globalSizeAttr.push_back(((gridSize.y.getDefiningOp())->getAttrOfType<I64IntegerAttr>("value")));
+      globalSizeAttr.push_back(((gridSize.x.getDefiningOp())->getAttrOfType<I64IntegerAttr>("value")));
+      localSizeAttr.push_back(((blockSize.z.getDefiningOp())->getAttrOfType<I64IntegerAttr>("value")));
+      localSizeAttr.push_back(((blockSize.y.getDefiningOp())->getAttrOfType<I64IntegerAttr>("value")));
+      localSizeAttr.push_back(((blockSize.x.getDefiningOp())->getAttrOfType<I64IntegerAttr>("value")));
       
     });
 
