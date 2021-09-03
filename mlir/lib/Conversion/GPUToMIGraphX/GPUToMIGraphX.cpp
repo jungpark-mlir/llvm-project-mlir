@@ -63,12 +63,12 @@ public:
       localSizeAttr.push_back(((blockSize.y.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
       localSizeAttr.push_back(((blockSize.x.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
   */
-    globalSizeAttr.push_back(rewriter.getI64IntegerAttr((gridSize.z)->getValue()));
-    globalSizeAttr.push_back(rewriter.getI64IntegerAttr((gridSize.y)->getValue()));
-    globalSizeAttr.push_back(rewriter.getI64IntegerAttr((gridSize.x)->getValue()));
-    localSizeAttr.push_back(rewriter.getI64IntegerAttr((blockSize.z)->getValue()));
-    localSizeAttr.push_back(rewriter.getI64IntegerAttr((blockSize.y)->getValue()));
-    localSizeAttr.push_back(rewriter.getI64IntegerAttr((blockSize.x)->getValue()));
+    globalSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value")))->getValue()));
+    globalSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value")))->getValue()));
+    globalSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value")))->getValue()));
+    localSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value")))->getValue()));
+    localSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value")))->getValue()));
+    localSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value")))->getValue()));
 
 
     });
