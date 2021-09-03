@@ -51,7 +51,7 @@ public:
 
    // auto fusedRegion = fusedFuncOp->getRegions()[0];
 
-    for (Region &region : op.getRegions()) {
+    for (Region &region : fusedFuncOp.getRegions()) {
       region.walk([&](Operation *Lop) {
         llvm::errs()<< "visiting op : " << Lop->getName().getStringRef() << "\n";
       });
