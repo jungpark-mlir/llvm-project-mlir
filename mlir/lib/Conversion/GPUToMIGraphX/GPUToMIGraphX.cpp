@@ -12,6 +12,7 @@
 
 #include "mlir/Conversion/GPUToMIGraphX/GPUToMIGraphX.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
+#include "mlir/Dialect/GPU/GPUDialect.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
@@ -29,14 +30,7 @@ public:
     auto loc = op->getLoc();
     auto results = op->getResults();
     auto resultType = results[0].getType().template cast<MemRefType>();
-  
-    /*
-    auto shape = resultType.getShape();
-    SmallVector<IntegerAttr, 5> shapeAttr;
-    for(auto dim: shape){
-      shapeAttr.push_back(rewriter.getI32IntegerAttr(dim));
-    }
-*/
+
     rewriter.setInsertionPoint(op);
     auto resultAlloc = rewriter.create<AllocOp>(loc, resultType);
     
@@ -46,32 +40,36 @@ public:
 
     //auto fusedFuncOp = op->getCallee();
     // Try to find the referenced function.
+    SmallVector<IntegerAttr, 5> globalSizeAttr;
+    SmallVector<IntegerAttr, 5> localSizeAttr;
+
     auto fusedFuncOp =
-         op->getParentOfType<ModuleOp>().lookupSymbol<FuncOp>(fnAttr.getValue());
-
-   // auto fusedRegion = fusedFuncOp->getRegions()[0];
-
-    //for (Region &region : fusedFuncOp.getRegions()) {
-      //auto fusedRegion = fusedFuncOp.getRegion();
+      op->getParentOfType<ModuleOp>().lookupSymbol<FuncOp>(fnAttr.getValue());
     fusedFuncOp.walk([&](Operation *Lop) {
-        llvm::errs()<< "visiting op : " << Lop->getName().getStringRef() << "\n";
-      });
-    //}
+      llvm::errs()<< "visiting op : " << Lop->getName().getStringRef() << "\n";
+      if (!isa<gpu::LaunchOp>(Lop))
+        return;
+      //               Index:$gridSizeX, Index:$gridSizeY, Index:$gridSizeZ,               Index:$blockSizeX, Index:$blockSizeY, Index:$blockSizeZ,
+      globalSizeAttr.push_back(Lop->getAttr("gridSizeZ");
+      globalSizeAttr.push_back(Lop->getAttr("gridSizeY");
+      globalSizeAttr.push_back(Lop->getAttr("gridSizeX");
+      localSizeAttr.push_back(Lop->getAttr("blockSizeZ");
+      localSizeAttr.push_back(Lop->getAttr("blockSizeY");
+      localSizeAttr.push_back(Lop->getAttr("blockSizeX");
+    });
 
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
     cop->setAttr("kernel", fnAttr);
 
-    SmallVector<IntegerAttr, 5> globalSizeAttr;
-    SmallVector<IntegerAttr, 5> localSizeAttr;
-
+/*
     globalSizeAttr.push_back(rewriter.getI64IntegerAttr(4));
     globalSizeAttr.push_back(rewriter.getI64IntegerAttr(4));
     globalSizeAttr.push_back(rewriter.getI64IntegerAttr(128));
-    
+
     localSizeAttr.push_back(rewriter.getI64IntegerAttr(1));
     localSizeAttr.push_back(rewriter.getI64IntegerAttr(1));
     localSizeAttr.push_back(rewriter.getI64IntegerAttr(32));
-    
+*/
     cop->setAttr("globalSize",
                  rewriter.getArrayAttr(ArrayRef<Attribute>(globalSizeAttr.begin(), globalSizeAttr.end())));
     cop->setAttr("localSize",
