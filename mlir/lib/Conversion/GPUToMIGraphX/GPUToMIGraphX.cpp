@@ -52,8 +52,8 @@ public:
       }
 
       // x, y, z
-      KernelDim3 gridSizes = Lop->getGridSizeOperandValues();
-      KernelDim3 blockSizes = Lop->getBlockSizeOperandValues();
+      auto gridSizes = Lop->getGridSizeOperandValues();
+      auto blockSizes = Lop->getBlockSizeOperandValues();
 
       globalSizeAttr.push_back(gridSize.z->getAttrOfType<IntegerAttr>("value"));
       globalSizeAttr.push_back(gridSize.y->getAttrOfType<IntegerAttr>("value"));
