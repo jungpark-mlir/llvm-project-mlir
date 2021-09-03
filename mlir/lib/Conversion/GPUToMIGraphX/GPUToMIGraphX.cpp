@@ -49,7 +49,7 @@ public:
     auto fusedFuncOp =
          op->getParentOfType<ModuleOp>().lookupSymbol<FuncOp>(fnAttr.getValue());
 
-    auto fusedRegion = fusedFuncOp->getRegion(0);
+    auto fusedRegion = fusedFuncOp->getRegions()[0];
 
       //for (Region &region : op.getRegions()) {
         fusedRegion.walk([&](Operation *Lop) {
