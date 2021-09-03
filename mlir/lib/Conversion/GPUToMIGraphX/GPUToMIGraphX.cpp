@@ -56,7 +56,7 @@ public:
       auto gridSize = Lop.getGridSizeOperandValues();
       auto blockSize = Lop.getBlockSizeOperandValues();
 
-      globalSizeAttr.push_back((gridSize.z)->getAttrOfType<IntegerAttr>("value"));
+      globalSizeAttr.push_back((gridSize.z->getOperation())->getAttrOfType<IntegerAttr>("value"));
       globalSizeAttr.push_back((gridSize.y)->getAttrOfType<IntegerAttr>("value"));
       globalSizeAttr.push_back((gridSize.x)->getAttrOfType<IntegerAttr>("value"));
       localSizeAttr.push_back((blockSize.z)->getAttrOfType<IntegerAttr>("value"));
