@@ -44,17 +44,17 @@ public:
     SmallVector<Value, 8> operands(op.getOperands());
     operands.push_back(resultAlloc);
 
-    auto fusedFuncOp = op->getCallee();
+    //auto fusedFuncOp = op->getCallee();
     // Try to find the referenced function.
-    /* auto fn =
+    auto fusedFuncOp =
          op->getParentOfType<ModuleOp>().lookupSymbol<FuncOp>(fnAttr.getValue());
-*/
+
     auto fusedRegion = fusedFuncOp->getRegion(0);
 
       //for (Region &region : op.getRegions()) {
         fusedRegion.walk([&](Operation *Lop) {
           llvm::errs()<< "visiting op : " << Lop->getName().getStringRef() << "\n";
-        }
+        });
 
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
     cop->setAttr("kernel", fnAttr);
