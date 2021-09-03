@@ -31,14 +31,14 @@ public:
     auto results = op->getResults();
     auto resultType = results[0].getType().template cast<MemRefType>();
 
+    // Insert std.alloc for result buffer
     rewriter.setInsertionPoint(op);
     auto resultAlloc = rewriter.create<AllocOp>(loc, resultType);
     
+    // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
     SmallVector<Value, 8> operands(op.getOperands());
     operands.push_back(resultAlloc);
-
-    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
 
     SmallVector<IntegerAttr, 5> globalSizeAttr;
     SmallVector<IntegerAttr, 5> localSizeAttr;
@@ -68,15 +68,8 @@ public:
       cop->setAttr("kernel", kernelRefAttr);
     });
 
-/*
-    globalSizeAttr.push_back(rewriter.getI64IntegerAttr(4));
-    globalSizeAttr.push_back(rewriter.getI64IntegerAttr(4));
-    globalSizeAttr.push_back(rewriter.getI64IntegerAttr(128));
+    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
 
-    localSizeAttr.push_back(rewriter.getI64IntegerAttr(1));
-    localSizeAttr.push_back(rewriter.getI64IntegerAttr(1));
-    localSizeAttr.push_back(rewriter.getI64IntegerAttr(32));
-*/
     cop->setAttr("globalSize",
                  rewriter.getArrayAttr(ArrayRef<Attribute>(globalSizeAttr.begin(), globalSizeAttr.end())));
     cop->setAttr("localSize",
