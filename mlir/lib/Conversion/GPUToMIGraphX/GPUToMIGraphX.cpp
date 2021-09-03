@@ -55,22 +55,14 @@ public:
       // x, y, z
       auto gridSize = Lop.getGridSizeOperandValues();
       auto blockSize = Lop.getBlockSizeOperandValues();
-/*
-      globalSizeAttr.push_back(((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
-      globalSizeAttr.push_back(((gridSize.y.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
-      globalSizeAttr.push_back(((gridSize.x.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
-      localSizeAttr.push_back(((blockSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
-      localSizeAttr.push_back(((blockSize.y.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
-      localSizeAttr.push_back(((blockSize.x.getDefiningOp())->getAttrOfType<IntegerAttr>("value")));
-  */
-    globalSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
-    globalSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
-    globalSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
-    localSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
-    localSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
-    localSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
 
-
+      // FIXME: Better way to import attribute as I64?
+      globalSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
+      globalSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.y.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
+      globalSizeAttr.push_back(rewriter.getI64IntegerAttr((((gridSize.x.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
+      localSizeAttr.push_back(rewriter.getI64IntegerAttr((((blockSize.z.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
+      localSizeAttr.push_back(rewriter.getI64IntegerAttr((((blockSize.y.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
+      localSizeAttr.push_back(rewriter.getI64IntegerAttr((((blockSize.x.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
     });
 
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
