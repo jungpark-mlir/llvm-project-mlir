@@ -45,15 +45,16 @@ public:
 
     auto fusedFuncOp =
       op->getParentOfType<ModuleOp>().lookupSymbol<FuncOp>(fnAttr.getValue());
-    fusedFuncOp.walk([&](Operation *Lop) {
-      if (!isa<gpu::LaunchFuncOp>(Lop)) {
-        llvm::errs()<< "visiting op : " << Lop->getName().getStringRef() << "\n";
+    fusedFuncOp.walk([&](Operation *Wop) {
+      if (!isa<gpu::LaunchFuncOp>(Wop)) {
+        llvm::errs()<< "visiting op : " << Wop->getName().getStringRef() << "\n";
         return;
       }
 
+      auto Lop = cast<gpu::LaunchFuncOp>(Wop);
       // x, y, z
-      auto gridSize = Lop.getGridSizeOperandValues();
-      auto blockSize = Lop.getBlockSizeOperandValues();
+      auto gridSize = Lop->getGridSizeOperandValues();
+      auto blockSize = Lop->getBlockSizeOperandValues();
 
       globalSizeAttr.push_back(gridSize.z->getAttrOfType<IntegerAttr>("value"));
       globalSizeAttr.push_back(gridSize.y->getAttrOfType<IntegerAttr>("value"));
