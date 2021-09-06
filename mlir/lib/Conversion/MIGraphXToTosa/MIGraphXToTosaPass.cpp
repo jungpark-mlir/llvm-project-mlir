@@ -30,7 +30,7 @@ struct MIGraphXToTosa
     : public MIGraphXToTosaBase<MIGraphXToTosa> {
 public:
   void getDependentDialects(DialectRegistry &registry) const override {
-    registry.insert<migraphx::MIGraphXDialect, StandardOpsDialect>();
+    registry.insert<tosa::TosaDialect, migraphx::MIGraphXDialect, StandardOpsDialect>();
   }
 
   void runOnFunction() override {
