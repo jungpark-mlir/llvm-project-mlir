@@ -15,7 +15,7 @@ def : Pat<(MIGraphX_AddOp $input1, $input2), (Tosa_AddOp $input1, $input2)>;
 def : Pat<(MIGraphX_SubOp $input1, $input2), (Tosa_SubOp $input1, $input2)>;
 def : Pat<(MIGraphX_MulOp $input1, $input2), (Tosa_MulOp $input1, $input2, ConstantAttr<I32Attr, "0">)>;
 //def : Pat<(MIGraphX_ConstantOp $valueAttr, $shapeAttr, $typeAttr), (Tosa_ConstOp ConstantAttr<RankedF32ElementsAttr<[$shapeAttr]>, "{0.0f}">:$value)>;
-def : Pat<(MIGraphX_ConstantOp ElementsAttr:$valueAttr), (Tosa_ConstOp ConstantAttr<ElementsAttr>:$valueAttr)>;
+def : Pat<(MIGraphX_ConstantOp ElementsAttr:$valueAttr), (Tosa_ConstOp ElementsAttr:$valueAttr)>;
 
 /*
 
