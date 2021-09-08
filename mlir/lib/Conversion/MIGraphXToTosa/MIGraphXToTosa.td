@@ -12,9 +12,9 @@ include "mlir/Dialect/Tosa/IR/TosaOps.td"
 include "mlir/Dialect/MIGraphX/MIGraphXOps.td"
 
 def : Pat<(MIGraphX_AddOp $input1, $input2), (Tosa_AddOp $input1, $input2)>;
-def : Pat<((MIGraphX_SubOp $input1, $input2), Tosa_SubOp $input1, $input2)>;
-def : Pat<((MIGraphX_MulOp $input1, $input2), Tosa_MulOp $input1, $input2, ConstantAttr<I32Attr, "0">)>;
-def : Pat<((MIGraphX_ConstantOp $valueAttr, $shapeAttr, $typeAttr), Tosa_ConstOp ConstantAttr<F32Attr, "0">:$value)>;
+def : Pat<((MIGraphX_SubOp $input1, $input2), (Tosa_SubOp $input1, $input2)>;
+def : Pat<((MIGraphX_MulOp $input1, $input2), (Tosa_MulOp $input1, $input2, ConstantAttr<I32Attr, "0">)>;
+def : Pat<((MIGraphX_ConstantOp $valueAttr, $shapeAttr, $typeAttr), (Tosa_ConstOp ConstantAttr<F32Attr, "0">:$value)>;
 
 
 /*
