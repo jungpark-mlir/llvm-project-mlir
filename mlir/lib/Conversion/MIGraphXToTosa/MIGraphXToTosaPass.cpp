@@ -37,7 +37,7 @@ public:
     OwningRewritePatternList patterns;
     ConversionTarget target(getContext());
     target.addLegalDialect<tosa::TosaDialect, migraphx::MIGraphXDialect, StandardOpsDialect>();
-    target.addIllegalOp<migraphx::AddOp
+    target.addIllegalOp<migraphx::AddOp, migraphx::ConstantOp
                         >();
     /*
     target.addIllegalOp<tosa::AddOp, tosa::SubOp, tosa::ReshapeOp, tosa::RsqrtOp,
