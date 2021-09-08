@@ -12,15 +12,19 @@ include "mlir/Dialect/Tosa/IR/TosaOps.td"
 include "mlir/Dialect/MIGraphX/MIGraphXOps.td"
 
 def : Pat<(MIGraphX_AddOp $input1, $input2), (Tosa_AddOp $input1, $input2)>;
+def : Pat<((MIGraphX_SubOp $input1, $input2), Tosa_SubOp $input1, $input2)>;
+def : Pat<((MIGraphX_MulOp $input1, $input2), Tosa_MulOp $input1, $input2, ConstantAttr<I32Attr, "0">)>;
+def : Pat<((MIGraphX_ConstantOp $valueAttr, $shapeAttr, $typeAttr), Tosa_ConstOp ConstantAttr<F32Attr, "0">:$value)>;
+
 
 /*
-def : Pat<(Tosa_SubOp $input1, $input2), (MIGraphX_SubOp $input1, $input2)>;
+
 
 // tosa.mul has attr shift which right_shift the result.
 // FIXME: NativeCodeCall to convert attr:rshift to operand:rshift, create const tensor.
 // def : Pat<(Tosa_MulOp $input1, $input2, $rshift), 
 //   (Tosa_ArithmeticRightShiftOp (MIGraphX_MulOp $input1, $input2), $rshift, ConstBoolAttrFalse)>;
-def : Pat<(Tosa_MulOp $input1, $input2, ConstantAttr<I32Attr, "0">), (MIGraphX_MulOp $input1, $input2)>;
+
 
 def : Pat<(Tosa_RsqrtOp $input1), (MIGraphX_RsqrtOp $input1)>;
 
