@@ -21,7 +21,7 @@ def Convert2DTo4DSymmPad : NativeCodeCall<
     "$_builder.getArrayAttr({($0.getValue()[0]), ($0.getValue()[0]), ($0.getValue()[1]), ($0.getValue()[1])})">;
 
 def : Pat<(MIGraphX_AddOp $bias, 
-    (MIGraphX_ConvolutionOp $input1, $filter, (Convert4DTo2DSymmPad $pad), $stride, $dilation,
+    (MIGraphX_ConvolutionOp $input1, $filter, $pad, $stride, $dilation,
       ConstantAttr<I32Attr, "1">:$group,
       ConstantAttr<PaddingModeAttr, "mlir::migraphx::padding_mode_t::default_">:$padmode):$conv2d),
       (Tosa_Conv2DOp $input1, $filter, $bias, (Convert2DTo4DSymmPad $pad), $stride, $dilation, $_)>;
