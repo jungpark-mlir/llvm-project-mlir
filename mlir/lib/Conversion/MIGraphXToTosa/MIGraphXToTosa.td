@@ -17,6 +17,16 @@ def : Pat<(MIGraphX_MulOp $input1, $input2), (Tosa_MulOp $input1, $input2, Const
 //def : Pat<(MIGraphX_ConstantOp $valueAttr, $shapeAttr, $typeAttr), (Tosa_ConstOp ConstantAttr<RankedF32ElementsAttr<[$shapeAttr]>, "{0.0f}">:$value)>;
 def : Pat<(MIGraphX_ConstantOp ElementsAttr:$valueAttr, $shapeAttr, $typeAttr), (Tosa_ConstOp $valueAttr)>;
 
+def Convert2DTo4DSymmPad : NativeCodeCall<
+    "$_builder.getArrayAttr({($0.getValue()[0]), ($0.getValue()[0]), ($0.getValue()[1]), ($0.getValue()[1])})">;
+
+def : Pat<(MIGraphX_AddOp $bias, 
+    (MIGraphX_ConvolutionOp $input1, $filter, (Convert4DTo2DSymmPad $pad), $stride, $dilation,
+      ConstantAttr<I32Attr, "1">:$group,
+      ConstantAttr<PaddingModeAttr, "mlir::migraphx::padding_mode_t::default_">:$padmode):$conv2d),
+      (Tosa_Conv2DOp $input1, $filter, $bias, (Convert2DTo4DSymmPad $pad), $stride, $dilation, $_)>;
+
+
 /*
 
 
