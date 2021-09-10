@@ -1,4 +1,4 @@
-//===- TosaToMIGraphXPass.cpp - Lowering Tosa to MIGraphX Dialect -------------===//
+//===- MIGraphXToTosaPass.cpp - Lowering MIGraphX to Tosa Dialect -------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This transformation pass legalizes Tosa operations to the MIGraphX dialect.
+// This transformation pass legalizes MIGraphX operations to the Tosa dialect.
 //
 //===----------------------------------------------------------------------===//
 
