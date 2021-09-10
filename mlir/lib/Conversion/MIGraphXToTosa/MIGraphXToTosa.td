@@ -14,7 +14,6 @@ include "mlir/Dialect/MIGraphX/MIGraphXOps.td"
 def : Pat<(MIGraphX_AddOp $input1, $input2), (Tosa_AddOp $input1, $input2)>;
 def : Pat<(MIGraphX_SubOp $input1, $input2), (Tosa_SubOp $input1, $input2)>;
 def : Pat<(MIGraphX_MulOp $input1, $input2), (Tosa_MulOp $input1, $input2, ConstantAttr<I32Attr, "0">)>;
-//def : Pat<(MIGraphX_ConstantOp $valueAttr, $shapeAttr, $typeAttr), (Tosa_ConstOp ConstantAttr<RankedF32ElementsAttr<[$shapeAttr]>, "{0.0f}">:$value)>;
 def : Pat<(MIGraphX_ConstantOp ElementsAttr:$valueAttr, $shapeAttr, $typeAttr), (Tosa_ConstOp $valueAttr)>;
 
 def Convert2DTo4DSymmPad : NativeCodeCall<
@@ -26,11 +25,12 @@ def : Pat<(MIGraphX_AddOp
       $_ // ignore padding mode
       ), $bias),
       (Tosa_Conv2DOp $input1, $filter, $bias, (Convert2DTo4DSymmPad $pad), $stride, $dilation, (GetNullAttr))>;
+// N.B., conv op not satisfying the match will be silently erased.
 def : Pat<(MIGraphX_ConvolutionOp $input1, $_, $_, $_, $_, $_, $_),
     (replaceWithValue $input1)>;
+
+
 /*
-
-
 // tosa.mul has attr shift which right_shift the result.
 // FIXME: NativeCodeCall to convert attr:rshift to operand:rshift, create const tensor.
 // def : Pat<(Tosa_MulOp $input1, $input2, $rshift), 
@@ -38,16 +38,6 @@ def : Pat<(MIGraphX_ConvolutionOp $input1, $_, $_, $_, $_, $_, $_),
 
 
 def : Pat<(Tosa_RsqrtOp $input1), (MIGraphX_RsqrtOp $input1)>;
-
-def Convert4DTo2DSymmPad : NativeCodeCall<
-    "$_builder.getArrayAttr({($0.getValue()[0]), ($0.getValue()[2])})">;
-
-//FIXME: handle the unsupported pad using extra PadOp
-def : Pat<(Tosa_Conv2DOp $input1, $filter, $bias, $pad, $stride, $dilation, $_),
-    (MIGraphX_AddOp $bias, 
-    (MIGraphX_ConvolutionOp $input1, $filter, (Convert4DTo2DSymmPad $pad), $stride, $dilation,
-      ConstantAttr<I32Attr, "1">:$group,
-      ConstantAttr<PaddingModeAttr, "mlir::migraphx::padding_mode_t::default_">:$padmode):$conv2d)>;
 
 // Clamp to Relu if it clamps to max/min number, otherwise convert to ceil + floor
 // {max_fp = 3.40282347E+38 : f32, max_int = 2147483647 : i64, min_fp = 0.000000e+00 : f32, min_int = 0 : i64} 
