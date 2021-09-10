@@ -6347,7 +6347,7 @@ struct GridwiseGemmV2RewritePattern
     // -----
 
     // Determine vector / scalar load type for Matrix A / B.
-    SmallVector<int64_t, 3> blockwiseCopyABounds = {
+    SmallVector<uint64_t, 3> blockwiseCopyABounds = {
         1, GemmABlockCopyThreadSliceLengths_GemmK,
         GemmABlockCopyThreadSliceLengths_GemmM};
     Type blockwiseLoadAType;
@@ -6360,7 +6360,7 @@ struct GridwiseGemmV2RewritePattern
         computeLoadStoreTypeInfo(b, op, elementType, blockwiseCopyABounds,
                                  true);
 
-    SmallVector<int64_t, 3> blockwiseCopyBBounds = {
+    SmallVector<uint64_t, 3> blockwiseCopyBBounds = {
         1, GemmBBlockCopyThreadSliceLengths_GemmK,
         GemmBBlockCopyThreadSliceLengths_GemmN};
     Type blockwiseLoadBType;
