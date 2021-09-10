@@ -29,33 +29,22 @@ def : Pat<(MIGraphX_AddOp
 def : Pat<(MIGraphX_ConvolutionOp $input1, $_, $_, $_, $_, $_, $_),
     (replaceWithValue $input1)>;
 
-
-/*
-// tosa.mul has attr shift which right_shift the result.
-// FIXME: NativeCodeCall to convert attr:rshift to operand:rshift, create const tensor.
-// def : Pat<(Tosa_MulOp $input1, $input2, $rshift), 
-//   (Tosa_ArithmeticRightShiftOp (MIGraphX_MulOp $input1, $input2), $rshift, ConstBoolAttrFalse)>;
-
-
-def : Pat<(Tosa_RsqrtOp $input1), (MIGraphX_RsqrtOp $input1)>;
+def : Pat<(MIGraphX_RsqrtOp $input1), (Tosa_RsqrtOp $input1)>;
 
 // Clamp to Relu if it clamps to max/min number, otherwise convert to ceil + floor
 // {max_fp = 3.40282347E+38 : f32, max_int = 2147483647 : i64, min_fp = 0.000000e+00 : f32, min_int = 0 : i64} 
-def : Pat<(Tosa_ClampOp $input1, $mini, $maxi,  
-  ConstantAttr<F32Attr, "0">:$minf, ConstantAttr<F32Attr, "3.40282347E+38">:$maxf), 
-  (MIGraphX_ReluOp $input1)>;
+def : Pat<(MIGraphX_ReluOp $input1), 
+  (Tosa_ClampOp $input1, ConstantAttr<I32Attr, "0">:$mini, ConstantAttr<I32Attr, "2147483647">:$maxi,  
+    ConstantAttr<F32Attr, "0">:$minf, ConstantAttr<F32Attr, "3.40282347E+38">:$maxf)>;
+def : Pat<(MIGraphX_TransposeOp $input1, $permAttr), 
+  (Tosa_TransposeOp $input1, (Tosa_ConstOp $permAttr))>;
+def : Pat<(MIGraphX_ReshapeOp $input1, $newshape), (Tosa_ReshapeOp $input1, $newshape)>;
 
-// To extract elements in ElementsAttr and construct ArrayAttr from it. e.g., tosa const to attributes
-def ConvertElemToArrayAttr: NativeCodeCall<
-    "$_builder.getI64ArrayAttr(ArrayRef<int64_t>(llvm::to_vector<8>($0.getValues<int64_t>())))">;
-def : Pat<(Tosa_TransposeOp $input1, (Tosa_ConstOp $permAttr)), 
-    (MIGraphX_TransposeOp $input1, (ConvertElemToArrayAttr $permAttr))>;
-def : Pat<(Tosa_ReshapeOp $input1, $newshape), (MIGraphX_ReshapeOp $input1, $newshape)>;
-//FIXME: ignore quantization for now.
+
+/*
 def : Pat<(Tosa_PadOp $input1, (Tosa_ConstOp $padDims), $_),
     (MIGraphX_PadOp $input1, (ConvertElemToArrayAttr $padDims), ConstantAttr<F32Attr, "0">:$value, 
     ConstantAttr<I32Attr, "0">:$padMode)>;
-//FIXME: fix using enum type PadOpModeAttr<"migraphx::constant_pad">:$padMode
 */
 
 #endif // MLIR_CONVERSION_MIGRAPHX_TO_TOSA
