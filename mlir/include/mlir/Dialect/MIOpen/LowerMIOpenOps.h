@@ -109,9 +109,9 @@ inline bool overrideLoadStoreHack(const DictionaryAttr &transformSpec) {
 template <typename T>
 inline std::tuple<Type, TupleType, int, int, int>
 computeLoadStoreTypeInfo(OpBuilder &b, T &gop, Type elementType,
-                         const SmallVector<int64_t, 3> &dims, bool isMatrixA) {
-  int64_t loadLength = 1;
-  int64_t storeLength = 1;
+                         const SmallVector<unsigned int64_t, 3> &dims, bool isMatrixA) {
+  unsigned int64_t loadLength = 1;
+  unsigned int64_t storeLength = 1;
   int vectorDim = dims.size() - 1;
   if (isMatrixA) {
     loadLength = gop->getAttr("matrix_a_source_data_per_read")
@@ -5312,7 +5312,7 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<miopen::GridwiseGemm
         b.create<miopen::GpuAllocOp>(loc, threadCRegisterMemRefType);
 
     // Determine vector / scalar load type for Matrix A / B.
-    SmallVector<int64_t, 3> blockwiseCopyABounds = {
+    SmallVector<unsigned int64_t, 3> blockwiseCopyABounds = {
         1, GemmABlockCopyThreadSliceLengths_GemmK,
         GemmABlockCopyThreadSliceLengths_GemmM};
     Type blockwiseLoadAType;
@@ -5340,7 +5340,7 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<miopen::GridwiseGemm
     // llvm::errs() << "load size: " << blockwiseLoadAVectorLength << "\n";
     // llvm::errs() << "store size: " << blockwiseStoreAVectorLength << "\n";
 
-    SmallVector<int64_t, 3> blockwiseCopyBBounds = {
+    SmallVector<unsigned int64_t, 3> blockwiseCopyBBounds = {
         1, GemmBBlockCopyThreadSliceLengths_GemmK,
         GemmBBlockCopyThreadSliceLengths_GemmN};
     Type blockwiseLoadBType;
