@@ -21,11 +21,10 @@ def Convert2DTo4DSymmPad : NativeCodeCall<
 def GetNullAttr : NativeCodeCall<"Attribute()">;
 def : Pat<(MIGraphX_AddOp
     (MIGraphX_ConvolutionOp $input1, $filter, $pad, $stride, $dilation,
-      $group,
-      $_ // ignore padding mode
+      $group, $_ // ignore padding mode
       ), $bias),
       (Tosa_Conv2DOp $input1, $filter, $bias, (Convert2DTo4DSymmPad $pad), $stride, $dilation, (GetNullAttr))>;
-// N.B., conv op not satisfying the match will be silently erased.
+// N.B., conv ops not satisfying the match will be silently erased.
 def : Pat<(MIGraphX_ConvolutionOp $input1, $_, $_, $_, $_, $_, $_),
     (replaceWithValue $input1)>;
 
@@ -39,12 +38,5 @@ def : Pat<(MIGraphX_ReluOp $input1),
 def : Pat<(MIGraphX_TransposeOp $input1, $permAttr), 
   (Tosa_TransposeOp $input1, (Tosa_ConstOp $permAttr))>;
 def : Pat<(MIGraphX_ReshapeOp $input1, $newshape), (Tosa_ReshapeOp $input1, $newshape)>;
-
-
-/*
-def : Pat<(Tosa_PadOp $input1, (Tosa_ConstOp $padDims), $_),
-    (MIGraphX_PadOp $input1, (ConvertElemToArrayAttr $padDims), ConstantAttr<F32Attr, "0">:$value, 
-    ConstantAttr<I32Attr, "0">:$padMode)>;
-*/
 
 #endif // MLIR_CONVERSION_MIGRAPHX_TO_TOSA
