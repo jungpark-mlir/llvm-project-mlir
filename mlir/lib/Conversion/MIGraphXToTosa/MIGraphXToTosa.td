@@ -24,8 +24,8 @@ def : Pat<(MIGraphX_AddOp $bias,
     (MIGraphX_ConvolutionOp $input1, $filter, $pad, $stride, $dilation,
       $group,
       $_ // ignore padding mode
-      )):$biasedConv,
-      (Tosa_Conv2DOp $input1, $filter, $bias, (Convert2DTo4DSymmPad $pad), $stride, $dilation, (GetNullAttr))>;
+      ):$conv),
+      ((Tosa_Conv2DOp $input1, $filter, $bias, (Convert2DTo4DSymmPad $pad), $stride, $dilation, (GetNullAttr)):$conv)>;
 
 /*
 
