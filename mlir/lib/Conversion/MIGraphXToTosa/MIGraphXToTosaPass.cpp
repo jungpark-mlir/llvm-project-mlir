@@ -38,7 +38,7 @@ public:
     ConversionTarget target(getContext());
     target.addLegalDialect<tosa::TosaDialect, migraphx::MIGraphXDialect, StandardOpsDialect>();
     //target.addIllegalOp<migraphx::AddOp, migraphx::ConstantOp, migraphx::ConvolutionOp
-    target.addIllegalOp<migraphx::ConvolutionOp
+    target.addIllegalOp<migraphx::AddOp
                         >();
     /*
     target.addIllegalOp<tosa::AddOp, tosa::SubOp, tosa::ReshapeOp, tosa::RsqrtOp,
