@@ -6147,11 +6147,11 @@ struct GridwiseGemmV2RewritePattern
     // Logic to prepare parameters for blockwise_copy.
 
     // Compute ThreadSliceLengths for Matrix A.
-    int64_t GemmABlockCopyNumberDataPerThread =
+    uint64_t GemmABlockCopyNumberDataPerThread =
         MPerBlock * KPerBlock / BlockSize;
 
-    int64_t GemmABlockCopyThreadSliceLengths_GemmK;
-    int64_t GemmABlockCopyThreadSliceLengths_GemmM;
+    uint64_t GemmABlockCopyThreadSliceLengths_GemmK;
+    uint64_t GemmABlockCopyThreadSliceLengths_GemmM;
     switch (matrix_a_source_vector_read_dim) {
     case GemmK:
       GemmABlockCopyThreadSliceLengths_GemmK = matrix_a_source_data_per_read;
@@ -6175,7 +6175,7 @@ struct GridwiseGemmV2RewritePattern
     // llvm::errs() << GemmABlockCopyThreadSliceLengths_GemmM << "\n";
 
     // Compute ThreadClusterLengths for Matrix A.
-    int64_t GemmABlockCopyClusterLengths_GemmK =
+    uint64_t GemmABlockCopyClusterLengths_GemmK =
         KPerBlock / GemmABlockCopyThreadSliceLengths_GemmK;
     // int64_t GemmABlockCopyClusterLengths_GemmM =
     //    MPerBlock / GemmABlockCopyThreadSliceLengths_GemmM;
