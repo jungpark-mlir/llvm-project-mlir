@@ -5340,7 +5340,7 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<miopen::GridwiseGemm
     // llvm::errs() << "load size: " << blockwiseLoadAVectorLength << "\n";
     // llvm::errs() << "store size: " << blockwiseStoreAVectorLength << "\n";
 
-    SmallVector<unsigned int64_t, 3> blockwiseCopyBBounds = {
+    SmallVector<uint64_t, 3> blockwiseCopyBBounds = {
         1, GemmBBlockCopyThreadSliceLengths_GemmK,
         GemmBBlockCopyThreadSliceLengths_GemmN};
     Type blockwiseLoadBType;
