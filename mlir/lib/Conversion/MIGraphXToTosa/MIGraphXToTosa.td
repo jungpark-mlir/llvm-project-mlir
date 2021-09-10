@@ -21,12 +21,13 @@ def Convert2DTo4DSymmPad : NativeCodeCall<
     "$_builder.getArrayAttr({($0.getValue()[0]), ($0.getValue()[0]), ($0.getValue()[1]), ($0.getValue()[1])})">;
 def GetNullAttr : NativeCodeCall<"Attribute()">;
 def : Pat<(MIGraphX_AddOp
-    (MIGraphX_ConvolutionOp:$loc1 $input1, $filter, $pad, $stride, $dilation,
+    (MIGraphX_ConvolutionOp $input1, $filter, $pad, $stride, $dilation,
       $group,
       $_ // ignore padding mode
       ), $bias),
       (Tosa_Conv2DOp $input1, $filter, $bias, (Convert2DTo4DSymmPad $pad), $stride, $dilation, (GetNullAttr))>;
-
+def : Pat<(MIGraphX_ConvolutionOp $input1, $_, $_, $_, $_, $_, $_),
+    (replaceWithValue $input1)>;
 /*
 
 
