@@ -153,14 +153,14 @@ computeLoadStoreTypeInfo(OpBuilder &b, T &gop, Type elementType,
 // threadwise_copy_v2 to determine the bounds of load/store loops.
 //===----------------------------------------------------------------------===//
 inline void
-computeSliceLengths(SmallVector<int64_t, 2> &sliceLengths,
+computeSliceLengths(SmallVector<uint64_t, 2> &sliceLengths,
                     const Optional<AffineMap> &composedSourceTransform,
                     const Optional<AffineMap> &composedDestTransform,
                     const ArrayAttr &coordTransformsAttr,
                     const Optional<ArrayAttr> &boundAttr, Type sourceType,
                     Type destType) {
   auto populateSliceLengthsWithTypeShape =
-      [](SmallVector<int64_t, 2> &sliceLengths, Type type) {
+      [](SmallVector<uint64_t, 2> &sliceLengths, Type type) {
         assert(type.isa<MemRefType>() || type.isa<VectorType>());
         if (type.isa<MemRefType>()) {
           // Use the shape of memref as initial slice lengths.
