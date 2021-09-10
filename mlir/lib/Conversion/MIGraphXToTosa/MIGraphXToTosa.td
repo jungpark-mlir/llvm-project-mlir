@@ -22,7 +22,7 @@ def Convert2DTo4DSymmPad : NativeCodeCall<
 def GetNullAttr : NativeCodeCall<"Attribute()">;
 def : Pat<(MIGraphX_AddOp $bias,
     (MIGraphX_ConvolutionOp $input1, $filter, $pad, $stride, $dilation,
-      ConstantAttr<I32Attr, "1">:$group,
+      $group,
       $_ // ignore padding mode
       ):$conv2d),
       (Tosa_Conv2DOp $input1, $filter, $bias, (Convert2DTo4DSymmPad $pad), $stride, $dilation, (GetNullAttr))>;
