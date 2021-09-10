@@ -5131,11 +5131,11 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<miopen::GridwiseGemm
     // llvm::errs() << GemmABlockCopyClusterLengths_GemmM << "\n";
 
     // Compute ThreadSliceLengths for Matrix B.
-    int64_t GemmBBlockCopyNumberDataPerThread =
+    uint64_t GemmBBlockCopyNumberDataPerThread =
         NPerBlock * KPerBlock / BlockSize;
 
-    int64_t GemmBBlockCopyThreadSliceLengths_GemmK;
-    int64_t GemmBBlockCopyThreadSliceLengths_GemmN;
+    uint64_t GemmBBlockCopyThreadSliceLengths_GemmK;
+    uint64_t GemmBBlockCopyThreadSliceLengths_GemmN;
     assert(matrix_b_source_vector_read_dim != GemmG);
     switch (matrix_b_source_vector_read_dim) {
     case GemmK:
@@ -5162,7 +5162,7 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<miopen::GridwiseGemm
     // Compute ThreadClusterLengths for Matrix B.
     // int64_t GemmBBlockCopyClusterLengths_GemmK =
     //    KPerBlock / GemmBBlockCopyThreadSliceLengths_GemmK;
-    int64_t GemmBBlockCopyClusterLengths_GemmN =
+    uint64_t GemmBBlockCopyClusterLengths_GemmN =
         NPerBlock / GemmBBlockCopyThreadSliceLengths_GemmN;
 
     // llvm::errs() << "thread cluster lengths for Matrix B\n";
@@ -7764,7 +7764,7 @@ struct ThreadwiseCopyRewritePattern
         boundAttr = op->getAttr("bound").template cast<ArrayAttr>();
 
       // Figure out the bounds of load/store loops.
-      SmallVector<int64_t, 2> sliceLengths;
+      SmallVector<uint64_t, 2> sliceLengths;
 
       computeSliceLengths(sliceLengths, composedSourceTransform,
                           composedDestTransform, coordTransformsAttr, boundAttr,
