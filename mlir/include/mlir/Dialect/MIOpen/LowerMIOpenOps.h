@@ -109,9 +109,9 @@ inline bool overrideLoadStoreHack(const DictionaryAttr &transformSpec) {
 template <typename T>
 inline std::tuple<Type, TupleType, int, int, int>
 computeLoadStoreTypeInfo(OpBuilder &b, T &gop, Type elementType,
-                         const SmallVector<unsigned int64_t, 3> &dims, bool isMatrixA) {
-  unsigned int64_t loadLength = 1;
-  unsigned int64_t storeLength = 1;
+                         const SmallVector<uint64_t, 3> &dims, bool isMatrixA) {
+  uint64_t loadLength = 1;
+  uint64_t storeLength = 1;
   int vectorDim = dims.size() - 1;
   if (isMatrixA) {
     loadLength = gop->getAttr("matrix_a_source_data_per_read")
@@ -4814,7 +4814,7 @@ static void affixThreadwiseCopyAttributes(miopen::ThreadwiseCopyOp top,
 template <typename T, typename U>
 void affixBlockwiseCopyAttributes(
     T &bop, U &gop, OpBuilder &b,
-    const SmallVector<int64_t, 3> &blockwiseCopyBounds, int vectorDim,
+    const SmallVector<uint64_t, 3> &blockwiseCopyBounds, int vectorDim,
     int blockwiseLoadLength, int blockwiseStoreLength) {
   bop->setAttr("block_size", gop->getAttr("block_size"));
 
@@ -5312,7 +5312,7 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<miopen::GridwiseGemm
         b.create<miopen::GpuAllocOp>(loc, threadCRegisterMemRefType);
 
     // Determine vector / scalar load type for Matrix A / B.
-    SmallVector<unsigned int64_t, 3> blockwiseCopyABounds = {
+    SmallVector<uint64_t, 3> blockwiseCopyABounds = {
         1, GemmABlockCopyThreadSliceLengths_GemmK,
         GemmABlockCopyThreadSliceLengths_GemmM};
     Type blockwiseLoadAType;
