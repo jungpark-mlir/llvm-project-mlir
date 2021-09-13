@@ -9035,7 +9035,7 @@ struct XdlopsGemmV2RewritePattern
     // K * KRepeats; constexpr index_t BStride = K * KRepeats;
 
     auto tid = b.create<miopen::WorkitemIdOp>(loc, b.getIndexType());
-    auto laneId = b.create<SignedRemIOp>(
+    auto laneId = b.create<UnsignedRemIOp>(
         loc, tid, b.create<ConstantIndexOp>(loc, wave_size));
 
     // TBD. FloatA / FloatB could be vectorized via KPack tuning parameter.
