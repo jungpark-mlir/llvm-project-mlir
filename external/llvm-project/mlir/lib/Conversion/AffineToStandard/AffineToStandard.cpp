@@ -87,7 +87,7 @@ public:
     auto rhs = visit(expr.getRHS());
     assert(lhs && rhs && "unexpected affine expr lowering failure");
 
-    Value remainder = builder.create<SignedRemIOp>(loc, lhs, rhs);
+    Value remainder = builder.create<UnsignedRemIOp>(loc, lhs, rhs);
     Value zeroCst = builder.create<ConstantIndexOp>(loc, 0);
     Value isRemainderNegative =
         builder.create<CmpIOp>(loc, CmpIPredicate::slt, remainder, zeroCst);
@@ -131,7 +131,7 @@ public:
     Value negatedDecremented = builder.create<SubIOp>(loc, noneCst, lhs);
     Value dividend =
         builder.create<SelectOp>(loc, negative, negatedDecremented, lhs);
-    Value quotient = builder.create<SignedDivIOp>(loc, dividend, rhs);
+    Value quotient = builder.create<UnsignedDivIOp>(loc, dividend, rhs);
     Value correctedQuotient = builder.create<SubIOp>(loc, noneCst, quotient);
     Value result =
         builder.create<SelectOp>(loc, negative, correctedQuotient, quotient);
@@ -171,7 +171,7 @@ public:
     Value decremented = builder.create<SubIOp>(loc, lhs, oneCst);
     Value dividend =
         builder.create<SelectOp>(loc, nonPositive, negated, decremented);
-    Value quotient = builder.create<SignedDivIOp>(loc, dividend, rhs);
+    Value quotient = builder.create<UnsignedDivIOp>(loc, dividend, rhs);
     Value negatedQuotient = builder.create<SubIOp>(loc, zeroCst, quotient);
     Value incrementedQuotient = builder.create<AddIOp>(loc, quotient, oneCst);
     Value result = builder.create<SelectOp>(loc, nonPositive, negatedQuotient,
