@@ -86,7 +86,7 @@ void migraphx::addGPUToMIGraphXPasses(OpPassManager &pm) {
   auto &kernelPm = pm.nest<gpu::GPUModuleOp>();
   kernelPm.addPass(createStripDebugInfoPass());
   kernelPm.addPass(createLowerGpuOpsToROCDLOpsPass(/*indexBitWidth=*/32));
-  pm.addNestedPass<gpu::GPUModuleOp>(createLowerGpuOpsToROCDLOpsPass(/*indexBitWidth=*/32));
+  pm.addPass<gpu::GPUModuleOp>(createLowerGpuOpsToROCDLOpsPass(/*indexBitWidth=*/32));
   kernelPm.addPass(createConvertGPUKernelToBlobPass(
       [&utils](Operation *m, llvm::LLVMContext &llvmContext,
                llvm::StringRef name) {
