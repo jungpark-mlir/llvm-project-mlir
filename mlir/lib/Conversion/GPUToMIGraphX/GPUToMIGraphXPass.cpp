@@ -19,6 +19,11 @@
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
+#include "mlir/Conversion/GPUToROCDL/GPUToROCDLPass.h"
+#include "mlir/ExecutionEngine/ROCm/BackendUitls.h"
+#include "mlir/ExecutionEngine/OptUtils.h"
+
+
 using namespace mlir;
 namespace {
 
