@@ -61,18 +61,18 @@ std::unique_ptr<Pass> migraphx::createGPUToMIGraphX() {
 void migraphx::addGPUToMIGraphXPasses(OpPassManager &pm) {
   pm.addNestedPass<FuncOp>(createGPUToMIGraphX());
 
-  applyPassManagerCLOptions(pm);
-  static cl::opt<std::string> tripleName("triple", cl::desc("target triple"),
-                                       cl::value_desc("triple string"),
-                                       cl::init(""));
+  //applyPassManagerCLOptions(pm);
+  static llvm::cl::opt<std::string> tripleName("triple", llvm::cl::desc("target triple"),
+                                       llvm::cl::value_desc("triple string"),
+                                       llvm::cl::init(""));
 
-  static cl::opt<std::string> targetChip("target", cl::desc("target chip"),
-                                       cl::value_desc("AMDGPU ISA version"),
-                                       cl::init(""));
+  static llvm::cl::opt<std::string> targetChip("target", llvm::cl::desc("target chip"),
+                                       llvm::cl::value_desc("AMDGPU ISA version"),
+                                       llvm::cl::init(""));
 
-  static cl::opt<std::string> features("feature", cl::desc("target features"),
-                                     cl::value_desc("AMDGPU target features"),
-                                     cl::init(""));
+  static llvm::cl::opt<std::string> features("feature", llvm::cl::desc("target features"),
+                                     llvm::cl::value_desc("AMDGPU target features"),
+                                     llvm::cl::init(""));
 
   bool systemOverride = false;
   if (tripleName.empty() && targetChip.empty() && features.empty()) {
