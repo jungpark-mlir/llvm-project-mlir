@@ -15,4 +15,6 @@ add_mlir_conversion_library(MLIRGPUToMIGraphX
   MLIRGPU
   MLIRSupport
   MLIRMIGraphX
+  MLIRGPUToGPURuntimeTransforms
+  LLVMROCmBackendUtils
   )
