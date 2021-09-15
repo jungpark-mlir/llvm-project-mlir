@@ -25,7 +25,6 @@
 
 
 using namespace mlir;
-namespace {
 
 struct GPUToMIGraphX
     : public GPUToMIGraphXBase<GPUToMIGraphX> {
@@ -56,12 +55,10 @@ public:
   }
 };
 
-} // namespace
-
-std::unique_ptr<Pass> mlir::migraphx::createGPUToMIGraphX() {
+std::unique_ptr<Pass> migraphx::createGPUToMIGraphX() {
   return std::make_unique<GPUToMIGraphX>();
 }
-void mlir::migraphx::addGPUToMIGraphXPasses(OpPassManager &pm) {
+void migraphx::addGPUToMIGraphXPasses(OpPassManager &pm) {
   pm.addNestedPass<FuncOp>(createGPUToMIGraphX());
 
   applyPassManagerCLOptions(pm);
