@@ -42,6 +42,7 @@ public:
 
     SmallVector<IntegerAttr, 5> globalSizeAttr;
     SmallVector<IntegerAttr, 5> localSizeAttr;
+    SymbolRefAttr kernelRefAttr;
 
     auto fusedFuncOp =
       op->getParentOfType<ModuleOp>().lookupSymbol<FuncOp>(fnAttr.getValue());
@@ -64,12 +65,11 @@ public:
       localSizeAttr.push_back(rewriter.getI64IntegerAttr((((blockSize.y.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
       localSizeAttr.push_back(rewriter.getI64IntegerAttr((((blockSize.x.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
 
-      auto kernelRefAttr = Lop->getAttrOfType<SymbolRefAttr>("kernel");
-      cop->setAttr("kernel", kernelRefAttr);
+      kernelRefAttr = Lop->getAttrOfType<SymbolRefAttr>("kernel");
     });
 
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
-
+    cop->setAttr("kernel", kernelRefAttr);    
     cop->setAttr("globalSize",
                  rewriter.getArrayAttr(ArrayRef<Attribute>(globalSizeAttr.begin(), globalSizeAttr.end())));
     cop->setAttr("localSize",
