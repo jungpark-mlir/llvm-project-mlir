@@ -23,16 +23,16 @@ namespace migraphx {
 
 std::unique_ptr<Pass> createGPUToMIGraphX();
 
-/// Populates passes to convert from GPU to MIGraphX. 
+/// Populates passes to convert from GPU to MIGraphX.
 /// The pass lowers a func only contains a gpu launch and result allocation
 /// with constant numbers representing dimension into a code_obj operation
 void addGPUToMIGraphXPasses(OpPassManager &pm);
 
-/// Populates conversion passes from TOSA dialect to MIOpen dialect.
+/// Populates conversion passes GPU to MIGraphX.
 void populateFuncToCOBJPatterns(MLIRContext *context,
                                             OwningRewritePatternList *patterns);
 
-} // namespace tosa
+} // namespace migraphx
 } // namespace mlir
 
 #endif // MLIR_CONVERSION_GPUTOMIGRAPHX_GPUTOMIGRAPHX_H
