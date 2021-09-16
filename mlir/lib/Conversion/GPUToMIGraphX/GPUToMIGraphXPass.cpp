@@ -60,7 +60,7 @@ std::unique_ptr<Pass> migraphx::createGPUToMIGraphX() {
 }
 void migraphx::addGPUToMIGraphXPasses(OpPassManager &pm) {
   pm.addNestedPass<FuncOp>(createGPUToMIGraphX());
-
+/*
   //applyPassManagerCLOptions(pm);
   static llvm::cl::opt<std::string> tripleName("triple", llvm::cl::desc("target triple"),
                                        llvm::cl::value_desc("triple string"),
@@ -85,8 +85,7 @@ void migraphx::addGPUToMIGraphXPasses(OpPassManager &pm) {
 
   auto &kernelPm = pm.nest<gpu::GPUModuleOp>();
   kernelPm.addPass(createStripDebugInfoPass());
-  kernelPm.addPass(createLowerGpuOpsToROCDLOpsPass(/*indexBitWidth=*/32));
-  pm.addPass(createLowerGpuOpsToROCDLOpsPass(/*indexBitWidth=*/32));
+  kernelPm.addPass(createLowerGpuOpsToROCDLOpsPass(32));
   kernelPm.addPass(createConvertGPUKernelToBlobPass(
       [&utils](Operation *m, llvm::LLVMContext &llvmContext,
                llvm::StringRef name) {
@@ -97,4 +96,5 @@ void migraphx::addGPUToMIGraphXPasses(OpPassManager &pm) {
       },
       utils.getTriple(), utils.getChip(), utils.getFeatures(),
       gpuBinaryAnnotation));
+      */
 }
