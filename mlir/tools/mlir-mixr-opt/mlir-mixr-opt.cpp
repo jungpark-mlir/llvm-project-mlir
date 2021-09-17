@@ -11,14 +11,16 @@
 //===----------------------------------------------------------------------===//
 
 #include <vector>
-#include "mlir/Conversion/MIOpenPasses.h"
-#include "mlir/Dialect/MIOpen/Passes.h"
-#include "mlir/Dialect/MIGraphX/MIGraphXOps.h"
 
 #include "mlir/InitAllDialects.h"
 #include "mlir/Parser.h"
 #include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassManager.h"
+#include "mlir/Reducer/OptReductionPass.h"
+#include "mlir/Reducer/Passes/OpReducer.h"
+#include "mlir/Reducer/ReductionNode.h"
+#include "mlir/Reducer/ReductionTreePass.h"
+#include "mlir/Reducer/Tester.h"
 #include "mlir/Support/FileUtilities.h"
 #include "mlir/Support/LogicalResult.h"
 #include "mlir/Transforms/Passes.h"
