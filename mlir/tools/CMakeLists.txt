@@ -11,3 +11,4 @@ add_subdirectory(mlir-translate)
 # MIOpen dialect specific.
 add_subdirectory(mlir-miopen-driver)
 add_subdirectory(mlir-miopen-lib)
+add_subdirectory(mlir-mixr-opt)
