@@ -12,7 +12,6 @@ add_mlir_conversion_library(MLIRGPUToMIGraphX
   LINK_LIBS PUBLIC
   MLIRIR
   MLIRPass
-  MLIRGPU
   MLIRSupport
   MLIRMIGraphX
   MLIRGPUToGPURuntimeTransforms
