@@ -34,7 +34,7 @@ public:
 
     // Insert std.alloc for result buffer
     rewriter.setInsertionPoint(op);
-    auto resultAlloc = rewriter.create<MemRef::AllocOp>(loc, resultType);
+    auto resultAlloc = rewriter.create<memref::AllocOp>(loc, resultType);
     
     // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
