@@ -13,6 +13,7 @@
 #include "PassDetail.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
+#include "mlir/Dialect/GPU/GPUDialect.h"
 #include "mlir/Dialect/StandardOps/Transforms/FuncConversions.h"
 #include "mlir/Dialect/StandardOps/Transforms/Passes.h"
 #include "mlir/Transforms/Bufferize.h"
@@ -42,7 +43,8 @@ struct FuncBufferizePass : public FuncBufferizeBase<FuncBufferizePass> {
 
     populateBranchOpInterfaceTypeConversionPattern(patterns, typeConverter);
     populateReturnOpTypeConversionPattern(patterns, typeConverter);
-    target.addLegalOp<ModuleOp, memref::TensorLoadOp, memref::BufferCastOp>();
+    target.addLegalOp<ModuleOp, memref::TensorLoadOp, memref::BufferCastOp, 
+        gpu::ReturnOp, gpu::ModuleEndOp>();
 
     target.markUnknownOpDynamicallyLegal([&](Operation *op) {
       return isNotBranchOpInterfaceOrReturnLikeOp(op) ||

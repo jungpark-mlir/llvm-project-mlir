@@ -20,4 +20,5 @@ add_mlir_dialect_library(MLIRStandardOpsTransforms
   MLIRSCF
   MLIRStandard
   MLIRTransforms
+  MLIRGPU
   )
