@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "mlir/Conversion/GPUToMIGraphX/GPUToMIGraphX.h"
+#include "mlir/Dialect/MemRef/IR/MemRefOps.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/Dialect/GPU/GPUDialect.h"
 #include "mlir/IR/PatternMatch.h"
@@ -33,7 +34,7 @@ public:
 
     // Insert std.alloc for result buffer
     rewriter.setInsertionPoint(op);
-    auto resultAlloc = rewriter.create<AllocOp>(loc, resultType);
+    auto resultAlloc = rewriter.create<MemRef::AllocOp>(loc, resultType);
     
     // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
