@@ -53,11 +53,9 @@ struct MiirHandle_s {
 // lowering.
 bool miirLazyInit() {
   static const bool once = []() {
-    llvm::InitializeAllTargets();
     llvm::InitializeAllTargetInfos();
     llvm::InitializeAllTargetMCs();
     llvm::InitializeAllAsmParsers();
-    llvm::InitializeAllAsmPrinters();
 
     // Initialize LLVM AMDGPU backend.
     LLVMInitializeAMDGPUTarget();

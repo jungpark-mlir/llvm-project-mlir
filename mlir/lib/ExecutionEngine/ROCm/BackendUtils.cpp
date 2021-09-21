@@ -37,14 +37,11 @@
 // lld headers.
 #include "lld/Common/Driver.h"
 
-// If an old rocm_agent_enumerator that has no "-name" option is used, rely on
-// the hip runtime function to provide GPU GCN Arch names.
-#if __USE_ROCM_4_4_OR_OLDER__
+// TODO: remove this once the rocm_agent_enumerator is ready
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 #include "hip/hip_runtime.h"
 #pragma GCC diagnostic pop
-#endif
 
 #include <mutex>
 #include <numeric>
@@ -55,8 +52,8 @@ static constexpr const char kRunnerProgram[] = "mlir-rocm-runner";
 static constexpr const char kRocmAgentEnumerator[] = "rocm_agent_enumerator";
 static constexpr const char kTargetTriple[] = "amdgcn-amd-amdhsa";
 
-#if __USE_ROCM_4_4_OR_OLDER__
 namespace {
+// TODO: remove this once the rocm_agent_enumerator is ready
 void getGpuGCNArchName(hipDevice_t device, std::string &gcnArchName) {
   hipDeviceProp_t props;
   hipError_t result = hipGetDeviceProperties(&props, device);
@@ -70,7 +67,6 @@ void getGpuGCNArchName(hipDevice_t device, std::string &gcnArchName) {
   gcnArchName.assign(pArchName);
 }
 } // namespace
-#endif
 
 BackendUtils::BackendUtils(const std::string &defaultTriple,
                            const std::string &defaultChip,
@@ -79,7 +75,8 @@ BackendUtils::BackendUtils(const std::string &defaultTriple,
     : triple(defaultTriple), chip(defaultChip), features(defaultFeatures) {
   if (systemOverride) {
     triple = kTargetTriple;
-    configTarget(chip, features);
+    configTargetChip(chip);
+    configTargetFeatures(features);
   }
 }
 
@@ -243,8 +240,7 @@ std::unique_ptr<llvm::Module> BackendUtils::compileModuleToROCDLIR(
   return llvmModule;
 }
 
-void BackendUtils::configTarget(std::string &targetChip,
-                                std::string &features) {
+void BackendUtils::configTargetChip(std::string &targetChip) {
   // Locate rocm_agent_enumerator.
   llvm::ErrorOr<std::string> rocmAgentEnumerator = llvm::sys::findProgramByName(
       kRocmAgentEnumerator, {__ROCM_PATH__ "/bin"});
@@ -271,12 +267,7 @@ void BackendUtils::configTarget(std::string &targetChip,
 
   // Invoke rocm_agent_enumerator.
   std::string errorMessage;
-#if __USE_ROCM_4_4_OR_OLDER__
-  SmallVector<StringRef, 1> args{rocmAgentEnumerator.get()};
-#else
-  SmallVector<StringRef, 2> args{rocmAgentEnumerator.get(), "-name"};
-#endif
-
+  SmallVector<StringRef, 2> args{"-t", "GPU"};
   Optional<StringRef> redirects[3] = {{""}, tempFilename.str(), {""}};
   int result =
       llvm::sys::ExecuteAndWait(rocmAgentEnumerator.get(), args, llvm::None,
@@ -285,24 +276,18 @@ void BackendUtils::configTarget(std::string &targetChip,
     llvm::WithColor::warning(llvm::errs(), kRunnerProgram)
         << kRocmAgentEnumerator << " invocation error: " << errorMessage
         << ", set target as " << chip << "\n";
-#if __USE_ROCM_4_4_OR_OLDER__
-    llvm::WithColor::warning(llvm::errs(), kRunnerProgram)
-        << "suggest to use a newer ROCm release and compile with "
-           "-DUSE_ROCM_4_4_OR_OLDER=0\n";
-#endif
     return;
   }
 
   // Load and parse the result.
-  auto gfxArchList = mlir::openInputFile(tempFilename);
-  if (!gfxArchList) {
+  auto gfxIsaList = mlir::openInputFile(tempFilename);
+  if (!gfxIsaList) {
     llvm::WithColor::error(llvm::errs(), kRunnerProgram)
-        << "read ROCm agent list temp file error, set features as " << chip
+        << "read ROCm agent list temp file error, set target as " << chip
         << "\n";
     return;
   }
-#if __USE_ROCM_4_4_OR_OLDER__
-  for (llvm::line_iterator lines(*gfxArchList); !lines.is_at_end(); ++lines) {
+  for (llvm::line_iterator lines(*gfxIsaList); !lines.is_at_end(); ++lines) {
     // Skip the line with content "gfx000".
     if (*lines == "gfx000")
       continue;
@@ -310,6 +295,9 @@ void BackendUtils::configTarget(std::string &targetChip,
     targetChip = lines->str();
     break;
   }
+}
+
+void BackendUtils::configTargetFeatures(std::string &features) {
   std::string gcnArchName;
   getGpuGCNArchName(0, gcnArchName);
   std::string chip;
@@ -317,16 +305,4 @@ void BackendUtils::configTarget(std::string &targetChip,
   if (status.failed()) {
     llvm_unreachable("HIP ArchName parsing should never fail.");
   }
-#else
-  std::string gcnArchName;
-  for (llvm::line_iterator lines(*gfxArchList); !lines.is_at_end(); ++lines) {
-    // Use the first Arch name found.
-    gcnArchName = lines->str();
-    break;
-  }
-  auto status = IsaNameParser::parseArchName(gcnArchName, targetChip, features);
-  if (status.failed()) {
-    llvm_unreachable("ArchName parsing failed.");
-  }
-#endif
 }

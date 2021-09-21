@@ -23,6 +23,13 @@ using namespace mlir;
 using namespace migraphx;
 
 //===----------------------------------------------------------------------===//
+// MIGraphXDialect Interfaces
+//===----------------------------------------------------------------------===//
+namespace {
+
+} // namespace
+
+//===----------------------------------------------------------------------===//
 // MIGraphXDialect
 //===----------------------------------------------------------------------===//
 
@@ -157,5 +164,9 @@ static LogicalResult verify(DotOp op) {
   return success();
 }
 
+//namespace mlir {
+
 #define GET_OP_CLASSES
 #include "mlir/Dialect/MIGraphX/MIGraphXOps.cpp.inc"
+
+//} // namespace mlir

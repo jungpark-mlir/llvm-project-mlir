@@ -65,7 +65,6 @@ set(MLIR_TEST_DEPENDS
   FileCheck count not
   mlir-miopen-opt
   mlir-miopen-translate
-  mlir-mixr-capi-test
   mlir-opt
   mlir-reduce
   mlir-translate
