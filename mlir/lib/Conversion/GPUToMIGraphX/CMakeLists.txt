@@ -13,6 +13,7 @@ add_mlir_conversion_library(MLIRGPUToMIGraphX
   MLIRIR
   MLIRPass
   MLIRSupport
+  MLIRGPUOps
   MLIRMIGraphX
   MLIRGPUToGPURuntimeTransforms
   MLIRGPUToROCDLTransforms
