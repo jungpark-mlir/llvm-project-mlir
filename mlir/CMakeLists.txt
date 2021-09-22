@@ -76,7 +76,7 @@ if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
 
   install(DIRECTORY ${PROJECT_BINARY_DIR}/external/llvm-project/llvm/lib
     DESTINATION lib
-    COMPONENT libMLIRPublicAPI
+    FILE libMLIRPublicAPI.so
   )
 
   add_llvm_install_targets(install-mlir-miopen-headers
