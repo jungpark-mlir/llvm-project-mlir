@@ -49,7 +49,7 @@ if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
     )
 
   install(DIRECTORY ${MLIR_INCLUDE_DIRS}
-    DESTINATION ./external
+    DESTINATION include/external
     COMPONENT mlir-miopen-headers
     FILES_MATCHING
     PATTERN "*.def"
@@ -62,7 +62,7 @@ if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
     )
 
   install(DIRECTORY ${PROJECT_BINARY_DIR}/mlir/include
-    DESTINATION ./build
+    DESTINATION include/build
     COMPONENT mlir-miopen-headers
     FILES_MATCHING
     PATTERN "*.def"
