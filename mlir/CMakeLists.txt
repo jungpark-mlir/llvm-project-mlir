@@ -49,7 +49,20 @@ if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
     )
 
   install(DIRECTORY ${MLIR_INCLUDE_DIRS}
-    DESTINATION include
+    DESTINATION ./external
+    COMPONENT mlir-miopen-headers
+    FILES_MATCHING
+    PATTERN "*.def"
+    PATTERN "*.h"
+    PATTERN "*.gen"
+    PATTERN "*.inc"
+    PATTERN "*.td"
+    PATTERN "CMakeFiles" EXCLUDE
+    PATTERN "config.h" EXCLUDE
+    )
+
+  install(DIRECTORY ${PROJECT_BINARY_DIR}/mlir/include
+    DESTINATION ./build
     COMPONENT mlir-miopen-headers
     FILES_MATCHING
     PATTERN "*.def"
