@@ -32,7 +32,7 @@ public:
     auto results = op->getResults();
     auto resultType = results[0].getType().template cast<MemRefType>();
 
-    // Insert std.alloc for result buffer
+    // Insert alloc for result buffer
     rewriter.setInsertionPoint(op);
     auto resultAlloc = rewriter.create<memref::AllocOp>(loc, resultType);
     
@@ -49,7 +49,7 @@ public:
       op->getParentOfType<ModuleOp>().lookupSymbol<FuncOp>(fnAttr.getValue());
     fusedFuncOp.walk([&](Operation *Wop) {
       if (!isa<gpu::LaunchFuncOp>(Wop)) {
-        llvm::errs()<< "visiting op : " << Wop->getName().getStringRef() << "\n";
+        //llvm::errs()<< "visiting op : " << Wop->getName().getStringRef() << "\n";
         return;
       }
 
