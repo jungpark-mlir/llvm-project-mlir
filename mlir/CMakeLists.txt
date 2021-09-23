@@ -74,7 +74,10 @@ if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
     PATTERN "config.h" EXCLUDE
   )
 
-  add_mlir_library_install(MLIRPublicAPI)
+  install(TARGETS MLIRPublicAPI
+    ARCHIVE
+    DESTINATION lib
+  )
 
   add_llvm_install_targets(install-mlir-miopen-headers
                            DEPENDS mlir-miopen-headers
