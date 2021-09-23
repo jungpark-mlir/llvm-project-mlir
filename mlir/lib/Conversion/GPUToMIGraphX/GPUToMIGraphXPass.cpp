@@ -30,14 +30,14 @@ struct GPUToMIGraphX
     : public GPUToMIGraphXBase<GPUToMIGraphX> {
 public:
   void getDependentDialects(DialectRegistry &registry) const override {
-    registry.insert<migraphx::MIGraphXDialect, StandardOpsDialect, gpu::GPUDialect, MemRefDialect>();
+    registry.insert<migraphx::MIGraphXDialect, StandardOpsDialect, gpu::GPUDialect, memref::MemRefDialect>();
   }
 
   void runOnFunction() override {
     auto &ctx = getContext();
     OwningRewritePatternList patterns(&ctx);
     ConversionTarget target(ctx);
-    target.addLegalDialect<migraphx::MIGraphXDialect, StandardOpsDialect, gpu::GPUDialect, MemRefDialect>();
+    target.addLegalDialect<migraphx::MIGraphXDialect, StandardOpsDialect, gpu::GPUDialect, memref::MemRefDialect>();
     target.addIllegalOp<CallOp>();
 /*
     target.addDynamicallyLegalOp<FuncOp>([&](FuncOp op) {
