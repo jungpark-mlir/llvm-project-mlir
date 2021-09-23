@@ -46,7 +46,7 @@ if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
     PATTERN "*.inc"
     PATTERN "*.td"
     PATTERN "LICENSE.TXT"
-    )
+  )
 
   install(DIRECTORY ${MLIR_INCLUDE_DIRS}
     DESTINATION include/external
@@ -59,7 +59,7 @@ if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
     PATTERN "*.td"
     PATTERN "CMakeFiles" EXCLUDE
     PATTERN "config.h" EXCLUDE
-    )
+  )
 
   install(DIRECTORY ${PROJECT_BINARY_DIR}/mlir/include
     DESTINATION include/build
@@ -72,11 +72,11 @@ if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
     PATTERN "*.td"
     PATTERN "CMakeFiles" EXCLUDE
     PATTERN "config.h" EXCLUDE
-    )
+  )
 
-  install(DIRECTORY ${PROJECT_BINARY_DIR}/external/llvm-project/llvm/lib
+  install(TARGETS MLIRPublicAPI
+    LIBRARY
     DESTINATION lib
-    COMPONENT libMLIRPublicAPI
   )
 
   add_llvm_install_targets(install-mlir-miopen-headers
