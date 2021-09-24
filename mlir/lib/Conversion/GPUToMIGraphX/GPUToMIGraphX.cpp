@@ -14,6 +14,7 @@
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/Dialect/GPU/GPUDialect.h"
+#include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
@@ -72,16 +73,16 @@ public:
 
       auto Lloc = Lop.getLoc();
       auto numKernelOperands = Lop.getNumKernelOperands();
-      auto arguments = getTypeConverter()->promoteOperands(
+      auto arguments = ConvertToLLVMPattern::getTypeConverter()->promoteOperands(
           Lloc, Lop.getOperands().take_back(numKernelOperands),
-          operands.take_back(numKernelOperands), reqriter);
+          operands.take_back(numKernelOperands), rewriter);
       auto numArguments = arguments.size();
       SmallVector<Type, 4> argumentTypes;
       argumentTypes.reserve(numArguments);
       for (auto argument : arguments)
         argumentTypes.push_back(argument.getType());
       for (auto en : llvm::enumerate(arguments)) {
-        auto index = builder.create<LLVM::ConstantOp>(
+        auto index = rewriter.create<LLVM::ConstantOp>(
             Lloc, llvmInt32Type, rewriter.getI32IntegerAttr(en.index()));
         kernelArgs.push_back(en.value());
       }
