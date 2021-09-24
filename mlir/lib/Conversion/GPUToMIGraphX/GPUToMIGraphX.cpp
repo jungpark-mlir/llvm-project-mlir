@@ -33,8 +33,8 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
   using OpConversionPattern<CallOp>::OpConversionPattern;
 
   LogicalResult
-  matchAndRewrite(CallOp op,
-                  PatternRewriter &rewriter) const final {
+  matchAndRewrite(CallOp op, ArrayRef<Value> operands,
+                  ConversionPatternRewriter &rewriter) const override {
     auto loc = op->getLoc();
     auto results = op->getResults();
     auto resultType = results[0].getType().template cast<MemRefType>();
