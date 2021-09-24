@@ -19,6 +19,7 @@
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 #include "mlir/Conversion/LLVMCommon/Pattern.h"
+#include "mlir/Conversion/LLVMCommon/ConversionTarget.h"
 
 using namespace mlir;
 
@@ -78,11 +79,17 @@ public:
       auto numArgs = llvmFuncOp.getNumFuncArguments();
 
       auto Lloc = Lop.getLoc();
+      for(auto arg: operands) {
+        auto kernelArg = getTypeConverter()->promoteOneMemRefDescriptor(
+          loc, arg, rewriter);
+        kernelArgs.push_back(kernelArg);
+      }
+      /*
       for (uint i = 0; i < numArgs; i++) {
         MemRefDescriptor desc(llvmFuncOp.getOperand(i));
         kernelArgs.push_back(desc);
       }
-
+*/
       Type llvmInt32Type = IntegerType::get(getContext(), 32);
 
       for (auto en : llvm::enumerate(kernelArgs)) {
