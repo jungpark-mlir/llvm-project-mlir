@@ -24,9 +24,13 @@
 using namespace mlir;
 
 namespace {
+  /*
 class FuncToCOBJPattern : public OpRewritePattern<CallOp> {
 public:
   using OpRewritePattern<CallOp>::OpRewritePattern;
+*/
+class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
+  using OpConversionPattern<CallOp>::OpConversionPattern;
 
   LogicalResult
   matchAndRewrite(CallOp op,
@@ -80,7 +84,7 @@ public:
 
       auto Lloc = Lop.getLoc();
       for(auto arg: operands) {
-        auto kernelArg = this->getTypeConverter()->promoteOneMemRefDescriptor(
+        auto kernelArg = getTypeConverter()->promoteOneMemRefDescriptor(
           loc, arg, rewriter);
         kernelArgs.push_back(kernelArg);
       }
