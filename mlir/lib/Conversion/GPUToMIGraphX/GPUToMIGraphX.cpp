@@ -17,6 +17,7 @@
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
+#include "mlir/Conversion/LLVMCommon/Pattern.h"
 
 using namespace mlir;
 
@@ -73,7 +74,7 @@ public:
       auto numKernelOperands = Lop.getNumKernelOperands();
       auto arguments = getTypeConverter()->promoteOperands(
           Lloc, Lop.getOperands().take_back(numKernelOperands),
-          operands.take_back(numKernelOperands), builder);
+          operands.take_back(numKernelOperands), reqriter);
       auto numArguments = arguments.size();
       SmallVector<Type, 4> argumentTypes;
       argumentTypes.reserve(numArguments);
@@ -81,7 +82,7 @@ public:
         argumentTypes.push_back(argument.getType());
       for (auto en : llvm::enumerate(arguments)) {
         auto index = builder.create<LLVM::ConstantOp>(
-            Lloc, llvmInt32Type, builder.getI32IntegerAttr(en.index()));
+            Lloc, llvmInt32Type, rewriter.getI32IntegerAttr(en.index()));
         kernelArgs.push_back(en.value());
       }
 
