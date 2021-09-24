@@ -41,6 +41,7 @@ public:
     // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
     SmallVector<Value, 8> operands(op.getOperands());
+    SmallVector<Value, 8> llvmArgs;
     SmallVector<Value, 8> kernelArgs;
     SmallVector<Value, 8> cobjArgs;
     operands.push_back(resultAlloc);
@@ -72,10 +73,13 @@ public:
 
       kernelRefAttr = Lop->getAttrOfType<SymbolRefAttr>("kernel");
 
-      auto Lloc = Lop.getLoc();
-      auto numKernelOperands = Lop.getNumKernelOperands();
+      auto llvmFuncOp = 
+        op->getParentOfType<ModuleOp>().lookupSymbol<LLVMFuncOp>(kernelRefAttr.getValue());
 
-      for (auto argument : operands) {
+      auto Lloc = Lop.getLoc();
+      auto numKernelOperands = llvmFuncOp.getNumKernelOperands();
+
+      for (auto argument : llvmArgs) {
         MemRefDescriptor desc(argument);
         kernelArgs.push_back(desc);
       }
