@@ -45,7 +45,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     
     // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
-    SmallVector<Value, 8> operands(op.getOperands());
+    //SmallVector<Value, 8> operands(op.getOperands());
     SmallVector<Value, 8> kernelArgs;
     SmallVector<Value, 8> cobjArgs;
     operands.push_back(resultAlloc);
