@@ -33,7 +33,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
   using OpConversionPattern<CallOp>::OpConversionPattern;
 
   LogicalResult
-  matchAndRewrite(CallOp op, ArrayRef<Value> operands,
+  matchAndRewrite(CallOp op, //ArrayRef<Value> operands,
                   ConversionPatternRewriter &rewriter) const override {
     auto loc = op->getLoc();
     auto results = op->getResults();
@@ -45,10 +45,10 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     
     // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
-    //SmallVector<Value, 8> operands(op.getOperands());
+    SmallVector<Value, 8> operands(op.getOperands());
     SmallVector<Value, 8> kernelArgs;
     SmallVector<Value, 8> cobjArgs;
-    //operands.push_back(resultAlloc);
+    operands.push_back(resultAlloc);
 
     SmallVector<IntegerAttr, 5> globalSizeAttr;
     SmallVector<IntegerAttr, 5> localSizeAttr;
