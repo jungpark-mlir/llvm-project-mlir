@@ -80,7 +80,7 @@ public:
 
       auto Lloc = Lop.getLoc();
       for(auto arg: operands) {
-        auto kernelArg = getTypeConverter()->promoteOneMemRefDescriptor(
+        auto kernelArg = this->getTypeConverter()->promoteOneMemRefDescriptor(
           loc, arg, rewriter);
         kernelArgs.push_back(kernelArg);
       }
