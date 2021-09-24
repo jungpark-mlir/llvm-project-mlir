@@ -73,12 +73,9 @@ public:
 
       auto Lloc = Lop.getLoc();
       auto numKernelOperands = Lop.getNumKernelOperands();
-      auto arguments = getTypeConverter()->promoteOperands(
-          Lloc, Lop.getOperands().take_back(numKernelOperands),
-          operands.take_back(numKernelOperands), rewriter);
 
       for (auto argument : operands) {
-        MemRefDescripitor desc(argument);
+        MemRefDescriptor desc(argument);
         kernelArgs.push_back(desc);
       }
 
