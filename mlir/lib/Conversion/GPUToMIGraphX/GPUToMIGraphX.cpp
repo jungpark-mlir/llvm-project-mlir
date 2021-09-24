@@ -79,13 +79,21 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
       auto llvmFuncOp = 
         op->getParentOfType<ModuleOp>().lookupSymbol<LLVM::LLVMFuncOp>(kernelRefAttr);
-      SmallVector<Value, 8> Loperands(op.getOperands());
+      //SmallVector<Value, 8> Loperands(op.getOperands());
 
       auto Lloc = Lop.getLoc();
-      for(auto arg: Loperands) {
-        auto kernelArg = getTypeConverter<LLVMTypeConverter>()->promoteOneMemRefDescriptor(
-          loc, arg, rewriter);
+      /*
+      for(auto arg: operands) {
+        //auto kernelArg = getTypeConverter<LLVMTypeConverter>()->promoteOneMemRefDescriptor(
+        //  loc, arg, rewriter);
+
         kernelArgs.push_back(kernelArg);
+      }
+*/
+      for(auto arg: operands) {
+        auto memrefType = arg.getType().dyn_cast<MemRefType>()) {
+        MemRefDescriptor::unpack(builder, loc, arg, memrefType,
+                                 promotedOperands);
       }
       /*
       for (uint i = 0; i < numArgs; i++) {
