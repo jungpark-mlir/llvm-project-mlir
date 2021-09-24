@@ -74,11 +74,12 @@ public:
 
       auto llvmFuncOp = 
         op->getParentOfType<ModuleOp>().lookupSymbol<LLVM::LLVMFuncOp>(kernelRefAttr);
-      SmallVector<Value, 8> llvmArgs(llvmFuncOp.getOperands());
+      SmallVector<Value, 8> llvmArgs;
+      auto numArgs = llvmFuncOp.getNumFuncArguments();
 
       auto Lloc = Lop.getLoc();
-      for (auto argument : llvmArgs) {
-        MemRefDescriptor desc(argument);
+      for (uint i = 0; i < numArgs; i++) {
+        MemRefDescriptor desc(llvmFuncOp.getOperand(i));
         kernelArgs.push_back(desc);
       }
 
