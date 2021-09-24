@@ -73,7 +73,7 @@ public:
 
       auto Lloc = Lop.getLoc();
       auto numKernelOperands = Lop.getNumKernelOperands();
-      auto arguments = ConvertToLLVMPattern::getTypeConverter()->promoteOperands(
+      auto arguments = ConversionPattern::getTypeConverter()->promoteOperands(
           Lloc, Lop.getOperands().take_back(numKernelOperands),
           operands.take_back(numKernelOperands), rewriter);
       auto numArguments = arguments.size();
