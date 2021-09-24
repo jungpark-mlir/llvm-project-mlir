@@ -19,6 +19,8 @@
 #include "mlir/Dialect/MIGraphX/MIGraphXOps.h"
 
 namespace mlir {
+class LLVMTypeConverter;
+
 namespace migraphx {
 
 std::unique_ptr<Pass> createGPUToMIGraphX();
