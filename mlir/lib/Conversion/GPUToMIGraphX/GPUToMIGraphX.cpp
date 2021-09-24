@@ -81,8 +81,8 @@ public:
       }
 
       auto numArguments = kernelArgs.size();
-      Type llvmInt32Type = IntegerType::get(context, 32);
-      
+      Type llvmInt32Type = IntegerType::get(getContext(), 32);
+
       for (auto en : llvm::enumerate(kernelArgs)) {
         auto index = rewriter.create<LLVM::ConstantOp>(
             Lloc, llvmInt32Type, rewriter.getI32IntegerAttr(en.index()));
