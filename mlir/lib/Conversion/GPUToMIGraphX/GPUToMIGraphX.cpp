@@ -91,7 +91,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
       }
 */
       for(auto arg: operands) {
-        auto memrefType = arg.getType().dyn_cast<MemRefType>())
+        auto memrefType = arg.getType().dyn_cast<MemRefType>();
         MemRefDescriptor::unpack(builder, loc, arg, memrefType,
                                  kernelArgs);
       }
