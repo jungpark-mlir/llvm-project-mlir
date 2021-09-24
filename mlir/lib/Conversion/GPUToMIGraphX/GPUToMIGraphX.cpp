@@ -34,7 +34,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
   LogicalResult
   matchAndRewrite(CallOp op,
-                  PatternRewriter &rewriter) const override {
+                  PatternRewriter &rewriter) const final {
     auto loc = op->getLoc();
     auto results = op->getResults();
     auto resultType = results[0].getType().template cast<MemRefType>();
@@ -84,7 +84,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
       auto Lloc = Lop.getLoc();
       for(auto arg: operands) {
-        auto kernelArg = getTypeConverter()->promoteOneMemRefDescriptor(
+        auto kernelArg = getTypeConverter<LLVMTypeConverter>()->promoteOneMemRefDescriptor(
           loc, arg, rewriter);
         kernelArgs.push_back(kernelArg);
       }
