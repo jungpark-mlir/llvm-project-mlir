@@ -33,7 +33,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
   using OpConversionPattern<CallOp>::OpConversionPattern;
 
   LogicalResult
-  matchAndRewrite(CallOp op, //ArrayRef<Value> operands,
+  matchAndRewrite(CallOp op, ArrayRef<Value> operands,
                   ConversionPatternRewriter &rewriter) const override {
     auto loc = op->getLoc();
     auto results = op->getResults();
@@ -45,10 +45,10 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     
     // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
-    SmallVector<Value, 8> operands(op.getOperands());
+    //SmallVector<Value, 8> operands(op.getOperands());
     SmallVector<Value, 8> kernelArgs;
     SmallVector<Value, 8> cobjArgs;
-    operands.push_back(resultAlloc);
+    //operands.push_back(resultAlloc);
 
     SmallVector<IntegerAttr, 5> globalSizeAttr;
     SmallVector<IntegerAttr, 5> localSizeAttr;
@@ -79,11 +79,10 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
       auto llvmFuncOp = 
         op->getParentOfType<ModuleOp>().lookupSymbol<LLVM::LLVMFuncOp>(kernelRefAttr);
-      SmallVector<Value, 8> llvmArgs;
-      auto numArgs = llvmFuncOp.getNumFuncArguments();
+      SmallVector<Value, 8> Loperands(Lop.getOperands());
 
       auto Lloc = Lop.getLoc();
-      for(auto arg: operands) {
+      for(auto arg: Loperands) {
         auto kernelArg = getTypeConverter<LLVMTypeConverter>()->promoteOneMemRefDescriptor(
           loc, arg, rewriter);
         kernelArgs.push_back(kernelArg);
