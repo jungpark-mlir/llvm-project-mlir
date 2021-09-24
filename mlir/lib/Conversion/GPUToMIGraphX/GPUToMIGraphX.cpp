@@ -74,7 +74,7 @@ public:
       kernelRefAttr = Lop->getAttrOfType<SymbolRefAttr>("kernel");
 
       auto llvmFuncOp = 
-        op->getParentOfType<ModuleOp>().lookupSymbol<LLVMFuncOp>(kernelRefAttr.getValue());
+        op->getParentOfType<ModuleOp>().lookupSymbol<LLVM::LLVMFuncOp>(kernelRefAttr.getValue());
 
       auto Lloc = Lop.getLoc();
       auto numKernelOperands = llvmFuncOp.getNumKernelOperands();
