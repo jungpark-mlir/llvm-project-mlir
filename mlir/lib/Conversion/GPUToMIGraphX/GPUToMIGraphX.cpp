@@ -79,7 +79,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
       auto llvmFuncOp = 
         op->getParentOfType<ModuleOp>().lookupSymbol<LLVM::LLVMFuncOp>(kernelRefAttr);
-      SmallVector<Value, 8> Loperands(Lop.getOperands());
+      SmallVector<Value, 8> Loperands(op.getOperands());
 
       auto Lloc = Lop.getLoc();
       for(auto arg: Loperands) {
