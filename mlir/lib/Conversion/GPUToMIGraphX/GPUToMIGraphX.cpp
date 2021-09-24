@@ -27,11 +27,6 @@ class FuncToCOBJPattern : public OpRewritePattern<CallOp> {
 public:
   using OpRewritePattern<CallOp>::OpRewritePattern;
 
-  LLVMTypeConverter getTypeConverter() const {
-    return static_cast<LLVMTypeConverter *>(
-        ConversionPattern::getTypeConverter());
-  }
-
   LogicalResult
   matchAndRewrite(CallOp op,
                   PatternRewriter &rewriter) const override {
@@ -81,12 +76,18 @@ public:
       auto arguments = getTypeConverter()->promoteOperands(
           Lloc, Lop.getOperands().take_back(numKernelOperands),
           operands.take_back(numKernelOperands), rewriter);
-      auto numArguments = arguments.size();
+
+      for (auto argument : operands) {
+        MemRefDescripitor desc(argument);
+        kernelArgs.push_back(desc);
+      }
+
+      auto numArguments = kernelArgs.size();
       SmallVector<Type, 4> argumentTypes;
       argumentTypes.reserve(numArguments);
-      for (auto argument : arguments)
-        argumentTypes.push_back(argument.getType());
-      for (auto en : llvm::enumerate(arguments)) {
+      for (auto argument : kernelArgs)
+        argumentTypes.push_back(kernelArgs.getType());
+      for (auto en : llvm::enumerate(kernelArgs)) {
         auto index = rewriter.create<LLVM::ConstantOp>(
             Lloc, llvmInt32Type, rewriter.getI32IntegerAttr(en.index()));
         kernelArgs.push_back(en.value());
