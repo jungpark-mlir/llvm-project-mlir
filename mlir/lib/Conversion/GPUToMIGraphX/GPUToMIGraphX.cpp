@@ -22,6 +22,11 @@
 
 using namespace mlir;
 
+LLVMTypeConverter *ConvertToLLVMPattern::getTypeConverter() const {
+  return static_cast<LLVMTypeConverter *>(
+      ConversionPattern::getTypeConverter());
+}
+
 namespace {
 class FuncToCOBJPattern : public OpRewritePattern<CallOp> {
 public:
