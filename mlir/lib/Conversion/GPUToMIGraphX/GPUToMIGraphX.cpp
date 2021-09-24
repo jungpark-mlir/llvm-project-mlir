@@ -39,6 +39,7 @@ public:
     // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
     SmallVector<Value, 8> operands(op.getOperands());
+    SmallVector<Value, 8> kernelArgs()
     operands.push_back(resultAlloc);
 
     SmallVector<IntegerAttr, 5> globalSizeAttr;
@@ -67,9 +68,26 @@ public:
       localSizeAttr.push_back(rewriter.getI64IntegerAttr((((blockSize.x.getDefiningOp())->getAttrOfType<IntegerAttr>("value"))).getInt()));
 
       kernelRefAttr = Lop->getAttrOfType<SymbolRefAttr>("kernel");
+
+      auto Lloc = Lop.getLoc();
+      auto numKernelOperands = Lop.getNumKernelOperands();
+      auto arguments = getTypeConverter()->promoteOperands(
+          Lloc, Lop.getOperands().take_back(numKernelOperands),
+          operands.take_back(numKernelOperands), builder);
+      auto numArguments = arguments.size();
+      SmallVector<Type, 4> argumentTypes;
+      argumentTypes.reserve(numArguments);
+      for (auto argument : arguments)
+        argumentTypes.push_back(argument.getType());
+      for (auto en : llvm::enumerate(arguments)) {
+        auto index = builder.create<LLVM::ConstantOp>(
+            Lloc, llvmInt32Type, builder.getI32IntegerAttr(en.index()));
+        kernelArgs.push_back(en.value());
+      }
+
     });
 
-    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, operands);
+    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, kernelArgs);
     cop->setAttr("kernel", kernelRefAttr);    
     cop->setAttr("globalSize",
                  rewriter.getArrayAttr(ArrayRef<Attribute>(globalSizeAttr.begin(), globalSizeAttr.end())));
