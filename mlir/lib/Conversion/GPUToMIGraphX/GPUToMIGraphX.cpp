@@ -29,7 +29,8 @@ class FuncToCOBJPattern : public OpRewritePattern<CallOp> {
 public:
   using OpRewritePattern<CallOp>::OpRewritePattern;
 */
-class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
+//class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
+class FuncToCOBJPattern : public ConvertOpToLLVMPattern<CallOpType>{}
   using OpConversionPattern<CallOp>::OpConversionPattern;
 
   LogicalResult
@@ -38,6 +39,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     auto loc = op->getLoc();
     auto results = op->getResults();
     auto resultType = results[0].getType().template cast<MemRefType>();
+    LowerToLLVMOptions options(&op->getContext());
 
     // Insert alloc for result buffer
     rewriter.setInsertionPoint(op);
