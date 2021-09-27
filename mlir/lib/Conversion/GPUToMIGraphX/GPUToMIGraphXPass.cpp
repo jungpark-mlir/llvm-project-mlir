@@ -16,6 +16,9 @@
 #include "mlir/Dialect/GPU/GPUDialect.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
+#include "mlir/Conversion/LLVMCommon/ConversionTarget.h"
+#include "mlir/Conversion/LLVMCommon/Pattern.h"
+#include "mlir/Conversion/MemRefToLLVM/MemRefToLLVM.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Transforms/DialectConversion.h"
@@ -38,7 +41,7 @@ public:
   void runOnFunction() override {
     auto &ctx = getContext();
     OwningRewritePatternList patterns(&ctx);
-    LLVMTypeConverter converter(&getContext());
+    LLVMTypeConverter converter(&ctx);
 
     ConversionTarget target(ctx);
     target.addLegalDialect<migraphx::MIGraphXDialect, StandardOpsDialect, gpu::GPUDialect, memref::MemRefDialect, LLVM::LLVMDialect>();
