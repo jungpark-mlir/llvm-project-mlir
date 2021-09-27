@@ -46,7 +46,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
     //SmallVector<Value, 8> operands(op.getOperands());
-    SmallVector<Value, 8> kernelArgs;
+    //SmallVector<Value, 8> kernelArgs;
     SmallVector<Value, 8> cobjArgs;
     //operands.push_back(resultAlloc);
 
@@ -90,28 +90,26 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         kernelArgs.push_back(kernelArg);
       }
 */
-      for(auto arg: operands) {
-        auto memrefType = arg.getType().dyn_cast<MemRefType>();
-        MemRefDescriptor::unpack(rewriter, loc, arg, memrefType,
-                                 kernelArgs);
-      }
+      auto numKernelOperands = Lop.getNumKernelOperands();
+      auto kernelArgs = getTypeConverter()->promoteOperands(
+          loc, Lop.getOperands().take_back(numKernelOperands),
+          operands.take_back(numKernelOperands), builder);
+      auto numArguments = arguments.size();
+      SmallVector<Type, 4> argumentTypes;
+      argumentTypes.reserve(numArguments);
+      for (auto argument : arguments)
+        argumentTypes.push_back(argument.getType());
       /*
       for (uint i = 0; i < numArgs; i++) {
         MemRefDescriptor desc(llvmFuncOp.getOperand(i));
         kernelArgs.push_back(desc);
       }
 */
-      Type llvmInt32Type = IntegerType::get(getContext(), 32);
 
-      for (auto en : llvm::enumerate(kernelArgs)) {
-        auto index = rewriter.create<LLVM::ConstantOp>(
-            Lloc, llvmInt32Type, rewriter.getI32IntegerAttr(en.index()));
-        cobjArgs.push_back(en.value());
-      }
 
     });
 
-    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, cobjArgs);
+    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, kernelArgs);
     cop->setAttr("kernel", kernelRefAttr);    
     cop->setAttr("globalSize",
                  rewriter.getArrayAttr(ArrayRef<Attribute>(globalSizeAttr.begin(), globalSizeAttr.end())));
