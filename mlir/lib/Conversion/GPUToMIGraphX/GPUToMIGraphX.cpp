@@ -99,7 +99,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
       argumentTypes.reserve(numArguments);
       for (auto argument : kernelArgs) {
         argumentTypes.push_back(argument.getType());
-        cobjArgs.puch_back(argument);
+        cobjArgs.push_back(argument);
       }
       /*
       for (uint i = 0; i < numArgs; i++) {
