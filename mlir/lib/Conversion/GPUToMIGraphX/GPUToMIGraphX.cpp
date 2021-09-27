@@ -39,7 +39,8 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     auto loc = op->getLoc();
     auto results = op->getResults();
     auto resultType = results[0].getType().template cast<MemRefType>();
-    LowerToLLVMOptions options(&op->getContext());
+    auto ctx = op->getContext();
+    LowerToLLVMOptions options(&ctx);
 
     // Insert alloc for result buffer
     rewriter.setInsertionPoint(op);
