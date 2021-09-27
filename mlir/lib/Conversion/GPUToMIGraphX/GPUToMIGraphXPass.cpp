@@ -38,16 +38,14 @@ public:
   void runOnFunction() override {
     auto &ctx = getContext();
     OwningRewritePatternList patterns(&ctx);
+    LLVMTypeConverter converter(&getContext());
+
     ConversionTarget target(ctx);
     target.addLegalDialect<migraphx::MIGraphXDialect, StandardOpsDialect, gpu::GPUDialect, memref::MemRefDialect, LLVM::LLVMDialect>();
     target.addIllegalOp<CallOp>();
-/*
-    target.addDynamicallyLegalOp<FuncOp>([&](FuncOp op) {
-      return typeConverter.isSignatureLegal(op.getType()) &&
-             typeConverter.isLegal(&op.getBody());
-    });
-    target.markUnknownOpDynamicallyLegal([](Operation *) { return true; });
-*/
+
+    populateMemRefToLLVMConversionPatterns(converter, patterns);
+
     FuncOp func = getFunction();
     mlir::migraphx::populateFuncToCOBJPatterns(
         func.getContext(), &patterns);
