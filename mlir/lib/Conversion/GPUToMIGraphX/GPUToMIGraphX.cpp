@@ -94,11 +94,13 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
       auto kernelArgs = getTypeConverter<LLVMTypeConverter>()->promoteOperands(
           loc, Lop.getOperands().take_back(numKernelOperands),
           operands.take_back(numKernelOperands), rewriter);
-      auto numArguments = arguments.size();
+      auto numArguments = kernelArgs.size();
       SmallVector<Type, 4> argumentTypes;
       argumentTypes.reserve(numArguments);
-      for (auto argument : arguments)
+      for (auto argument : kernelArgs) {
         argumentTypes.push_back(argument.getType());
+        cobjArgs.puch_back(argument);
+      }
       /*
       for (uint i = 0; i < numArgs; i++) {
         MemRefDescriptor desc(llvmFuncOp.getOperand(i));
@@ -109,7 +111,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
     });
 
-    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, kernelArgs);
+    auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, cobjArgs);
     cop->setAttr("kernel", kernelRefAttr);    
     cop->setAttr("globalSize",
                  rewriter.getArrayAttr(ArrayRef<Attribute>(globalSizeAttr.begin(), globalSizeAttr.end())));
