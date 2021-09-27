@@ -8,8 +8,10 @@ add_mlir_conversion_library(MLIRGPUToMIGraphX
 
   DEPENDS
   MLIRMIOpenConversionPassIncGen
-  
-  LINK_LIBS PUBLIC
+)
+
+target_link_libraries(MLIRGPUToMIGraphX
+  PUBLIC
   MLIRIR
   MLIRPass
   MLIRSupport
@@ -18,4 +20,4 @@ add_mlir_conversion_library(MLIRGPUToMIGraphX
   MLIRGPUToGPURuntimeTransforms
   MLIRGPUToROCDLTransforms
   LLVMROCmBackendUtils
-  )
+)
