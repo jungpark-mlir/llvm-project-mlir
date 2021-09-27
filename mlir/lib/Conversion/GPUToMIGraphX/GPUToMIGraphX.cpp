@@ -93,7 +93,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
       auto numKernelOperands = Lop.getNumKernelOperands();
       auto kernelArgs = getTypeConverter<LLVMTypeConverter>()->promoteOperands(
           loc, Lop.getOperands().take_back(numKernelOperands),
-          operands.take_back(numKernelOperands), builder);
+          operands.take_back(numKernelOperands), rewriter);
       auto numArguments = arguments.size();
       SmallVector<Type, 4> argumentTypes;
       argumentTypes.reserve(numArguments);
