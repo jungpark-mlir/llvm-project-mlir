@@ -95,7 +95,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
       auto callOperands = op.getOperands();
       SmallVector<Value, 4> kernelArgs;
-      promotedOperands.reserve(operands.size());
+      kernelArgs.reserve(operands.size());
       for (auto it : llvm::zip(callOperands, operands)) {
         auto operand = std::get<0>(it);
         auto llvmOperand = std::get<1>(it);
@@ -104,9 +104,9 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         // aligned pointer of a memref.
         if (auto memrefType = operand.getType().dyn_cast<MemRefType>()) {
           MemRefDescriptor desc(llvmOperand);
-          llvmOperand = desc.alignedPtr(builder, loc);
+          llvmOperand = desc.alignedPtr(rewriter, loc);
         }
-        promotedOperands.push_back(llvmOperand);
+        kernelArgs.push_back(llvmOperand);
       }
 /*
 SmallVector<Value, 4> LLVMTypeConverter::promoteOperands(Location loc,
