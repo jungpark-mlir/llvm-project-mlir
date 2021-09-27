@@ -61,8 +61,8 @@ public:
     //                                                target);
 
     FuncOp func = getFunction();
-    mlir::migraphx::populateFuncToCOBJPatterns(
-        func.getContext(), &patterns);
+    //mlir::migraphx::populateFuncToCOBJPatterns(
+    //    func.getContext(), &patterns);
 
     if (failed(applyPartialConversion(func, target, std::move(patterns)))) {
       signalPassFailure();
