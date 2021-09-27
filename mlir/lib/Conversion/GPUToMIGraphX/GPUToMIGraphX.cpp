@@ -39,8 +39,6 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     auto loc = op->getLoc();
     auto results = op->getResults();
     auto resultType = results[0].getType().template cast<MemRefType>();
-    auto ctx = op->getContext();
-    LowerToLLVMOptions options(&ctx);
 
     // Insert alloc for result buffer
     rewriter.setInsertionPoint(op);
@@ -94,9 +92,60 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
       }
 */
       auto numKernelOperands = Lop.getNumKernelOperands();
-      auto kernelArgs = getTypeConverter<LLVMTypeConverter>()->promoteOperands(
-          loc, op.getOperands(),
-          operands, rewriter);
+
+      auto callOperands = op.getOperands();
+      SmallVector<Value, 4> kernelArgs;
+      promotedOperands.reserve(operands.size());
+      for (auto it : llvm::zip(callOperands, operands)) {
+        auto operand = std::get<0>(it);
+        auto llvmOperand = std::get<1>(it);
+
+        // For the bare-ptr calling convention, we only have to extract the
+        // aligned pointer of a memref.
+        if (auto memrefType = operand.getType().dyn_cast<MemRefType>()) {
+          MemRefDescriptor desc(llvmOperand);
+          llvmOperand = desc.alignedPtr(builder, loc);
+        }
+        promotedOperands.push_back(llvmOperand);
+      }
+/*
+SmallVector<Value, 4> LLVMTypeConverter::promoteOperands(Location loc,
+                                                         ValueRange opOperands,
+                                                         ValueRange operands,
+                                                         OpBuilder &builder) {
+  SmallVector<Value, 4> promotedOperands;
+  promotedOperands.reserve(operands.size());
+  for (auto it : llvm::zip(opOperands, operands)) {
+    auto operand = std::get<0>(it);
+    auto llvmOperand = std::get<1>(it);
+
+    if (options.useBarePtrCallConv) {
+      // For the bare-ptr calling convention, we only have to extract the
+      // aligned pointer of a memref.
+      if (auto memrefType = operand.getType().dyn_cast<MemRefType>()) {
+        MemRefDescriptor desc(llvmOperand);
+        llvmOperand = desc.alignedPtr(builder, loc);
+      } else if (operand.getType().isa<UnrankedMemRefType>()) {
+        llvm_unreachable("Unranked memrefs are not supported");
+      }
+    } else {
+      if (operand.getType().isa<UnrankedMemRefType>()) {
+        UnrankedMemRefDescriptor::unpack(builder, loc, llvmOperand,
+                                         promotedOperands);
+        continue;
+      }
+      if (auto memrefType = operand.getType().dyn_cast<MemRefType>()) {
+        MemRefDescriptor::unpack(builder, loc, llvmOperand, memrefType,
+                                 promotedOperands);
+        continue;
+      }
+    }
+
+    promotedOperands.push_back(llvmOperand);
+  }
+  return promotedOperands;
+}
+*/
       auto numArguments = kernelArgs.size();
       SmallVector<Type, 4> argumentTypes;
       argumentTypes.reserve(numArguments);
