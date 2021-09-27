@@ -29,8 +29,8 @@ class FuncToCOBJPattern : public OpRewritePattern<CallOp> {
 public:
   using OpRewritePattern<CallOp>::OpRewritePattern;
 */
-//class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
-class FuncToCOBJPattern : public ConvertOpToLLVMPattern<CallOpType>{}
+class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
+//class FuncToCOBJPattern : public ConvertOpToLLVMPattern<CallOpType>{}
   using OpConversionPattern<CallOp>::OpConversionPattern;
 
   LogicalResult
