@@ -54,7 +54,7 @@ public:
     target.addLegalDialect<migraphx::MIGraphXDialect, StandardOpsDialect, gpu::GPUDialect, memref::MemRefDialect, LLVM::LLVMDialect>();
     //target.addIllegalOp<CallOp>();
 
-    //populateVectorToLLVMConversionPatterns(converter, patterns);
+    populateVectorToLLVMConversionPatterns(converter, patterns);
     populateMemRefToLLVMConversionPatterns(converter, patterns);
     populateStdToLLVMConversionPatterns(converter, patterns);
     populateAsyncStructuralTypeConversionsAndLegality(converter, patterns,
