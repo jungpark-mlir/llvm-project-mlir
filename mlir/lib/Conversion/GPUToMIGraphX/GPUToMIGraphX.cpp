@@ -95,12 +95,11 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
       auto numKernelOperands = llvmFuncOp.getNumFuncArguments();
 
       auto callOperands = op.getOperands();
-      for (int i=0; i<numKernelOperands; i++) {
-        llArgs.push_back(llvmFuncOp.getOperand(i));
-      }
+      auto llArgs = Lop.getOperands();
 
       SmallVector<Value, 4> kernelArgs;
       kernelArgs.reserve(llArgs.size());
+      
       for (auto it : llvm::zip(callOperands, llArgs)) {
         auto operand = std::get<0>(it);
         auto llvmOperand = std::get<1>(it);
