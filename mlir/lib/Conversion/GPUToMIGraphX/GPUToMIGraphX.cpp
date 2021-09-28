@@ -56,7 +56,8 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     SymbolRefAttr kernelRefAttr;
 
     auto fusedFuncOp =
-      op->getParentOfType<ModuleOp>().lookupSymbol<LLVM::LLVMFuncOp>(fnAttr.getValue());
+      op->getParentOfType<ModuleOp>().lookupSymbol<FuncOp>(fnAttr.getValue());
+      //op->getParentOfType<ModuleOp>().lookupSymbol<LLVM::LLVMFuncOp>(fnAttr.getValue());
     fusedFuncOp.walk([&](Operation *Wop) {
       if (!isa<gpu::LaunchFuncOp>(Wop)) {
         //llvm::errs()<< "visiting op : " << Wop->getName().getStringRef() << "\n";
