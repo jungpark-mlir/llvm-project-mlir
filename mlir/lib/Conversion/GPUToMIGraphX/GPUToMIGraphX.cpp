@@ -92,10 +92,12 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         kernelArgs.push_back(kernelArg);
       }
 */
-      auto numKernelOperands = llvmFuncOp.getNumFuncArguments();
+      auto numKernelOperands = Lop.getNumKernelOperands();
 
       auto callOperands = op.getOperands();
-      auto llArgs = Lop.getOperands();
+      for (i=0; i<numKernelOperands; i++){
+        llArgs.push_back(Lop.getKernelOperand(i);
+      }
 
       SmallVector<Value, 4> kernelArgs;
       kernelArgs.reserve(llArgs.size());
