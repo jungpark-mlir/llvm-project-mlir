@@ -47,7 +47,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
     //SmallVector<Value, 8> operands(op.getOperands());
-    //SmallVector<Value, 8> kernelArgs;
+    SmallVector<Value, 8> llArgs;
     SmallVector<Value, 8> cobjArgs;
     //operands.push_back(resultAlloc);
 
@@ -92,13 +92,16 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         kernelArgs.push_back(kernelArg);
       }
 */
-      auto numKernelOperands = Lop.getNumKernelOperands();
+      auto numKernelOperands = llvmFuncOp.getNumFuncArguments();
 
       auto callOperands = op.getOperands();
-      auto llOps = llvmFuncOp.getOperands();
+      for (int i=0; i<numKernelOpernads; i++) {
+        llArgs.push_back(llvmFuncOp.getOperand(i));
+      }
+
       SmallVector<Value, 4> kernelArgs;
-      kernelArgs.reserve(llOps.size());
-      for (auto it : llvm::zip(callOperands, llOps)) {
+      kernelArgs.reserve(llArgs.size());
+      for (auto it : llvm::zip(callOperands, llArgs)) {
         auto operand = std::get<0>(it);
         auto llvmOperand = std::get<1>(it);
 
