@@ -1133,7 +1133,7 @@ void mlir::populateStdToLLVMFuncOpConversionPattern(
 
 void mlir::populateStdToLLVMConversionPatterns(LLVMTypeConverter &converter,
                                                RewritePatternSet &patterns) {
-  populateStdToLLVMFuncOpConversionPattern(converter, patterns);
+  //populateStdToLLVMFuncOpConversionPattern(converter, patterns);
   // clang-format off
   patterns.add<
       AbsFOpLowering,
