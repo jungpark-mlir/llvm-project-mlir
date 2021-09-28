@@ -95,7 +95,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
       auto numKernelOperands = llvmFuncOp.getNumFuncArguments();
 
       auto callOperands = op.getOperands();
-      for (int i=0; i<numKernelOpernads; i++) {
+      for (int i=0; i<numKernelOperands; i++) {
         llArgs.push_back(llvmFuncOp.getOperand(i));
       }
 
