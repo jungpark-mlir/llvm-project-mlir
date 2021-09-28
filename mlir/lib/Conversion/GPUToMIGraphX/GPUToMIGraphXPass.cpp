@@ -57,7 +57,7 @@ public:
     //populateVectorToLLVMConversionPatterns(converter, patterns);
     populateMemRefToLLVMConversionPatterns(converter, patterns);
     populateStdToLLVMConversionPatterns(converter, patterns);
-    //populateAsyncStructuralTypeConversionsAndLegality(converter, patterns,
+    populateAsyncStructuralTypeConversionsAndLegality(converter, patterns,
     //                                                target);
 
     FuncOp func = getFunction();
