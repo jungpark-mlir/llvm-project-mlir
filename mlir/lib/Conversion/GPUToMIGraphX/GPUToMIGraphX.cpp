@@ -106,9 +106,9 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         auto operand = std::get<0>(it);
         auto llvmOperand = std::get<1>(it);
 
-        auto memrefType = operand.getType().dyn_cast<MemRefType>() {
-            MemRefDescriptor::unpack(rewriter, loc, llvmOperand, memrefType,
-                                 kernelArgs);
+        auto memrefType = operand.getType().dyn_cast<MemRefType>();
+        MemRefDescriptor::unpack(rewriter, loc, llvmOperand, memrefType,
+                            kernelArgs);
 /*
         // For the bare-ptr calling convention, we only have to extract the
         // aligned pointer of a memref.
