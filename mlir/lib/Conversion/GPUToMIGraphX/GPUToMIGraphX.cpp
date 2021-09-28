@@ -96,7 +96,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
       auto callOperands = op.getOperands();
       for (uint i=0; i<numKernelOperands; i++){
-        llArgs.push_back(Lop.getKernelOperand(i);
+        llArgs.push_back(Lop.getKernelOperand(i));
       }
 
       SmallVector<Value, 4> kernelArgs;
