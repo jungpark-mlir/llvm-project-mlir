@@ -58,7 +58,7 @@ public:
     populateMemRefToLLVMConversionPatterns(converter, patterns);
     populateStdToLLVMConversionPatterns(converter, patterns);
     populateAsyncStructuralTypeConversionsAndLegality(converter, patterns,
-    //                                                target);
+                                                    target);
 
     FuncOp func = getFunction();
     //mlir::migraphx::populateFuncToCOBJPatterns(
