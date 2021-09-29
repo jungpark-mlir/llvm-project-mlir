@@ -94,7 +94,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
         // shape
         auto argType = arg.getType();
-        auto argShape = argType.getShape()
+        auto argShape = argType.getShape();
 
         for (auto dim: argShape) {
           auto constOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, rewriter.getI64Type(), noArgs);
