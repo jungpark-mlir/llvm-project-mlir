@@ -85,7 +85,8 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         cobjArgs.push_back(arg);
         // aligned ptr
         cobjArgs.push_back(arg);
-
+        ValueRange noArgs({});
+        
         // offset
         auto offsetOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, rewriter.getI64Type(), noArgs)
         offsetOp->setAttr("value", rewriter.getI64IntegerAttr(0));
@@ -94,7 +95,6 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         // shape
         auto argType = arg.getType();
         auto argShape = argType.getShape()
-        ValueRange noArgs({});
 
         for (auto dim: argShape) {
           auto constOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, rewriter.getI64Type(), noArgs)
