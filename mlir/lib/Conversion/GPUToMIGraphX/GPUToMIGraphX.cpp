@@ -93,7 +93,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         cobjArgs.push_back(offsetOp);
 
         // shape
-        auto argType = arg.getType().cast<MemRefType>
+        auto argType = arg->getType().cast<MemRefType>
         auto argShape = argType.getShape();
 
         for (auto dim: argShape) {
