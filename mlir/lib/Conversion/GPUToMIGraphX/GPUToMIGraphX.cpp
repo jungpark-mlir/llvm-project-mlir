@@ -46,10 +46,9 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     
     // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
-    //SmallVector<Value, 8> operands(op.getOperands());
-    SmallVector<Value, 8> llArgs;
+    SmallVector<Value, 8> mrOperands(op.getOperands());
     SmallVector<Value, 8> cobjArgs;
-    operands.push_back(resultAlloc);
+    mrOperands.push_back(resultAlloc);
 
     SmallVector<IntegerAttr, 5> globalSizeAttr;
     SmallVector<IntegerAttr, 5> localSizeAttr;
@@ -79,16 +78,8 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
       kernelRefAttr = Lop->getAttrOfType<SymbolRefAttr>("kernel");
 
-      auto Lloc = Lop.getLoc();
-      auto numKernelOperands = Lop.getNumKernelOperands();
-
-      auto callOperands = op.getOperands();
-
-      SmallVector<Value, 4> kernelArgs;
-      kernelArgs.reserve(llArgs.size());
-
       // Lowering memref structure
-      for (auto arg: operands) {
+      for (auto arg: mrOperands) {
         // Sending the reference to the memref itself because we're sending this to an excution engine which will handle the allocation.
         // allocation ptr
         cobjArgs.push_back(arg);
@@ -101,8 +92,8 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         cobjArgs.push_back(offsetOp);
 
         // shape
-        auto argType = arg->getType();
-        auto argShape = argType->getShape()
+        auto argType = arg.getType();
+        auto argShape = argType.getShape()
         ValueRange noArgs({});
 
         for (auto dim: argShape) {
