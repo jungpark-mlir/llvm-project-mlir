@@ -100,7 +100,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
         for (auto dim: argShape) {
           auto constOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, rewriter.getI64Type(), noArgs);
-          offsetOp->setAttr("value", rewriter.getI64ArrayAttr(dim));
+          constOp->setAttr("value", rewriter.getI64ArrayAttr(dim));
           cobjArgs.push_back(constOp);
         }
 
@@ -108,7 +108,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         uint64_t stride = 1;
         for (auto dim: argShape) {
           auto constOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, rewriter.getI64Type(), noArgs);
-          offsetOp->setAttr("value", rewriter.getI64ArrayAttr(stride));
+          constOp->setAttr("value", rewriter.getI64ArrayAttr(stride));
           cobjArgs.push_back(constOp);
           stride *= dim;
         }
