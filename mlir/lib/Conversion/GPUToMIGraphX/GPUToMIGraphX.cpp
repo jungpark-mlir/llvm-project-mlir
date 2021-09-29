@@ -49,7 +49,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     //SmallVector<Value, 8> operands(op.getOperands());
     SmallVector<Value, 8> llArgs;
     SmallVector<Value, 8> cobjArgs;
-    //operands.push_back(resultAlloc);
+    operands.push_back(resultAlloc);
 
     SmallVector<IntegerAttr, 5> globalSizeAttr;
     SmallVector<IntegerAttr, 5> localSizeAttr;
@@ -79,99 +79,47 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
       kernelRefAttr = Lop->getAttrOfType<SymbolRefAttr>("kernel");
 
-      auto llvmFuncOp = 
-        op->getParentOfType<ModuleOp>().lookupSymbol<LLVM::LLVMFuncOp>(kernelRefAttr);
-      //SmallVector<Value, 8> Loperands(op.getOperands());
-
       auto Lloc = Lop.getLoc();
-      /*
-      for(auto arg: operands) {
-        //auto kernelArg = getTypeConverter<LLVMTypeConverter>()->promoteOneMemRefDescriptor(
-        //  loc, arg, rewriter);
-
-        kernelArgs.push_back(kernelArg);
-      }
-*/
       auto numKernelOperands = Lop.getNumKernelOperands();
 
       auto callOperands = op.getOperands();
-      for (uint i=0; i<numKernelOperands; i++){
-        llArgs.push_back(Lop.getKernelOperand(i));
-      }
 
       SmallVector<Value, 4> kernelArgs;
       kernelArgs.reserve(llArgs.size());
 
-      for (auto it : llvm::zip(callOperands, llArgs)) {
-        auto operand = std::get<0>(it);
-        auto llvmOperand = std::get<1>(it);
+      // Lowering memref structure
+      for (auto arg: operands) {
+        // Sending the reference to the memref itself because we're sending this to an excution engine which will handle the allocation.
+        // allocation ptr
+        cobjArgs.push_back(arg);
+        // aligned ptr
+        cobjArgs.push_back(arg);
 
-        auto memrefType = operand.getType().dyn_cast<MemRefType>();
-        MemRefDescriptor::unpack(rewriter, loc, llvmOperand, memrefType,
-                            kernelArgs);
-/*
-        // For the bare-ptr calling convention, we only have to extract the
-        // aligned pointer of a memref.
-        if (auto memrefType = operand.getType().dyn_cast<MemRefType>()) {
-          MemRefDescriptor desc(llvmOperand);
-          llvmOperand = desc.alignedPtr(rewriter, loc);
+        // offset
+        auto offsetOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, rewriter.getI64Type(), noArgs)
+        offsetOp->setAttr("value", rewriter.getI64IntegerAttr(0));
+        cobjArgs.push_back(offsetOp);
+
+        // shape
+        auto argType = arg->getType();
+        auto argShape = argType->getShape()
+        ValueRange noArgs({});
+
+        for (auto dim: argShape) {
+          auto constOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, rewriter.getI64Type(), noArgs)
+          constOp->setAttr("value", rewriter.getI64IntegerAttr(dim));
+          cobjArgs.push_back(constOp);
         }
-        */
-        kernelArgs.push_back(llvmOperand);
-      }
-/*
-SmallVector<Value, 4> LLVMTypeConverter::promoteOperands(Location loc,
-                                                         ValueRange opOperands,
-                                                         ValueRange operands,
-                                                         OpBuilder &builder) {
-  SmallVector<Value, 4> promotedOperands;
-  promotedOperands.reserve(operands.size());
-  for (auto it : llvm::zip(opOperands, operands)) {
-    auto operand = std::get<0>(it);
-    auto llvmOperand = std::get<1>(it);
 
-    if (options.useBarePtrCallConv) {
-      // For the bare-ptr calling convention, we only have to extract the
-      // aligned pointer of a memref.
-      if (auto memrefType = operand.getType().dyn_cast<MemRefType>()) {
-        MemRefDescriptor desc(llvmOperand);
-        llvmOperand = desc.alignedPtr(builder, loc);
-      } else if (operand.getType().isa<UnrankedMemRefType>()) {
-        llvm_unreachable("Unranked memrefs are not supported");
+        // stride
+        uint64_t stride = 1;
+        for (auto dim: argShape) {
+          auto constOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, rewriter.getI64Type(), noArgs)
+          constOp->setAttr("value", rewriter.getI64IntegerAttr(stride));
+          cobjArgs.push_back(constOp);
+          stride *= dim;
+        }
       }
-    } else {
-      if (operand.getType().isa<UnrankedMemRefType>()) {
-        UnrankedMemRefDescriptor::unpack(builder, loc, llvmOperand,
-                                         promotedOperands);
-        continue;
-      }
-      if (auto memrefType = operand.getType().dyn_cast<MemRefType>()) {
-        MemRefDescriptor::unpack(builder, loc, llvmOperand, memrefType,
-                                 promotedOperands);
-        continue;
-      }
-    }
-
-    promotedOperands.push_back(llvmOperand);
-  }
-  return promotedOperands;
-}
-*/
-      auto numArguments = kernelArgs.size();
-      SmallVector<Type, 4> argumentTypes;
-      argumentTypes.reserve(numArguments);
-      for (auto argument : kernelArgs) {
-        argumentTypes.push_back(argument.getType());
-        cobjArgs.push_back(argument);
-      }
-      /*
-      for (uint i = 0; i < numArgs; i++) {
-        MemRefDescriptor desc(llvmFuncOp.getOperand(i));
-        kernelArgs.push_back(desc);
-      }
-*/
-
-
     });
 
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, cobjArgs);
