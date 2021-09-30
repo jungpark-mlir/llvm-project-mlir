@@ -97,19 +97,19 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         auto argType = arg.getType().cast<MemRefType>();
         auto argShape = argType.getShape();
 
-        for (auto dim: argShape) {
+        for (auto it = argShape.rbegin(); it != argShape.rend(); ++it) {
           auto constOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, RankedTensorType::get({1}, rewriter.getI64Type()), noArgs);
-          constOp->setAttr("value", DenseIntElementsAttr::get(RankedTensorType::get({1}, rewriter.getI64Type()), dim));
+          constOp->setAttr("value", DenseIntElementsAttr::get(RankedTensorType::get({1}, rewriter.getI64Type()), *it));
           cobjArgs.push_back(constOp);
         }
 
         // stride
         uint64_t stride = 1;
-        for (auto dim: argShape) {
+        for (auto it = argShape.rbegin(); it != argShape.rend(); ++it) {
           auto constOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, RankedTensorType::get({1}, rewriter.getI64Type()), noArgs);
           constOp->setAttr("value", DenseIntElementsAttr::get(RankedTensorType::get({1}, rewriter.getI64Type()), stride));
           cobjArgs.push_back(constOp);
-          stride *= dim;
+          stride *= (*it);
         }
       }
     });
