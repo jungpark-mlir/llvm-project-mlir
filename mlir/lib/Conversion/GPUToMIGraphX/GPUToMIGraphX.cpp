@@ -90,7 +90,6 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         // offset
         auto offsetOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, rewriter.getI64Type(), noArgs);
         uint64_t zero = 0;
-        //offsetOp->setAttr("value", rewriter.getArrayAttr(ArrayRef<Attribute>(rewriter.getI64IntegerAttr(0))));
         offsetOp->setAttr("value", DenseIntElementsAttr::get(RankedTensorType::get({1}, rewriter.getI64Type()), zero));
         cobjArgs.push_back(offsetOp);
 
@@ -100,7 +99,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
         for (auto dim: argShape) {
           auto constOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, rewriter.getI64Type(), noArgs);
-          constOp->setAttr("value", rewriter.getI64ArrayAttr(dim));
+          constOp->setAttr("value", DenseIntElementsAttr::get(RankedTensorType::get({1}, rewriter.getI64Type()), dim));
           cobjArgs.push_back(constOp);
         }
 
@@ -108,7 +107,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         uint64_t stride = 1;
         for (auto dim: argShape) {
           auto constOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, rewriter.getI64Type(), noArgs);
-          constOp->setAttr("value", rewriter.getI64ArrayAttr(stride));
+          constOp->setAttr("value", DenseIntElementsAttr::get(RankedTensorType::get({1}, rewriter.getI64Type()), stride));
           cobjArgs.push_back(constOp);
           stride *= dim;
         }
