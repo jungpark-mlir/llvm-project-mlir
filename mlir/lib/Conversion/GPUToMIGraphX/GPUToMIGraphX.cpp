@@ -44,7 +44,6 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
     rewriter.setInsertionPoint(op);
     auto resultAlloc = rewriter.create<memref::AllocOp>(loc, resultType);
     
-    // 
     auto fnAttr = op->getAttrOfType<FlatSymbolRefAttr>("callee");
     SmallVector<Value, 8> mrOperands(op.getOperands());
     SmallVector<Value, 8> cobjArgs;
@@ -56,10 +55,9 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
 
     auto fusedFuncOp =
       op->getParentOfType<ModuleOp>().lookupSymbol<FuncOp>(fnAttr.getValue());
-      //op->getParentOfType<ModuleOp>().lookupSymbol<LLVM::LLVMFuncOp>(fnAttr.getValue());
+
     fusedFuncOp.walk([&](Operation *Wop) {
       if (!isa<gpu::LaunchFuncOp>(Wop)) {
-        //llvm::errs()<< "visiting op : " << Wop->getName().getStringRef() << "\n";
         return;
       }
 
@@ -92,17 +90,14 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         uint64_t zero = 0;
         offsetOp->setAttr("value", DenseIntElementsAttr::get(RankedTensorType::get({1}, rewriter.getI64Type()), zero));
         cobjArgs.push_back(offsetOp);
-
         // shape
         auto argType = arg.getType().cast<MemRefType>();
         auto argShape = argType.getShape();
-
         for (auto it = argShape.rbegin(); it != argShape.rend(); ++it) {
           auto constOp = rewriter.create<mlir::migraphx::ConstantOp>(loc, RankedTensorType::get({1}, rewriter.getI64Type()), noArgs);
           constOp->setAttr("value", DenseIntElementsAttr::get(RankedTensorType::get({1}, rewriter.getI64Type()), *it));
           cobjArgs.push_back(constOp);
         }
-
         // stride
         uint64_t stride = 1;
         for (auto it = argShape.rbegin(); it != argShape.rend(); ++it) {
@@ -112,6 +107,8 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
           stride *= (*it);
         }
       }
+
+      cobjArgs.push_back(mrOperands.back())
     });
 
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, cobjArgs);
