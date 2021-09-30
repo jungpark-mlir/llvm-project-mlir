@@ -108,7 +108,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         }
       }
 
-      cobjArgs.push_back(mrOperands.back())
+      cobjArgs.push_back(mrOperands.back());
     });
 
     auto cop = rewriter.create<mlir::migraphx::CodeObjOp>(loc, resultType, cobjArgs);
