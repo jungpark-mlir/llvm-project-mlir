@@ -24,13 +24,8 @@
 using namespace mlir;
 
 namespace {
-  /*
-class FuncToCOBJPattern : public OpRewritePattern<CallOp> {
-public:
-  using OpRewritePattern<CallOp>::OpRewritePattern;
-*/
+
 class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
-//class FuncToCOBJPattern : public ConvertOpToLLVMPattern<CallOpType>{}
   using OpConversionPattern<CallOp>::OpConversionPattern;
 
   LogicalResult
@@ -108,6 +103,7 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
         }
       }
 
+      // insert the result buffer at the end again to specify the output buffer
       cobjArgs.push_back(mrOperands.back());
     });
 
@@ -119,7 +115,6 @@ class FuncToCOBJPattern : public OpConversionPattern<CallOp> {
                  rewriter.getArrayAttr(ArrayRef<Attribute>(localSizeAttr.begin(), localSizeAttr.end())));
 
     rewriter.replaceOp(op, cop->getResults());
-
     return success();
   }
 };
