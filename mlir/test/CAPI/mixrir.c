@@ -40,9 +40,15 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
   //-------------- func op
 
   // Set func attributes
-  MlirAttribute funcTypeAttr = mlirAttributeParseGet(
-      ctx, 
-      mlirStringRefCreateFromCString("(tensor<1x64x56x56xf32>) -> (tensor<1x64x56x56xf32>)"));
+  int64_t funcDims[] = {1, 64, 56, 56};
+  MlirType funcResultType = mlirRankedTensorTypeGet(4, funcDims, mlirF32TypeGet(ctx), mlirAttributeGetNull());
+  MlirAttribute funcTypeAttr = mlirTypeAttrGet(
+      mlirFunctionTypeGet(ctx,
+                          1,                // numInputs,
+                          &inType,          // MlirType const *inputs,
+                          1,                // numResults,
+                          &funcResultType   // MlirType const *results
+  ));
   MlirAttribute funcNameAttr = mlirAttributeParseGet(
       ctx,
       mlirStringRefCreateFromCString("\"main\""));
