@@ -74,6 +74,12 @@ if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
     PATTERN "config.h" EXCLUDE
   )
 
+  install(DIRECTORY ${PROJECT_BINARY_DIR}/external/llvm-project/llvm/lib
+    DESTINATION lib
+    FILES_MATCHING
+    PATTERN "lib*"
+  )
+
   add_llvm_install_targets(install-mlir-miopen-headers
                            DEPENDS mlir-miopen-headers
                            COMPONENT mlir-miopen-headers)
