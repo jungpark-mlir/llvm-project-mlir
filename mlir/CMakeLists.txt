@@ -75,7 +75,7 @@ if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
   )
 
   install(DIRECTORY ${PROJECT_BINARY_DIR}/external/llvm-project/llvm/lib
-    DESTINATION lib
+    DESTINATION ./
     FILES_MATCHING
     PATTERN "lib*"
   )
