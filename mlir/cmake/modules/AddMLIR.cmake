@@ -159,7 +159,7 @@ function(add_mlir_library_install name)
     message(STATUS "1=${name}")
     message(STATUS "2=${export_to_mlirtargets}")
     message(STATUS "3=${LLVM_LIBDIR_SUFFIX}")
-    
+
   if (NOT LLVM_ENABLE_IDE)
     add_llvm_install_targets(install-${name}
                             DEPENDS ${name}
@@ -168,6 +168,7 @@ function(add_mlir_library_install name)
   set_property(GLOBAL APPEND PROPERTY MLIR_ALL_LIBS ${name})
   endif()
   set_property(GLOBAL APPEND PROPERTY MLIR_EXPORTS ${name})
+  message(STATUS "4=${MLIR_EXPORTS}")
 endfunction()
 
 # Declare an mlir library which is part of the public C-API and will be

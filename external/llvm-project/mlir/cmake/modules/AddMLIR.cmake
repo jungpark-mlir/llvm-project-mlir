@@ -166,6 +166,8 @@ function(add_mlir_library_install name)
   set_property(GLOBAL APPEND PROPERTY MLIR_ALL_LIBS ${name})
   endif()
   set_property(GLOBAL APPEND PROPERTY MLIR_EXPORTS ${name})
+  
+  message(STATUS "4=${MLIR_EXPORTS}")
 endfunction()
 
 # Declare an mlir library which is part of the public C-API.
