@@ -153,9 +153,11 @@ function(add_mlir_library_install name)
     LIBRARY DESTINATION lib${LLVM_LIBDIR_SUFFIX}
     ARCHIVE DESTINATION lib${LLVM_LIBDIR_SUFFIX}
     RUNTIME DESTINATION bin)
-    cmake_print_variables(name)
-    cmake_print_variables(export_to_mlirtargets)
-    cmake_print_variables(LLVM_LIBDIR_SUFFIX)
+
+    message(STATUS "1=${name}")
+    message(STATUS "2=${export_to_mlirtargets}")
+    message(STATUS "3=${LLVM_LIBDIR_SUFFIX}")
+
   if (NOT LLVM_ENABLE_IDE)
     add_llvm_install_targets(install-${name}
                             DEPENDS ${name}
