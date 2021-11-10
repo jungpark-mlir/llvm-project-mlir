@@ -5,6 +5,8 @@ add_mlir_dialect_library(MLIRMIGraphXPipeline
   MLIRDialect
   LLVMROCmBackendUtils
   MLIRGPUToROCDLTransforms
+  MLIRMIGraphXToTosa
+  MLIRGPUToMIGraphX
   MLIRIR
   MLIRPass
   MLIRLLVMIR
