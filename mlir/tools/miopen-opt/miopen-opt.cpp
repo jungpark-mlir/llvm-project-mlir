@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
   registerAllPasses();
   registerMIOpenPasses();
 
-  mlir::DialectRegistry registry;
+  DialectRegistry registry;
   registerAllDialects(registry);
   registerMIOpenDialects(registry);
   return mlir::asMainReturnCode(

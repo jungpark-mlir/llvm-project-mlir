@@ -278,7 +278,7 @@ static bool constructAndTraverseIr(MlirContext ctx) {
 int main() {
   MlirContext ctx = mlirContextCreate();
   mlirRegisterAllDialects(ctx);
-  DialectRegistry registry;
+  mlir::DialectRegistry registry;
   mlir::registerMIOpenDialects(registry);
   context.appendDialectRegistry(registry);
   
