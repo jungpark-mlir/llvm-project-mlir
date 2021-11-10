@@ -39,7 +39,7 @@ add_llvm_executable(mlir-mixr-full-test
 llvm_update_compile_flags(mlir-mixr-full-test)
 
 get_property(dialect_libs GLOBAL PROPERTY MLIR_DIALECT_LIBS)
-target_link_libraries(mlir-tosa-miir-test
+target_link_libraries(mlir-mixr-full-test
   PRIVATE
   MLIRCAPIIR
   MLIRCAPIRegistration
