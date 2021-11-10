@@ -24,6 +24,7 @@
 #include "mlir/Dialect/MIOpen/Pipeline.h"
 #include "mlir/ExecutionEngine/OptUtils.h"
 #include "llvm/Support/TargetSelect.h"
+#include "mlir/InitMIOpenDialects.h"
 
 #include <assert.h>
 #include <math.h>
