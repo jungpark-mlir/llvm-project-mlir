@@ -277,10 +277,10 @@ static bool constructAndTraverseIr(MlirContext ctx) {
 
 int main() {
   MlirContext ctx = mlirContextCreate();
-  mlir::DialectRegistry &registry;
-  mlir::registerAllDialects(registry);
-  mlir::registerMIOpenDialects(registry);
-  unwrap(ctx)->appendDialectRegistry(registry);
+  mlirRegisterAllDialects(ctx);
+
+  MlirDialectHandle mixrHandle = mlirGetDialectHandle__migraphx__();
+  mlirDialectHandleRegisterDialect(mixrHandle, ctx);
   
   if (!constructAndTraverseIr(ctx)) {
     printf("FAILED!\n");
