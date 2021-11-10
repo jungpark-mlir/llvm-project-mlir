@@ -82,7 +82,7 @@ def MIGraphXToTosa : FunctionPass<"migraphx-to-tosa"> {
   let constructor = "migraphx::createMIGraphXToTosaPass()";
 }
 
-#endif // MIOPEN_MLIR_CONVERSION_PASSES
+//===----------------------------------------------------------------------===//
 // GPUToMIGraphX
 //===----------------------------------------------------------------------===//
 
