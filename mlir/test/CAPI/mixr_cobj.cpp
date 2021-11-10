@@ -280,7 +280,7 @@ int main() {
   mlirRegisterAllDialects(ctx);
   mlir::DialectRegistry registry;
   mlir::registerMIOpenDialects(registry);
-  ctx.appendDialectRegistry(registry);
+  unwrap(ctx)->appendDialectRegistry(registry);
   
   if (!constructAndTraverseIr(ctx)) {
     printf("FAILED!\n");
