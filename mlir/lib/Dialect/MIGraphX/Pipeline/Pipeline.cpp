@@ -38,16 +38,16 @@ using namespace mlir;
 
 //===- Consolidate the MIOpen Pipelines here ---------------------===//
 
-void miopen::addHighLevelPipeline(PassManager &pm) {
+void migraphx::addHighLevelPipeline(PassManager &pm) {
   // passes for MIXR to TOSA
   pm.addPass(migraphx::createMIGraphXToTosaPass());
 }
 
-void miopen::addBackendPipeline(PassManager &pm, const std::string &triple,
+void migraphx::addBackendPipeline(PassManager &pm, const std::string &triple,
                                 const std::string &chip,
                                 const std::string &features, int32_t optLevel) {
   // Passes for lowering ROCDL dialect
   pm.addPass(createLowerGpuOpsToROCDLOpsPass(/*indexBitWidth=*/32));
   pm.addPass(createGpuSerializeToHsacoPass(triple, chip, features, optLevel));
-  pm.addPass(createGPUToMIGraphXPass());
+  pm.addPass(migraphx::createGPUToMIGraphXPass());
 }
