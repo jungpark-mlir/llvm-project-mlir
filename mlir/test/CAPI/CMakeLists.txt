@@ -43,6 +43,7 @@ target_link_libraries(mlir-mixr-full-test
   PRIVATE
   MLIRCAPIIR
   MLIRCAPIRegistration
+  MLIRCAPIMIGraphX
   MLIRMIGraphXPipeline
   MLIRMIOpenPipeline
   LLVMAMDGPUAsmParser
