@@ -213,16 +213,14 @@ static bool constructAndTraverseIr(MlirContext ctx) {
 
   mlir::migraphx::addHighLevelPipeline(pm);
   mlir::miopen::addHighLevelPipeline(pm);
-  mlir::miopen::addPipeline(pm, perfConfig, false, true);
-  mlir::miopen::addBackendPipeline(pm, triple, chip, features);
-
   pm.run(module);
   mlirOperationDump(moduleMO);
+
+  mlir::miopen::addPipeline(pm, perfConfig, false, true);
+  mlir::miopen::addBackendPipeline(pm, triple, chip, features);
   mlir::migraphx::addBackendPipeline(pm);
 
   auto status = pm.run(module);
-  mlirOperationDump(moduleMO);
-
   mlirModuleDestroy(moduleOp1);
 
   if (status.succeeded()) {
