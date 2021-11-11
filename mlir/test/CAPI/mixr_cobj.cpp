@@ -210,14 +210,14 @@ static bool constructAndTraverseIr(MlirContext ctx) {
                        mlir::PassManager::Nesting::Implicit);
 
   mlir::migraphx::addHighLevelPipeline(pm);
-
   mlir::miopen::addHighLevelPipeline(pm);
-
   mlir::miopen::addPipeline(pm, perfConfig, false, true);
-
   mlir::migraphx::addBackendPipeline(pm, triple, chip, features);
 
   auto status = pm.run(module);
+
+  MlirOperation moduleMO = mlirModuleGetOperation(moduleOp1);
+  mlirOperationDump(moduleMO);
 
   mlirModuleDestroy(moduleOp1);
 
