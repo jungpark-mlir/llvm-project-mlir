@@ -158,7 +158,7 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
   //-------------- bias0 = migraphx.constant
 
   // Set constant attributes
-  int64_t bias0Dims[] = {1, 64, 1, 1};
+  int64_t bias0Dims[] = {64};
   float f32Bias[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
