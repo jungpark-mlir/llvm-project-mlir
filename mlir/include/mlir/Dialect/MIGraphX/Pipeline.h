@@ -25,9 +25,7 @@ namespace migraphx {
 void addHighLevelPipeline(PassManager &pm);
 
 // Compilation pipeline from GPU to MIXR code object
-void addBackendPipeline(PassManager &pm, const std::string &triple,
-                        const std::string &chip, const std::string &features,
-                        int32_t optLevel = 3);
+void addBackendPipeline(PassManager &pm);
 
 } // namespace migraphx
 } // namespace mlir
