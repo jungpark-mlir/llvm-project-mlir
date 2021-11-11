@@ -165,14 +165,14 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
   MlirAttribute bias0ValueAttr = mlirDenseElementsAttrFloatGet(
-      mlirRankedTensorTypeGet(4, bias0Dims, mlirF32TypeGet(ctx), mlirAttributeGetNull()), 64, f32Bias);
+      mlirRankedTensorTypeGet(1, bias0Dims, mlirF32TypeGet(ctx), mlirAttributeGetNull()), 64, f32Bias);
   MlirNamedAttribute bias0Attrs[] = {mlirNamedAttributeGet(
       mlirIdentifierGet(ctx, mlirStringRefCreateFromCString("value")),
       bias0ValueAttr)};
 
   // Set constant op
   MlirType bias0Type =
-      mlirRankedTensorTypeGet(4, bias0Dims, mlirF32TypeGet(ctx), mlirAttributeGetNull());
+      mlirRankedTensorTypeGet(1, bias0Dims, mlirF32TypeGet(ctx), mlirAttributeGetNull());
   MlirOperationState bias0State = mlirOperationStateGet(
       mlirStringRefCreateFromCString("migraphx.constant"), location);
   mlirOperationStateAddResults(&bias0State, 1, &bias0Type);
