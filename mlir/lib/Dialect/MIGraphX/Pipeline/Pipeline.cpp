@@ -43,11 +43,6 @@ void migraphx::addHighLevelPipeline(PassManager &pm) {
   pm.addPass(migraphx::createMIGraphXToTosaPass());
 }
 
-void migraphx::addBackendPipeline(PassManager &pm, const std::string &triple,
-                                const std::string &chip,
-                                const std::string &features, int32_t optLevel) {
-  // Passes for lowering ROCDL dialect
-  pm.addPass(createLowerGpuOpsToROCDLOpsPass(/*indexBitWidth=*/32));
-  pm.addPass(createGpuSerializeToHsacoPass(triple, chip, features, optLevel));
+void migraphx::addBackendPipeline(PassManager &pm) {
   pm.addPass(migraphx::createGPUToMIGraphXPass());
 }
