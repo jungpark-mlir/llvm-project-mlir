@@ -22,7 +22,7 @@ namespace mlir {
 class LLVMTypeConverter;
 
 namespace migraphx {
-
+std::unique_ptr<Pass> createMainWrapperPass();
 std::unique_ptr<Pass> createGPUToMIGraphXPass();
 
 /// Populates passes to convert from GPU to MIGraphX.
