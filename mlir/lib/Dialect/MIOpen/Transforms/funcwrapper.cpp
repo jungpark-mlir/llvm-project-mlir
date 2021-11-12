@@ -45,7 +45,7 @@ void MainWrapperPass::runOnOperation() {
   MLIRContext *ctx = &getContext();
   ModuleOp module = getOperation();
   auto ops = module.getOps<FuncOp>();
-  Operation fusedFunc;
+
   for (auto f : module.getOps<FuncOp>()) {
     auto mainFunc = f.cloneWithoutRegions();
     f.setAttr("sym_visibility", StringAttr::get(ctx, "private"));
