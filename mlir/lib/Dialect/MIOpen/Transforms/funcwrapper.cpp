@@ -56,10 +56,8 @@ void MainWrapperPass::runOnOperation() {
     auto mainFunc = b.create<FuncOp>(loc, "new_main", type);
 
     b.setInsertionPointToStart(mainFunc.addEntryBlock());
-    CallOp callOp = b.create<CallOp>(loc, f, f.getArguments());
+    CallOp callOp = b.create<CallOp>(loc, f, mainFunc.getArguments());
   }
-
-
 }
 
 std::unique_ptr<Pass> mlir::miopen::createMainWrapperPass() {
