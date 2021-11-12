@@ -100,17 +100,4 @@ def GPUToMIGraphX : FunctionPass<"gpu-to-migraphx"> {
   ];
 }
 
-//===----------------------------------------------------------------------===//
-// MainWrapper
-//===----------------------------------------------------------------------===//
-
-def MainWrapper : FunctionPass<"mainwrapper"> {
-  let summary = "Dummy pass to generate main func wraps a func";
-  let description = [{
-    clone a func and add call to the original func.
-  }];
-
-  let constructor = "migraphx::createMainWrapperPass()";
-}
-
 #endif // MIOPEN_MLIR_CONVERSION_PASSES
