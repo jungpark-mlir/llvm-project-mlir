@@ -48,7 +48,7 @@ void MainWrapperPass::runOnOperation() {
 
   for (auto f : module.getOps<FuncOp>()) {
     auto mainFunc = f.cloneWithoutRegions();
-    f.setAttr("sym_visibility", StringAttr::get(ctx, "private"));
+    //f.setAttr("sym_visibility", StringAttr::get(ctx, "private"));
   }
 }
 
