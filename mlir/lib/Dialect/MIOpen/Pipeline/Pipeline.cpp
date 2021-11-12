@@ -49,7 +49,7 @@ void miopen::addHighLevelPipeline(PassManager &pm) {
   pm.addPass(createLinalgElementwiseOpFusionPass());
   pm.addPass(createLinalgBufferizePass());
   pm.addPass(createFuncBufferizePass());
-  pm.addPass(createBufferResultsToOutParamsPass());
+//  pm.addPass(createBufferResultsToOutParamsPass());
   pm.addPass(createFinalizingBufferizePass());
   pm.addPass(miopen::createMIOpenCopyOptPass());
 }
