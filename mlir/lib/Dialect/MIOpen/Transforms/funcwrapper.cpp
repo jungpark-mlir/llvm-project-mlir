@@ -57,6 +57,7 @@ void MainWrapperPass::runOnOperation() {
 
     b.setInsertionPointToStart(mainFunc.addEntryBlock());
     CallOp callOp = b.create<CallOp>(loc, f, mainFunc.getArguments());
+    b.create<ReturnOp>(loc);
   }
 }
 
