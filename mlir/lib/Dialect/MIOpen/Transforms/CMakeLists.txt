@@ -5,6 +5,7 @@ add_mlir_dialect_library(MLIRMIOpenTransforms
   CopyOpt.cpp
   LowerMIOpenOps.cpp
   TestAffineTransforms.cpp
+  funcwrapper.cpp
 
   ADDITIONAL_HEADER_DIRS
   ${MLIR_MAIN_INCLUDE_DIR}/mlir/Dialect/MIOpen

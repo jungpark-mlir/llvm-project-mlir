@@ -74,4 +74,10 @@ def MIOpenOpsStep5Pass : Pass<"miopen-lowering-step5", "ModuleOp"> {
   let dependentDialects = ["miopen::MIOpenDialect", "scf::SCFDialect", "AffineDialect", "StandardOpsDialect", "memref::MemRefDialect"];
 }
 
+def MainWrapperPass : Pass<"miopen-funcwrapper", "ModuleOp"> {
+  let summary = "dummy func wrapper";
+  let constructor = "mlir::miopen::createMainWrapperPass()";
+  let dependentDialects = ["miopen::MIOpenDialect", "StandardOpsDialect"];
+}
+
 #endif // MLIR_DIALECT_MIOPEN_PASSES
