@@ -48,7 +48,7 @@ void MainWrapperPass::runOnOperation() {
   OpBuilder b(ctx);
 
   for (auto f : module.getOps<FuncOp>()) {
-    auto mainFunc = f.cloneWithoutRegions();
+    //auto mainFunc = f.cloneWithoutRegions();
     //f.setAttr("sym_visibility", StringAttr::get(ctx, "private"));
     Location loc = f.getLoc();
     b.setInsertionPoint(f);
@@ -56,7 +56,7 @@ void MainWrapperPass::runOnOperation() {
     auto mainFunc = b.create<FuncOp>(loc, "new_main", type);
 
     b.setInsertionPointToStart(mainFunc.addEntryBlock());
-    CallOp callOp = b.create<CallOp>(loc, outlinedFunc, f.getOpOperands());
+    CallOp callOp = b.create<CallOp>(loc, f, f.getOpOperands());
   }
 
 
