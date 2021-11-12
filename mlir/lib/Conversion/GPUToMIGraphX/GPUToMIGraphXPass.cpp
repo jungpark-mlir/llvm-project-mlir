@@ -70,18 +70,3 @@ std::unique_ptr<Pass> migraphx::createGPUToMIGraphXPass() {
 void migraphx::addGPUToMIGraphXPasses(OpPassManager &pm) {
   pm.addNestedPass<FuncOp>(createGPUToMIGraphXPass());
 }
-
-struct MainWrapper
-    : public MainWrapperBase<MainWrapper> {
-public:
-  void runOnFunction() override {
-    ModuleOp module = getOperation();
-    Operation fusedFunc = module.getOps<FuncOp>()[0];
-    
-  }
-
-};
-
-std::unique_ptr<Pass> migraphx::createMainWrapperPass() {
-  return std::make_unique<MainWrapper>();
-}
