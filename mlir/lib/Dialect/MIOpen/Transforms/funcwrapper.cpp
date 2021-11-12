@@ -42,10 +42,11 @@ struct MainWrapperPass
 } // end anonymous namespace
 
 void MainWrapperPass::runOnOperation() {
+  MLIRContext *ctx = &getContext();
   ModuleOp module = getOperation();
-  Operation fusedFunc = module.getOps<FuncOp>()[0];
+  Operation fusedFunc = module.getOps<FuncOp>();
   auto mainFunc = fusedFunc.cloneWithoutRegions();
-  fusedFunc->setAttr("sym_visibility", StringAttr::get(ctx, "private"));
+  fusedFunc.setAttr("sym_visibility", StringAttr::get(ctx, "private"));
 }
 
 std::unique_ptr<Pass> mlir::miopen::createMainWrapperPass() {
