@@ -216,6 +216,10 @@ static bool constructAndTraverseIr(MlirContext ctx) {
   pm.run(module);
   mlirOperationDump(moduleMO);
 
+  pm.addPass(miopen::createMainWrapperPass());
+  pm.run(module);
+  mlirOperationDump(moduleMO);
+
   mlir::miopen::addPipeline(pm, perfConfig, false, true);
   mlir::miopen::addBackendPipeline(pm, triple, chip, features);
   mlir::migraphx::addBackendPipeline(pm);
