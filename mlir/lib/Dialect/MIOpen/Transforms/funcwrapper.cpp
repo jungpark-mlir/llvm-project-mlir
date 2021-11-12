@@ -47,6 +47,10 @@ void MainWrapperPass::runOnOperation() {
   ModuleOp module = getOperation();
 //  auto ops = module.getOps<FuncOp>();
   OpBuilder b(ctx);
+  static ModuleOp visited;
+  if (visited == module)
+    return;
+  visited = module;
 
   module.walk([&](FuncOp f) {
     Location loc = f.getLoc();
