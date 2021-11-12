@@ -54,8 +54,9 @@ void MainWrapperPass::runOnOperation() {
     Location loc = f.getLoc();
     b.setInsertionPoint(f);
     auto type = f.getType();
-    mlir::function_like_impl::eraseFunctionResults(f, 0, 1, type);
+
     auto mainFunc = b.create<FuncOp>(loc, "new_main", type);
+    mlir::function_like_impl::eraseFunctionResults(mainFunc, {0}, 1, type);
 
     b.setInsertionPointToStart(mainFunc.addEntryBlock());
     CallOp callOp = b.create<CallOp>(loc, f, mainFunc.getArguments());
