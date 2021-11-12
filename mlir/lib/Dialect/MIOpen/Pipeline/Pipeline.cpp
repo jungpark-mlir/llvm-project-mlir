@@ -38,6 +38,10 @@ using namespace mlir;
 
 //===- Consolidate the MIOpen Pipelines here ---------------------===//
 
+void miopen::addLevel0Pipeline(PassManager &pm) {
+  pm.addPass(miopen::createMainWrapperPass());
+}
+
 void miopen::addHighLevelPipeline(PassManager &pm) {
   // passes for TOSA and bufferization
   pm.addPass(tosa::createTosaToMIOpenPass());

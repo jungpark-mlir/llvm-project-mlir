@@ -212,11 +212,17 @@ static bool constructAndTraverseIr(MlirContext ctx) {
                        mlir::PassManager::Nesting::Implicit);
 
   mlir::migraphx::addHighLevelPipeline(pm);
+
+  mlir::miopen::addLevel0Pipeline(pm);
+  pm.run(module);
+  mlirOperationDump(moduleMO);
+
+
   mlir::miopen::addHighLevelPipeline(pm);
   pm.run(module);
   mlirOperationDump(moduleMO);
 
-  pm.addPass(mlir::miopen::createMainWrapperPass());
+  
   pm.run(module);
   mlirOperationDump(moduleMO);
 
