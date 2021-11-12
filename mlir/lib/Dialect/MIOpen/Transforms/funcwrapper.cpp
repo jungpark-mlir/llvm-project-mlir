@@ -45,11 +45,21 @@ void MainWrapperPass::runOnOperation() {
   MLIRContext *ctx = &getContext();
   ModuleOp module = getOperation();
   auto ops = module.getOps<FuncOp>();
+  OpBuilder b(ctx);
 
   for (auto f : module.getOps<FuncOp>()) {
     auto mainFunc = f.cloneWithoutRegions();
     //f.setAttr("sym_visibility", StringAttr::get(ctx, "private"));
+    Location loc = f.getLoc();
+    b.setInsertionPoint(f);
+    auto type = f.getType();
+    auto mainFunc = b.create<FuncOp>(loc, "new_main", type);
+
+    b.setInsertionPointToStart(mainFunc.addEntryBlock());
+    CallOp callOp = b.create<CallOp>(loc, outlinedFunc, f.getOpOperands());
   }
+
+
 }
 
 std::unique_ptr<Pass> mlir::miopen::createMainWrapperPass() {
