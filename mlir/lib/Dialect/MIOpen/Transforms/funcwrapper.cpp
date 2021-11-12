@@ -47,10 +47,9 @@ void MainWrapperPass::runOnOperation() {
   auto ops = module.getOps<FuncOp>();
   Operation fusedFunc;
   for (auto f : module.getOps<FuncOp>()) {
-    fusedFunc = f;
+    auto mainFunc = f.cloneWithoutRegions();
+    f.setAttr("sym_visibility", StringAttr::get(ctx, "private"));
   }
-  auto mainFunc = fusedFunc.cloneWithoutRegions();
-  fusedFunc.setAttr("sym_visibility", StringAttr::get(ctx, "private"));
 }
 
 std::unique_ptr<Pass> mlir::miopen::createMainWrapperPass() {
