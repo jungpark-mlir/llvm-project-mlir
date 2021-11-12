@@ -28,6 +28,7 @@
 #include "mlir/Dialect/MIOpen/Passes.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
+#include "mlir/IR/FunctionSupport.h"
 
 #include "llvm/ADT/SmallVector.h"
 
@@ -53,6 +54,7 @@ void MainWrapperPass::runOnOperation() {
     Location loc = f.getLoc();
     b.setInsertionPoint(f);
     auto type = f.getType();
+    eraseFunctionResults(f, 0, 1, type);
     auto mainFunc = b.create<FuncOp>(loc, "new_main", type);
 
     b.setInsertionPointToStart(mainFunc.addEntryBlock());
