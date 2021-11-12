@@ -216,7 +216,7 @@ static bool constructAndTraverseIr(MlirContext ctx) {
   pm.run(module);
   mlirOperationDump(moduleMO);
 
-  pm.addPass(miopen::createMainWrapperPass());
+  pm.addPass(mlir::miopen::createMainWrapperPass());
   pm.run(module);
   mlirOperationDump(moduleMO);
 
