@@ -49,15 +49,13 @@ void MainWrapperPass::runOnOperation() {
   OpBuilder b(ctx);
 
   for (auto f : module.getOps<FuncOp>()) {
-    //auto mainFunc = f.cloneWithoutRegions();
-    f.setAttr("sym_visibility", StringAttr::get(ctx, "private"));
     Location loc = f.getLoc();
     b.setInsertionPoint(f);
     auto type = f.getType();
 
     auto mainFunc = b.create<FuncOp>(loc, "main", type);
     b.setInsertionPointToStart(mainFunc.addEntryBlock());
-    CallOp callOp = b.create<CallOp>(loc, f, mainFunc.getArguments());
+    CallOp callOp = b.create<CallOp>(loc, f, mainFunc.getArguments(), mainFunc.getResults());
     b.create<ReturnOp>(loc);
     mlir::function_like_impl::eraseFunctionResults(mainFunc, {0}, 1, mainFunc.getTypeWithoutArgsAndResults({}, {0}));
   }
