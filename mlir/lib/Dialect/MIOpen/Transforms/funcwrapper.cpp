@@ -56,7 +56,7 @@ void MainWrapperPass::runOnOperation() {
     auto mainFunc = b.create<FuncOp>(loc, "new_main", type);
 
     b.setInsertionPointToStart(mainFunc.addEntryBlock());
-    CallOp callOp = b.create<CallOp>(loc, f, f.getOpOperands());
+    CallOp callOp = b.create<CallOp>(loc, f, f.getArguments());
   }
 
 
