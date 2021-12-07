@@ -21,7 +21,7 @@ def Convert2DTo4DSymmPad : NativeCodeCall<
 def GetNullAttr : NativeCodeCall<"Attribute()">;
 
 def UI64ArrayToI64Array : NativeCodeCall<
-    "$_builder.getI64ArrayAttr(llvm::map_range($0.dyn_cast<ArrayAttr>(), [&](IntegerAttr intAttr){return intAttr.cast<IntegerAttr>().getValue();})">;
+    "$_builder.getI64ArrayAttr(llvm::map_range($0.dyn_cast<ArrayAttr>(), [&](IntegerAttr intAttr){return intAttr.cast<IntegerAttr>().getInt();})">;
 
 def : Pat<(MIGraphX_ConvolutionOp:$result $input1, $filter, $pad, $stride, $dilation,
       $group, $_ // ignore padding mode
