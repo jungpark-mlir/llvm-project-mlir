@@ -126,11 +126,11 @@ def MIGraphX_ConvolutionOp :
     Arguments<(ins AnyRankedTensor:$input,
                    AnyRankedTensor:$filter,
 
-                   I64ArrayAttr:$padding,
-                   I64ArrayAttr:$stride,
-                   I64ArrayAttr:$dilation,
-                   I64Attr:$group,
-                   OptionalAttr<I64Attr>:$padding_mode
+                   UI64ArrayAttr:$padding,
+                   UI64ArrayAttr:$stride,
+                   UI64ArrayAttr:$dilation,
+                   UI64Attr:$group,
+                   OptionalAttr<UI64Attr>:$padding_mode
                    )>,
 	  Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "convolution forward";
@@ -169,7 +169,7 @@ def MIGraphX_BatchNormOp :
 
                    F32Attr:$epsilon,
                    F32Attr:$momentum,
-                   I64Attr:$bn_mode
+                   UI64Attr:$bn_mode
                    )>,
 	  Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "batch_norm_inference";
@@ -195,7 +195,7 @@ def MIGraphX_PadOp :
     MIGraphX_Op<"pad">,
     Arguments<(ins AnyRankedTensor:$input,
 
-                   I64ArrayAttr:$pads,
+                   UI64ArrayAttr:$pads,
                    F32Attr:$value,
                    PadOpModeAttr:$mode
                    )>,
@@ -213,10 +213,10 @@ def MIGraphX_PoolingOp :
     Arguments<(ins AnyRankedTensor:$input,
 
                    StrAttr:$mode,
-                   I64ArrayAttr:$padding,
-                   I64ArrayAttr:$stride,
-                   I64ArrayAttr:$length,
-                   I64Attr:$ceil_mode
+                   UI64ArrayAttr:$padding,
+                   UI64ArrayAttr:$stride,
+                   UI64ArrayAttr:$length,
+                   UI64Attr:$ceil_mode
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "Pooling operation";
@@ -228,7 +228,7 @@ def MIGraphX_PoolingOp :
 def MIGraphX_FlattenOp :
     MIGraphX_Op<"flatten">,
     Arguments<(ins AnyRankedTensor:$input,
-                   I64Attr:$axis
+                   UI64Attr:$axis
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "Flatten tensor";
@@ -240,7 +240,7 @@ def MIGraphX_FlattenOp :
 def MIGraphX_TransposeOp :
     MIGraphX_Op<"transpose">,
     Arguments<(ins AnyRankedTensor:$input,
-                   I64ArrayAttr:$dims
+                   UI64ArrayAttr:$dims
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "transpose dimensions";
@@ -254,7 +254,7 @@ def MIGraphX_TransposeOp :
 def MIGraphX_ReshapeOp :
     MIGraphX_Op<"reshape">,
     Arguments<(ins AnyRankedTensor:$input,
-                   I64ArrayAttr:$dims
+                   UI64ArrayAttr:$dims
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "reshape a tensor";
@@ -268,7 +268,7 @@ def MIGraphX_ReshapeOp :
 def MIGraphX_MultiBroadcastOp :
     MIGraphX_Op<"multibroadcast">,
     Arguments<(ins AnyRankedTensor:$input,
-                   I64ArrayAttr:$ouput_lens
+                   UI64ArrayAttr:$ouput_lens
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "Broadcast tensor in multiple dimensions";
@@ -282,8 +282,8 @@ def MIGraphX_DotOp :
     Arguments<(ins AnyRankedTensor:$input,
                    AnyRankedTensor:$a,
                    AnyRankedTensor:$b,
-                   I64Attr:$alpha,
-                   I64Attr:$beta
+                   UI64Attr:$alpha,
+                   UI64Attr:$beta
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  
   let summary = "Broadcast tensor in multiple dimensions";
@@ -295,7 +295,7 @@ def MIGraphX_DotOp :
 def MIGraphX_ConstantOp :
     MIGraphX_Op<"constant">,
     Arguments<(ins OptionalAttr<ElementsAttr>:$value,
-                   OptionalAttr<I64ArrayAttr>:$shape,
+                   OptionalAttr<UI64ArrayAttr>:$shape,
                    OptionalAttr<TypeAttr>:$type
                    )>,
 	Results<(outs AnyRankedTensor:$output)> {	  

@@ -15,6 +15,11 @@
 
 include "mlir/IR/OpBase.td"
 
+def UI64ArrayAttr : TypedArrayAttrBase<UI64Attr,
+                                      "64-bit unsigned integer array attribute"> {
+  let constBuilderCall = "$_builder.getI64ArrayAttr($0)";
+}
+
 def default_ : I32EnumAttrCase<"default_", 0>;
 def same     : I32EnumAttrCase<"same", 1>;
 def valid    : I32EnumAttrCase<"valid", 2>;
