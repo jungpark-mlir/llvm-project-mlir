@@ -20,7 +20,6 @@ def Convert2DTo4DSymmPad : NativeCodeCall<
     "$_builder.getArrayAttr({($0.getValue()[0]), ($0.getValue()[0]), ($0.getValue()[1]), ($0.getValue()[1])})">;
 def GetNullAttr : NativeCodeCall<"Attribute()">;
 
-llvm::map_range(arrayAttr.getAsRange<IntegerAttr>(),
 def UI64ArrayToI64Array : NativeCodeCall<
     "$0.dyn_cast<ArrayAttr>().getI64ArrayAttr">;
 //    "$_builder.getI64ArrayAttr($0.dyn_cast<ArrayAttr>().getValue())">;
