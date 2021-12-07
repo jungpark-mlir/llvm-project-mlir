@@ -20,16 +20,19 @@ def Convert2DTo4DSymmPad : NativeCodeCall<
     "$_builder.getArrayAttr({($0.getValue()[0]), ($0.getValue()[0]), ($0.getValue()[1]), ($0.getValue()[1])})">;
 def GetNullAttr : NativeCodeCall<"Attribute()">;
 
+def UI64ArrayToI64Array : NativeCodeCall<
+    "$_builder.get64ArrayAttr($0)">;
+
 def : Pat<(MIGraphX_ConvolutionOp:$result $input1, $filter, $pad, $stride, $dilation,
       $group, $_ // ignore padding mode
       ),
-    (Tosa_Conv2DOp $input1, $filter, (Tosa_ConstOp ConstantAttr<RankedF32ElementsAttr<[1]>, "{0.0f}">:$f32attr), I64ArrayAttr:$pad, I64ArrayAttr:$stride, I64ArrayAttr:$dilation, (GetNullAttr))>;
+    (Tosa_Conv2DOp $input1, $filter, (Tosa_ConstOp ConstantAttr<RankedF32ElementsAttr<[1]>, "{0.0f}">:$f32attr), (UI64ArrayToI64Array $pad), (UI64ArrayToI64Array $stride), (UI64ArrayToI64Array $dilation), (GetNullAttr))>;
 
 def : Pat<(MIGraphX_AddOp
     (MIGraphX_ConvolutionOp $input1, $filter, $pad, $stride, $dilation,
       $group, $_ // ignore padding mode
       ), $bias),
-      (Tosa_Conv2DOp $input1, $filter, $bias, I64ArrayAttr:$pad, I64ArrayAttr:$stride, I64ArrayAttr:$dilation, (GetNullAttr))>;
+      (Tosa_Conv2DOp $input1, $filter, $bias, (UI64ArrayToI64Array $pad), (UI64ArrayToI64Array $stride), (UI64ArrayToI64Array $dilation), (GetNullAttr))>;
 
 def : Pat<(MIGraphX_RsqrtOp $input1), (Tosa_RsqrtOp $input1)>;
 // Clamp to Relu if it clamps to max/min number, otherwise convert to ceil + floor
