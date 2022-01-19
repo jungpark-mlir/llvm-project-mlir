@@ -110,9 +110,9 @@ public:
       filterLayoutSpec.push_back(
           rewriter.getStringAttr(StringRef(&filterLayout[i], 1).str()));
       inputLayoutSpec.push_back(
-          rewriter.getStringAttr((StringRef(&inputLayout[i], 1).str()));
+          rewriter.getStringAttr(StringRef(&inputLayout[i], 1).str()));
       outputLayoutSpec.push_back(
-          rewriter.getStringAttr((StringRef(&outputLayout[i], 1).str()));
+          rewriter.getStringAttr(StringRef(&outputLayout[i], 1).str()));
     }
 
     // convolution config attributes
