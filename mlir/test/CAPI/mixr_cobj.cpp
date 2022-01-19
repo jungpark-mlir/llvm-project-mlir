@@ -199,7 +199,7 @@ static bool constructAndTraverseIr(MlirContext ctx) {
 
   mlir::PassManager pm(module.getContext(),
                        mlir::PassManager::Nesting::Implicit);
-
+  mlirOperationDump(moduleMO);
   mlir::migraphx::addHighLevelPipeline(pm);
   pm.run(module);
   mlirOperationDump(moduleMO);
