@@ -71,8 +71,8 @@ public:
     SmallVector<int64_t> NHWC2NCHW{0, 3, 1, 2};
 
     // insert transpose to input and filter tensors
-    input_t = getRank4TransposeOp(loc, input_t, rewriter, NCHW2NHWC);
-    filter_t = getRank4TransposeOp(loc, filter_t, rewriter, NCHW2NHWC);
+    //input_t = getRank4TransposeOp(loc, input_t, rewriter, NCHW2NHWC);
+    //filter_t = getRank4TransposeOp(loc, filter_t, rewriter, NCHW2NHWC);
 
     auto outShape = outputTy.getShape();
 
@@ -83,7 +83,7 @@ public:
 
     // Construct a new Conv2DOp.
     auto cop = rewriter.create<tosa::Conv2DOp>(
-        loc, newOutTy,
+        loc, outputTy,
         ValueRange{input_t, filter_t, getZero(loc, elementTy, rewriter)});
 
     // translate attributes
@@ -100,19 +100,19 @@ public:
     int64_t dilationWidth = dilationAttr[1].dyn_cast<IntegerAttr>().getInt();
 
     // specify layout attributes
-    const char *filterLayout = "gkcyx"; //"kyxcg";
-    const char *inputLayout = "ngchw";  //"nhwcg";
-    const char *outputLayout = "ngkhw"; //"nhwkg";
-    SmallVector<StringAttr, 5> filterLayoutSpec;
-    SmallVector<StringAttr, 5> inputLayoutSpec;
-    SmallVector<StringAttr, 5> outputLayoutSpec;
-    for (size_t i = 0; i < 5; ++i) {
+    const char *filterLayout = "nchw";
+    const char *inputLayout = "nchw";
+    const char *outputLayout = "nchw";
+    SmallVector<StringAttr, 4> filterLayoutSpec;
+    SmallVector<StringAttr, 4> inputLayoutSpec;
+    SmallVector<StringAttr, 4> outputLayoutSpec;
+    for (size_t i = 0; i < 4; ++i) {
       filterLayoutSpec.push_back(
           rewriter.getStringAttr(StringRef(&filterLayout[i], 1).str()));
       inputLayoutSpec.push_back(
-          rewriter.getStringAttr((StringRef(&inputLayout[i], 1) + "i").str()));
+          rewriter.getStringAttr((StringRef(&inputLayout[i], 1).str()));
       outputLayoutSpec.push_back(
-          rewriter.getStringAttr((StringRef(&outputLayout[i], 1) + "o").str()));
+          rewriter.getStringAttr((StringRef(&outputLayout[i], 1).str()));
     }
 
     // convolution config attributes
@@ -143,8 +143,8 @@ public:
 
     // transpose the output back to NCHW so that it can match following
     // operators.
-    auto top = getRank4TransposeOp(loc, cop, rewriter, NHWC2NCHW);
-    rewriter.replaceOp(op, {top});
+    //auto top = getRank4TransposeOp(loc, cop, rewriter, NHWC2NCHW);
+    rewriter.replaceOp(op, {cop});
     return success();
   }
 };

@@ -126,9 +126,9 @@ public:
     int32_t dilationWidth = op.dilation()[1].dyn_cast<IntegerAttr>().getInt();
 
     // specify layout attributes
-    const char *filterLayout = "kyxcg";
-    const char *inputLayout = "nhwcg";
-    const char *outputLayout = "nhwkg";
+    const char *filterLayout = "gkcyx"; //"kyxcg";
+    const char *inputLayout = "ngchw";  //"nhwcg";
+    const char *outputLayout = "ngkhw"; //"nhwkg";
     SmallVector<StringAttr, 5> filterLayoutSpec;
     SmallVector<StringAttr, 5> inputLayoutSpec;
     SmallVector<StringAttr, 5> outputLayoutSpec;
