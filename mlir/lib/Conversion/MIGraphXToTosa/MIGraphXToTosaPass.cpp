@@ -40,7 +40,7 @@ public:
     OwningRewritePatternList patterns(&ctx);
     ConversionTarget target(ctx);
     target.addLegalDialect<tosa::TosaDialect, migraphx::MIGraphXDialect,
-                           StandardOpsDialect>();
+                           arith::Arithmetic_Dialect, StandardOpsDialect>();
     target.addIllegalOp<migraphx::AddOp, migraphx::ConstantOp,
                         migraphx::ConvolutionOp, migraphx::RsqrtOp,
                         migraphx::ReluOp, migraphx::TransposeOp,
