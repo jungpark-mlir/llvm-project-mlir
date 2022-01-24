@@ -112,7 +112,7 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
   MlirType in0Type =
       mlirRankedTensorTypeGet(4, in0Dims, mlirF32TypeGet(ctx), mlirAttributeGetNull());
   MlirOperationState in0State = mlirOperationStateGet(
-      mlirStringRefCreateFromCString("migraphx.constant"), location);
+      mlirStringRefCreateFromCString("arith.constant"), location);
   mlirOperationStateAddResults(&in0State, 1, &in0Type);
   mlirOperationStateAddAttributes(&in0State, 1, in0Attrs);
 
@@ -141,7 +141,7 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
   MlirType filterc0Type =
       mlirRankedTensorTypeGet(4, filterc0Dims, mlirF32TypeGet(ctx), mlirAttributeGetNull());
   MlirOperationState filterc0State = mlirOperationStateGet(
-      mlirStringRefCreateFromCString("migraphx.constant"), location);
+      mlirStringRefCreateFromCString("arith.constant"), location);
   mlirOperationStateAddResults(&filterc0State, 1, &filterc0Type);
   mlirOperationStateAddAttributes(&filterc0State, 1, filterc0Attrs);
 
