@@ -92,12 +92,69 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
   MlirOperation func = mlirOperationCreate(&funcState);
   mlirBlockInsertOwnedOperation(moduleBody, 0, func);
 
+//-------------- in0 = migraphx.constant
+
+  // Set constant attributes
+  int64_t in0Dims[] = {1, 8, 4, 4};
+  float f32in0[128];
+  for (int i = 0; i < 128; i++) {
+    f32in0[i] = 1.0f;
+  }
+
+  MlirAttribute in0ValueAttr = mlirDenseElementsAttrFloatGet(
+      mlirRankedTensorTypeGet(4, in0Dims, mlirF32TypeGet(ctx), mlirAttributeGetNull()), 128,
+      f32in0);
+  MlirNamedAttribute in0Attrs[] = {mlirNamedAttributeGet(
+      mlirIdentifierGet(ctx, mlirStringRefCreateFromCString("value")),
+      in0ValueAttr)};
+
+  // Set constant op
+  MlirType in0Type =
+      mlirRankedTensorTypeGet(4, in0Dims, mlirF32TypeGet(ctx), mlirAttributeGetNull());
+  MlirOperationState in0State = mlirOperationStateGet(
+      mlirStringRefCreateFromCString("migraphx.constant"), location);
+  mlirOperationStateAddResults(&in0State, 1, &in0Type);
+  mlirOperationStateAddAttributes(&in0State, 1, in0Attrs);
+
+  MlirOperation in0Op = mlirOperationCreate(&in0State);
+  mlirBlockAppendOwnedOperation(funcBody, in0Op);
+  MlirValue in0Value = mlirOperationGetResult(in0Op, 0);
+
+
+ //-------------- filter0 = migraphx.constant
+
+  // Set constant attributes
+  int64_t filter0Dims[] = {2, 8, 3, 3};
+  float f32Filter0[144];
+  for (int i = 0; i < 144; i++) {
+    f32Filter0[i] = 1.0f;
+  }
+
+  MlirAttribute filter0ValueAttr = mlirDenseElementsAttrFloatGet(
+      mlirRankedTensorTypeGet(4, filter0Dims, mlirF32TypeGet(ctx), mlirAttributeGetNull()), 144,
+      f32Filter0);
+  MlirNamedAttribute filter0Attrs[] = {mlirNamedAttributeGet(
+      mlirIdentifierGet(ctx, mlirStringRefCreateFromCString("value")),
+      filter0ValueAttr)};
+
+  // Set constant op
+  MlirType filter0Type =
+      mlirRankedTensorTypeGet(4, filter0Dims, mlirF32TypeGet(ctx), mlirAttributeGetNull());
+  MlirOperationState filter0State = mlirOperationStateGet(
+      mlirStringRefCreateFromCString("migraphx.constant"), location);
+  mlirOperationStateAddResults(&filter0State, 1, &filter0Type);
+  mlirOperationStateAddAttributes(&filter0State, 1, filter0Attrs);
+
+  MlirOperation filter0Op = mlirOperationCreate(&filter0State);
+  mlirBlockAppendOwnedOperation(funcBody, filter0Op);
+  MlirValue filter0Value = mlirOperationGetResult(filter0Op, 0);
+
   //-------------- conv0 = migraphx.convolution
 
   // Set conv0 arguments : arg0 from the func and constant filter0
   MlirValue funcArg0 = mlirBlockGetArgument(funcBody, 0);
   MlirValue funcArg1 = mlirBlockGetArgument(funcBody, 1);
-  MlirValue conv0Operands[] = {funcArg0, funcArg1};
+  MlirValue conv0Operands[] = {in0Value, filter0Value};
 
   // Set convolution attributes
   // padding, stride, dilation, group, padding_mode
