@@ -96,7 +96,7 @@ public:
         loc, resultTypes, ValueRange{args[0], args[1], args[2]});
 
     // TODO(sjw): get these from options
-    StringRef arch = "gfx906";
+    StringRef arch = "gfx908";
     uint32_t num_cu = 64;
     bool xdlopsV2 = false;
 
