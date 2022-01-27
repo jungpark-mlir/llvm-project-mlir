@@ -43,7 +43,7 @@ public:
     auto shape = oprType.getShape();
     SmallVector<int64_t, 5> expShape;
     uint32_t i=0, j=0;
-    for (;i<shape.size();i++){
+    for (; i < shape.size() + 1; i++){
       if (i == idx){
         expShape.push_back(1);
       } else {
