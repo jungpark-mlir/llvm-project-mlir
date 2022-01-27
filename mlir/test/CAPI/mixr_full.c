@@ -154,7 +154,7 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
 static bool constructAndTraverseIr(MlirContext ctx) {
   MlirLocation location1 = mlirLocationUnknownGet(ctx);
   MlirModule module = makeAndDumpMIXR(ctx, location1);
-  ctx.disableMultithreading();
+  mlirContextEnableMultithreading(ctx, false);
   MlirPassManager pm = mlirPassManagerCreate(ctx);
   mlirPassManagerEnableIRPrinting(pm);
   // 1st pipeline to call
