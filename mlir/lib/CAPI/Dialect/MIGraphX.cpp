@@ -132,6 +132,7 @@ mlirMIGraphXAddBackendPipeline(MlirPassManager pm, const char* chip, MlirModule 
 
   auto passMan = unwrap(pm);
   passMan->setNesting(mlir::PassManager::Nesting::Implicit);
+  MlirOperation moduleOp = mlirModuleGetOperation(module);
 
   const char *triple = "amdgcn-amd-amdhsa";
   const char *features = "";
