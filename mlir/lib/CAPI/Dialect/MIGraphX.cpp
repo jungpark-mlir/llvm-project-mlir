@@ -127,7 +127,7 @@ void mlirMIGraphXAddHighLevelPipeline(MlirPassManager pm) {
 }
 
 MLIR_CAPI_EXPORTED void
-mlirMIGraphXAddBackendPipeline(MlirPassManager pm, const char* chip) {
+mlirMIGraphXAddBackendPipeline(MlirPassManager pm, const char* chip, MlirModule module) {
   mlir::registerGpuSerializeToHsacoPass();
 
   auto passMan = unwrap(pm);
@@ -137,5 +137,8 @@ mlirMIGraphXAddBackendPipeline(MlirPassManager pm, const char* chip) {
   const char *features = "";
   const char *perfConfig = "";
   mlir::miopen::addPipeline(*passMan, perfConfig, false, true);
+  mlirPassManagerRun(pm, module);
+  mlirOperationDump(moduleOp);
+
   mlir::miopen::addBackendPipeline(*passMan, triple, chip, features);
 }

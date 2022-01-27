@@ -188,7 +188,7 @@ static bool constructAndTraverseIr(MlirContext ctx) {
 
   // 2nd pipeline to call
   const char *deviceName = "gfx908";
-  mlirMIGraphXAddBackendPipeline(pm, deviceName);
+  mlirMIGraphXAddBackendPipeline(pm, deviceName, module);
   mlirPassManagerRun(pm, module);
 
   int attrs[2];
