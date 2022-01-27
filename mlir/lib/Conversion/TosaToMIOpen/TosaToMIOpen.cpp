@@ -56,7 +56,7 @@ public:
     uint32_t dim = 0;
     if (idx == shape.size())
       idx--;
-    for (; dim < shape.size(); ++dim) {
+    for (; dim < shape.size() + 1; ++dim) {
       if (dim == idx) {
         reassociations.push_back(
           {getAffineDimExpr(dim, context), getAffineDimExpr(++dim, context)});
