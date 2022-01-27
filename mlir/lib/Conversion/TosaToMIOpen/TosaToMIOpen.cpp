@@ -30,7 +30,7 @@ class ConvConverter final : public OpConversionPattern<tosa::Conv2DOp> {
 public:
   using OpConversionPattern<tosa::Conv2DOp>::OpConversionPattern;
 
-  Value expandMemRef(tosa::Conv2DOp op, Value operand,
+  Value expandMemRef(tosa::Conv2DOp op, Value operand, int idx,
                      ConversionPatternRewriter &rewriter) const {
     auto loc = op->getLoc();
     auto context = rewriter.getContext();
@@ -41,19 +41,29 @@ public:
       return Value();
     }
     auto shape = oprType.getShape();
-    SmallVector<int64_t, 5> expShape(shape.begin(), shape.end());
-    expShape.push_back(1);
+    SmallVector<int64_t, 5> expShape;
+    uint32_t i=0, j=0;
+    for (;i<shape.size();i++){
+      if (i == idx){
+        expShape.push_back(1);
+      } else {
+        expShape.push_back(shape[j++]);
+      }
+    }
     auto newType = MemRefType::get(expShape, oprType.getElementType());
 
     SmallVector<ReassociationExprs, 5> reassociations;
     uint32_t dim = 0;
-    for (; dim < shape.size() - 1; ++dim) {
-      reassociations.push_back({getAffineDimExpr(dim, context)});
+    if (idx == shape.size())
+      idx--;
+    for (; dim < shape.size(); ++dim) {
+      if (dim == idx) {
+        reassociations.push_back(
+          {getAffineDimExpr(dim, context), getAffineDimExpr(dim + 1, context)});
+      } else {
+        reassociations.push_back({getAffineDimExpr(dim, context)});
+      }
     }
-
-    // last dimension + g dimension
-    reassociations.push_back(
-        {getAffineDimExpr(dim, context), getAffineDimExpr(dim + 1, context)});
 
     auto oprExpand = rewriter.create<memref::ExpandShapeOp>(
         loc, newType, operand, reassociations);
@@ -78,15 +88,15 @@ public:
     assert(results.size() == 1);
 
     // expand tensors from rank 4 (NHWC) to rank 5 (NHWCG)
-    auto inputExpanded = expandMemRef(op, input_t, rewriter);
+    auto inputExpanded = expandMemRef(op, input_t, 1, rewriter);
 
-    auto filterExpanded = expandMemRef(op, filter_t, rewriter);
+    auto filterExpanded = expandMemRef(op, filter_t, 0, rewriter);
 
     auto outputType = getTypeConverter<mlir::bufferization::BufferizeTypeConverter>()
                           ->convertType(results[0].getType())
                           .cast<MemRefType>();
     Value output = rewriter.create<memref::AllocOp>(loc, outputType);
-    auto outputExpanded = expandMemRef(op, output, rewriter);
+    auto outputExpanded = expandMemRef(op, output, 1, rewriter);
 
     SmallVector<Value, 4> args({filterExpanded, inputExpanded, outputExpanded});
 
