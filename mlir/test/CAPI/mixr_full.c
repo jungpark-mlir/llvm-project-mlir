@@ -156,6 +156,7 @@ static bool constructAndTraverseIr(MlirContext ctx) {
   MlirModule module = makeAndDumpMIXR(ctx, location1);
 
   MlirPassManager pm = mlirPassManagerCreate(ctx);
+  mlirPassManagerEnableIRPrinting(pm);
   // 1st pipeline to call
   mlirMIGraphXAddHighLevelPipeline(pm);
   mlirPassManagerRun(pm, module);
