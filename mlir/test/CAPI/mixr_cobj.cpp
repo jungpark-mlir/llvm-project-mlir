@@ -92,6 +92,8 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
   MlirOperation func = mlirOperationCreate(&funcState);
   mlirBlockInsertOwnedOperation(moduleBody, 0, func);
 
+
+/*
 //-------------- in0 = migraphx.constant
 
   // Set constant attributes
@@ -148,13 +150,13 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
   MlirOperation filterc0Op = mlirOperationCreate(&filterc0State);
   mlirBlockAppendOwnedOperation(funcBody, filterc0Op);
   MlirValue filterc0Value = mlirOperationGetResult(filterc0Op, 0);
-
+*/
   //-------------- conv0 = migraphx.convolution
 
   // Set conv0 arguments : arg0 from the func and constant filterc0
   MlirValue funcArg0 = mlirBlockGetArgument(funcBody, 0);
   MlirValue funcArg1 = mlirBlockGetArgument(funcBody, 1);
-  MlirValue conv0Operands[] = {in0Value, filterc0Value};
+  MlirValue conv0Operands[] = {funcArg0, funcArg1};
 
   // Set convolution attributes
   // padding, stride, dilation, group, padding_mode
