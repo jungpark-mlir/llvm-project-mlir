@@ -59,7 +59,7 @@ public:
     for (; dim < shape.size(); ++dim) {
       if (dim == idx) {
         reassociations.push_back(
-          {getAffineDimExpr(dim, context), getAffineDimExpr(dim + 1, context)});
+          {getAffineDimExpr(dim, context), getAffineDimExpr(++dim, context)});
       } else {
         reassociations.push_back({getAffineDimExpr(dim, context)});
       }
