@@ -26,8 +26,8 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
   MlirBlock moduleBody = mlirModuleGetBody(moduleOp);
 
   // Set func arguments
-  int64_t inDims[] = {1, 64, 56, 56};
-  int64_t filter0Dims[] = {64, 64, 1, 1};
+  int64_t inDims[] = {1, 8, 4, 4};
+  int64_t filter0Dims[] = {2, 8, 3, 3};
   int64_t bias0Dims[] = {64};
 
   MlirType inType = mlirRankedTensorTypeGet(4, inDims, mlirF32TypeGet(ctx),
@@ -47,8 +47,8 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
   // Set func attributes
   MlirAttribute funcTypeAttr = mlirAttributeParseGet(
       ctx, mlirStringRefCreateFromCString(
-               "(tensor<1x64x56x56xf32>, tensor<64x64x1x1xf32>, "
-               "tensor<64xf32>) -> (tensor<1x64x56x56xf32>)"));
+               "(tensor<1x8x4x4xf32>, tensor<2x8x3x3xf32>, "
+               "tensor<64xf32>) -> (tensor<1x2x2x2xf32>)"));
   MlirAttribute funcNameAttr =
       mlirAttributeParseGet(ctx, mlirStringRefCreateFromCString("\"main\""));
   MlirNamedAttribute funcAttrs[] = {
@@ -105,7 +105,7 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
           conv0PaddingModeAttr)};
 
   // Set output shape
-  int64_t conv0Dims[] = {1, 64, 56, 56};
+  int64_t conv0Dims[] = {1, 2, 2, 2};
   MlirType conv0Type = mlirRankedTensorTypeGet(
       4, conv0Dims, mlirF32TypeGet(ctx), mlirAttributeGetNull());
 
@@ -118,7 +118,7 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
   MlirOperation conv0Op = mlirOperationCreate(&conv0OpState);
   mlirBlockAppendOwnedOperation(funcBody, conv0Op);
   MlirValue conv0Value = mlirOperationGetResult(conv0Op, 0);
-
+/*
   //-------------- migraphx.relu op
 
   // Set relu0 arguments
@@ -136,10 +136,10 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
   MlirOperation relu0Op = mlirOperationCreate(&relu0State);
   mlirBlockAppendOwnedOperation(funcBody, relu0Op);
   MlirValue relu0Value = mlirOperationGetResult(relu0Op, 0);
-
+*/
   //-------------- std.return op
 
-  MlirValue retOperands[] = {relu0Value};
+  MlirValue retOperands[] = {conv0Value};
   MlirOperationState retState = mlirOperationStateGet(
       mlirStringRefCreateFromCString("std.return"), location);
   mlirOperationStateAddOperands(&retState, 1, retOperands);
