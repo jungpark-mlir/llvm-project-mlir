@@ -154,9 +154,9 @@ MlirModule makeAndDumpMIXR(MlirContext ctx, MlirLocation location) {
 static bool constructAndTraverseIr(MlirContext ctx) {
   MlirLocation location1 = mlirLocationUnknownGet(ctx);
   MlirModule module = makeAndDumpMIXR(ctx, location1);
-  mlirContextEnableMultithreading(ctx, false);
+//  mlirContextEnableMultithreading(ctx, false);
   MlirPassManager pm = mlirPassManagerCreate(ctx);
-  mlirPassManagerEnableIRPrinting(pm);
+//  mlirPassManagerEnableIRPrinting(pm);
   // 1st pipeline to call
   mlirMIGraphXAddHighLevelPipeline(pm);
   mlirPassManagerRun(pm, module);
@@ -166,7 +166,6 @@ static bool constructAndTraverseIr(MlirContext ctx) {
   // returns the required buffer size to hold information including
   // ranks, dimensions of each arguments and kernel name.
   int argSize = mlirGetKernelInfoSize(module);
-  ;
   void *argInfo = malloc(argSize);
   // get the data
   mlirGetKernelInfo(module, (void *)argInfo);

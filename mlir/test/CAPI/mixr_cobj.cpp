@@ -258,14 +258,8 @@ static bool constructAndTraverseIr(MlirContext ctx) {
 
   mlir::PassManager pm(module.getContext(),
                        mlir::PassManager::Nesting::Implicit);
-  mlirOperationDump(moduleMO);
   mlir::migraphx::addHighLevelPipeline(pm);
-  pm.run(module);
-  mlirOperationDump(moduleMO);
-
   mlir::miopen::addHighLevelPipeline(pm);
-  pm.run(module);
-  mlirOperationDump(moduleMO);
 
   size_t argIdx = 0;
   module.walk([&](mlir::FuncOp f) {
@@ -295,8 +289,6 @@ static bool constructAndTraverseIr(MlirContext ctx) {
   // printf("Estimated #kernel params : %d\n", argIdx);
 
   mlir::miopen::addPipeline(pm, perfConfig, false, true);
-  pm.run(module);
-  mlirOperationDump(moduleMO);
   mlir::miopen::addBackendPipeline(pm, triple, chip, features);
   auto status = pm.run(module);
 
