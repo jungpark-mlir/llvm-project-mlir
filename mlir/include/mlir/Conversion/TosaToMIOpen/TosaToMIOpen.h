@@ -15,7 +15,7 @@
 #define MLIR_CONVERSION_TOSATOMIOPEN_TOSATOMIOPEN_H
 
 #include "mlir/Pass/Pass.h"
-#include "mlir/Dialect/Bufferization/IR/Bufferization.h"
+#include "mlir/Dialect/Bufferization/Transform/Bufferization.h"
 
 namespace mlir {
 namespace tosa {
