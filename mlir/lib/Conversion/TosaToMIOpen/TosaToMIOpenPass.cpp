@@ -13,6 +13,7 @@
 #include "../PassDetail.h"
 #include "mlir/Conversion/TosaToMIOpen/TosaToMIOpen.h"
 #include "mlir/Dialect/Bufferization/IR/Bufferization.h"
+#include "mlir/Dialect/Bufferization/Transforms/Bufferize.h"
 #include "mlir/Dialect/Linalg/IR/LinalgOps.h"
 #include "mlir/Dialect/MIOpen/MIOpen.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
