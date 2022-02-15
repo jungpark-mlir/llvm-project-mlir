@@ -46,7 +46,7 @@ public:
     target.markUnknownOpDynamicallyLegal([](Operation *) { return true; });
 
     FuncOp func = getFunction();
-    mlir::bufferization::BufferizeTypeConverter bufferizer();
+    mlir::bufferization::BufferizeTypeConverter bufferizer;
 
     mlir::tosa::populateTosaToMIOpenConversionPatterns(func.getContext(),
                                                        &patterns, bufferizer);
