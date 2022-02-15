@@ -238,7 +238,7 @@ public:
 } // namespace
 
 void tosa::populateTosaToMIOpenConversionPatterns(
-    MLIRContext *context, OwningRewritePatternList *patterns) {
-  static mlir::bufferization::BufferizeTypeConverter bufferizer;
+    MLIRContext *context, OwningRewritePatternList *patterns,  mlir::bufferization::BufferizeTypeConverter bufferizer) {
+  //static mlir::bufferization::BufferizeTypeConverter bufferizer;
   patterns->insert<ConvConverter>(bufferizer, context);
 }

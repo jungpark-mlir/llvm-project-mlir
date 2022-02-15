@@ -45,8 +45,10 @@ public:
     target.markUnknownOpDynamicallyLegal([](Operation *) { return true; });
 
     FuncOp func = getFunction();
+    mlir::bufferization::BufferizeTypeConverter bufferizer();
+
     mlir::tosa::populateTosaToMIOpenConversionPatterns(func.getContext(),
-                                                       &patterns);
+                                                       &patterns, bufferizer);
     if (failed(applyFullConversion(func, target, std::move(patterns))))
       signalPassFailure();
   }
