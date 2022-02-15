@@ -28,11 +28,12 @@ std::unique_ptr<Pass> createTosaToMIOpenPass();
 /// pipeline succeeds.
 void addTosaToMIOpenPasses(OpPassManager &pm);
 
-/// Populates conversion passes from TOSA dialect to MIOpen dialect.
-void populateTosaToMIOpenConversionPatterns(MLIRContext *context,
-                                            OwningRewritePatternList *patterns,  mlir::bufferization::BufferizeTypeConverter bufferizer);
 
 } // namespace tosa
 } // namespace mlir
+
+/// Populates conversion passes from TOSA dialect to MIOpen dialect.
+void mlir::tosa::populateTosaToMIOpenConversionPatterns(MLIRContext *context,
+                                            OwningRewritePatternList *patterns,  mlir::bufferization::BufferizeTypeConverter bufferizer);
 
 #endif // MLIR_CONVERSION_TOSATOMIOPEN_TOSATOMIOPEN_H
