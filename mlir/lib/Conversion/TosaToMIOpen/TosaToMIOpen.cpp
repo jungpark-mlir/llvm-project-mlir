@@ -202,7 +202,7 @@ public:
     // TODO: remove these
     cop->setAttr("arch", rewriter.getStringAttr(arch));
     cop->setAttr("num_cu", rewriter.getI32IntegerAttr(num_cu));
-    cop->setAttr("xdlopsV2", rewriter.getBoolAttr(xdlopsV2));
+    cop->setAttr("xdlopsV2", rewriter.getBoolAttr(true)); //xdlopsV2));
 
     // convolution config attributes
     cop->setAttr("filter_layout",
