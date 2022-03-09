@@ -2657,6 +2657,7 @@ struct GridwiseGemmV2RewritePattern
       // Original C++ logic.
       // const index_t col = (waveId % GemmNWaves) * GemmNPerWave + n *
       // NPerXdlops + thread_mtx_on_blk.col;
+      /*
       c_thread_mtx_index_col = b.create<AddIOp>(
           loc,
           b.create<AddIOp>(
@@ -2666,11 +2667,13 @@ struct GridwiseGemmV2RewritePattern
                                NPerWaveConstantOp),
               b.create<ConstantIndexOp>(loc, n_blockwise_gemm * NPerXdlops)),
           thread_mtx_on_blk_col);
+*/
+      c_thread_mtx_index_col = ((waveId % NWavesConstantOp) * NPerWaveConstantOp) + thread_mtx_on_blk_col;
 
       // Original C++ logic.
       // const index_t row = (waveId / GemmNWaves) * GemmMPerWave + m *
       // MPerXdlops + thread_mtx_on_blk.row;
-      c_thread_mtx_index_row = b.create<AddIOp>(
+      /*c_thread_mtx_index_row = b.create<AddIOp>(
           loc,
           b.create<AddIOp>(
               loc,
@@ -2678,7 +2681,9 @@ struct GridwiseGemmV2RewritePattern
                                b.create<DivUIOp>(loc, waveId, NWavesConstantOp),
                                MPerWaveConstantOp),
               b.create<ConstantIndexOp>(loc, m_blockwise_gemm * MPerXdlops)),
-          thread_mtx_on_blk_row);
+          thread_mtx_on_blk_row);*/
+
+      c_thread_mtx_index_row = ((waveId / NWavesConstantOp) * MPerWaveConstantOp) + thread_mtx_on_blk_row;
 
       // In gridwise_gemm_xdlops.hpp:
       //
