@@ -64,6 +64,19 @@ std::tuple<Value, ArrayAttr> untransform(OpBuilder &b, Value transformed,
 /// the dimension on the memref)
 std::tuple<ArrayAttr, ArrayAttr> computeOobFromTransforms(Builder &b,
                                                           ArrayAttr transforms);
+
+/// Create a map of dimension names to indices in a destination coordinate space
+/// using the expansion map [original name] -> [expanded names] to
+/// replace one dimension with multiple ones.
+/// For example, expandNamesInPlace(["a", "b", "c"], {"b": ["x", "y"]})
+/// will return the mapping {"a": 0, "x": 1, "y": 2, "c": 3}
+llvm::StringMap<uint32_t>
+expandNamesInPlace(ArrayRef<StringRef> original,
+                   const llvm::StringMap<SmallVector<StringRef, 2>> expansion);
+llvm::StringMap<uint32_t>
+expandNamesInPlace(CoordTransformsBuilder &builder,
+                   const llvm::StringMap<SmallVector<StringRef, 2>> expansion);
+
 } // end namespace miopen
 } // end namespace mlir
 #endif
