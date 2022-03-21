@@ -484,7 +484,7 @@ struct ThreadwiseCopyV2RewritePattern
     bounds[5] /= dataPerCopy;
 
     Value c0 = b.create<arith::ConstantIndexOp>(loc, 0);
-    auto oobDims = computeOobFromTransforms(b, destTransforms);
+    auto oobDims = miopen::computeOobFromTransforms(b, destTransforms);
 
     miopen::TransformingForOp copyLoop = b.create<miopen::TransformingForOp>(
         loc, ArrayRef<ValueRange>{op.sourceCoord(), op.destCoord()}, ArrayRef<Attribute>{sourceTransforms, noTransforms}, bounds,
