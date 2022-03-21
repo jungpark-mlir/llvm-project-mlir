@@ -274,7 +274,8 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
                                          {1, 1, 1, 1, 1, 16}, loc);
         getTopTransform.passThrough({"d"}, {0}, {"d5"});
         miopen::TransformMapAttr getTopTransformAttr = getTopTransform.get();
-        newInput = b.create<miopen::TransformOp>(loc, newInput, getTopTransformAttr);
+        auto newInputTransformed = b.create<miopen::TransformOp>(loc, newInput, getTopTransformAttr);
+        newInput = newInputTransformed->getResult(0);
       }
       newInputs.push_back(newInput);
       laGenericAMaps.push_back(AffineMap::getMultiDimIdentityMap(
