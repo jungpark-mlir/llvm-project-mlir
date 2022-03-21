@@ -272,7 +272,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
         //FIXME shrink back the dimension so linalg can have 1d arguments.
         miopen::TopDownCTBuilder getTopTransform(b, {"d0", "d1", "d2", "d3", "d4", "d5"},
                                          {1, 1, 1, 1, 1, 16}, loc);
-        getTopTransform.passThrough({"d5"}, {5}, {"d"});
+        getTopTransform.passThrough({"d5"});
         miopen::TransformMapAttr getTopTransformAttr = getTopTransform.get();
         newInput = b.create<miopen::TransformOp>(loc, newInput, getTopTransformAttr);
       }
