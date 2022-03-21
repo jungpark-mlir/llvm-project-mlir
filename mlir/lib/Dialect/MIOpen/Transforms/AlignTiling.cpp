@@ -334,6 +334,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
                          inp, transforms)) {
         assert(!twinpV2);
         twinpV2 = twinp_t;
+        break;
       }
     }
 
