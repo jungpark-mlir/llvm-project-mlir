@@ -186,7 +186,14 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     // 5. Adjust the copy to show the correct argument as global
     nTWCopy->setAttr("globalArg", b.getIndexAttr(0));
 
-    return clonedVec->getResult(0);
+    //FIXME shrink back the dimension so linalg can have 1d arguments.
+    miopen::TopDownCTBuilder getTopTransform(b, {"d0", "d1", "d2", "d3", "d4", "d5"},
+                                     {1, 1, 1, 1, 1, 16}, loc);
+    getTopTransform.passThrough({"d"}, {0}, {"d5"});
+    miopen::TransformMapAttr getTopTransformAttr = getTopTransform.get();
+    auto cvTransformed = b.create<miopen::TransformOp>(loc, clonedVec, getTopTransformAttr);
+
+    return cvTransformed->getResult(0);
   }
 
   Value applyTransforms(PatternRewriter &b, Operation *miTWCopy, Value inp,
@@ -269,13 +276,6 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
       } else {
         // 2.1.1. Align tiling of other inputs
         newInput = applyTransforms(b, twcopy, inp, transforms);
-        //FIXME shrink back the dimension so linalg can have 1d arguments.
-        miopen::TopDownCTBuilder getTopTransform(b, {"d0", "d1", "d2", "d3", "d4", "d5"},
-                                         {1, 1, 1, 1, 1, 16}, loc);
-        getTopTransform.passThrough({"d"}, {0}, {"d5"});
-        miopen::TransformMapAttr getTopTransformAttr = getTopTransform.get();
-        auto newInputTransformed = b.create<miopen::TransformOp>(loc, newInput, getTopTransformAttr);
-        newInput = newInputTransformed->getResult(0);
       }
       newInputs.push_back(newInput);
       laGenericAMaps.push_back(AffineMap::getMultiDimIdentityMap(
