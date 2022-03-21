@@ -269,6 +269,12 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
       } else {
         // 2.1.1. Align tiling of other inputs
         newInput = applyTransforms(b, twcopy, inp, transforms);
+        //FIXME shrink back the dimension so linalg can have 1d arguments.
+        TopDownCTBuilder getTopTransform(b, {"d0", "d1", "d2", "d3", "d4", "d5"},
+                                         {1, 1, 1, 1, 1, 16}, loc);
+        getTopTransform.passThrough({"d5"}, {5}, {"d"});
+        TransformMapAttr getTopTransformAttr = getTopTransform.get();
+        newInput = b.create<TransformOp>(loc, newInput, getTopTransformAttr);
       }
       newInputs.push_back(newInput);
       laGenericAMaps.push_back(AffineMap::getMultiDimIdentityMap(
