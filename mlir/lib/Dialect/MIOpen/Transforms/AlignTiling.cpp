@@ -484,6 +484,7 @@ struct ThreadwiseCopyV2RewritePattern
     bounds[5] /= dataPerCopy;
 
     Value c0 = b.create<arith::ConstantIndexOp>(loc, 0);
+    auto oobDims = computeOobFromTransforms(b, destTransforms);
 
     miopen::TransformingForOp copyLoop = b.create<miopen::TransformingForOp>(
         loc, ArrayRef<ValueRange>{op.sourceCoord(), op.destCoord()}, ArrayRef<Attribute>{sourceTransforms, noTransforms}, bounds,
@@ -491,7 +492,7 @@ struct ThreadwiseCopyV2RewritePattern
     OpBuilder::InsertionGuard guard(b);
     b.setInsertionPointToStart(copyLoop.getBody());
 
-    Value loaded = b.create<miopen::BufferLoadOp>(loc, vecType, source, op.destOobDims(),
+    Value loaded = b.create<miopen::BufferLoadOp>(loc, vecType, source, std::get<0>(oobDims), std::get<1>(oobDims),
                                         copyLoop.getLowerCoords(/*domain=*/1));
 //    loadVec = b.create<vector::InsertStridedSliceOp>(loc, loaded, loadVec, copyLoop.getLowerCoords(0)[0], loadType.getNumElements());
 //    loadVec = b.create<miopen::InsertSliceOp>(loc, loadType, loaded, loadVec, copyLoop.getLowerCoords(0)[0]);
