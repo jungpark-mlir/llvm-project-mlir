@@ -189,11 +189,10 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     miopen::TopDownCTBuilder getTopTransform(b, {"d"},
                                      {16}, loc);
     getTopTransform.merge({"d0", "d1", "d2", "d3", "d4", "d5"}, {0, 1, 2, 3, 4, 5}, {"d"}, {1, 1, 1, 1, 1, 16}, false);
-
     miopen::TransformMapAttr getTopTransformAttr = getTopTransform.get();
     auto cvTransformed = b.create<miopen::TransformOp>(loc, clonedVec, getTopTransformAttr);
-
-    return cvTransformed->getResult(0);
+    return clonedVec->getResult(0);
+//    return cvTransformed->getResult(0);
   }
 
   Value applyTransforms(PatternRewriter &b, Operation *miTWCopy, Value inp,
