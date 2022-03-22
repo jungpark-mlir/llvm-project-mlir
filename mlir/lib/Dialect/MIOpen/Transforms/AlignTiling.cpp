@@ -512,11 +512,11 @@ struct ThreadwiseCopyV2RewritePattern
     b.setInsertionPointToStart(copyLoop.getBody());
 
     Value loaded = b.create<miopen::BufferLoadOp>(loc, vecType, source, std::get<0>(oobDims), std::get<1>(oobDims),
-                                        copyLoop.getLowerCoords(/*domain=*/0));
+                                        copyLoop.getLowerCoords(/*domain=*/1));
 //    loadVec = b.create<vector::InsertStridedSliceOp>(loc, loaded, loadVec, copyLoop.getLowerCoords(0)[0], loadType.getNumElements());
 //    loadVec = b.create<miopen::InsertSliceOp>(loc, loadType, loaded, loadVec, copyLoop.getLowerCoords(0)[0]);
 
-    b.create<vector::StoreOp>(loc, loaded, dest, copyLoop.getLowerCoords(/*domain=*/1));
+    b.create<vector::StoreOp>(loc, loaded, dest, copyLoop.getLowerCoords(/*domain=*/0));
 
     op.erase();
     return success();
