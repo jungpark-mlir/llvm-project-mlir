@@ -2519,7 +2519,7 @@ struct GridwiseGemmV2RewritePattern
         VectorType::get({vectorCoffset}, vectorType.getElementType());
        
 */
-    int64_t vectorLen = vectorType.getShape()[0];
+    uint64_t vectorLen = vectorType.getShape()[0];
     VectorType mergedType = VectorType::get({vectorLen * transformedTail.size()}, vectorType.getElementType());
     Value resultMerged = b.create<arith::ConstantOp>(loc, mergedType, b.getZeroAttr(mergedType));
     int j = 0;
