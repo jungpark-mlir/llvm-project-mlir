@@ -500,14 +500,14 @@ struct ThreadwiseCopyV2RewritePattern
     Value c0 = b.create<arith::ConstantIndexOp>(loc, 0);
     ArrayAttr srcLeftOob, srcRightOob;
     std::tie(srcLeftOob, srcRightOob) =
-        computeOobFromTransforms(b, srcTransforms);
+        computeOobFromTransforms(b, sourceTransforms);
 
     miopen::TransformingForOp copyLoop = b.create<miopen::TransformingForOp>(
         loc, ArrayRef<ValueRange>{op.sourceCoord(), op.destCoord()}, ArrayRef<Attribute>{sourceTransforms, noTransforms}, bounds,
         /*forceUnroll=*/true, /*useIndexDiffs=*/true);
     OpBuilder::InsertionGuard guard(b);
     b.setInsertionPointToStart(copyLoop.getBody());
-    Value loaded = b.create<miopen::BufferLoadOp>(loc, vecType, source, srcLeftOob, srcRightOob),
+    Value loaded = b.create<miopen::BufferLoadOp>(loc, vecType, source, srcLeftOob, srcRightOob,
                                         copyLoop.getLowerCoords(/*domain=*/0));
     b.create<vector::StoreOp>(loc, loaded, dest, copyLoop.getLowerCoords(/*domain=*/1));
 
