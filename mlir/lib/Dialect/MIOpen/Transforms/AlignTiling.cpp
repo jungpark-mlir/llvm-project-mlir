@@ -162,7 +162,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     Value c0 = b.create<arith::ConstantIndexOp>(loc, 0);
     //FIXME
     auto indices = ValueRange({c0, c0, c0, c0, c0, c0});
-    b.create<vector::StoreOp>(loc, nVecSlice->getResult(0), clonedVec->getResult(0), indices);
+    b.create<vector::StoreOp>(loc, nVecSlice->getResult(0), clonedVec, indices);
 
     // 2. clone twcopy for <addend> -> regs
     cloningMap.map(miTWCopy->getOperand(0), inp);
