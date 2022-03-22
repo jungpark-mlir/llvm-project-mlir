@@ -193,7 +193,8 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
   */  
     miopen::BottomUpCTBuilder getTopTransform(b, {"d5"},
                                      {16}, loc);
-    miopen::BottomUpCTTopDimsWrapper topTransformWrapper(getTopTransform, {"d0", "d1", "d2", "d3", "d4", "d5"});
+    llvm::StringMap<uint32_t> upperNames = {"d0", "d1", "d2", "d3", "d4", "d5"};
+    miopen::BottomUpCTTopDimsWrapper topTransformWrapper(getTopTransform, upperNames);
     topTransformWrapper.passThrough("d5");
     topTransformWrapper.addDim({"d0"}, 0);
     topTransformWrapper.addDim({"d1"}, 1);
