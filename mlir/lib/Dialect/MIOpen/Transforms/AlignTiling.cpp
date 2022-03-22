@@ -189,13 +189,19 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     //FIXME shrink back the dimension so linalg can have 1d arguments.
     miopen::TopDownCTBuilder getTopTransform(b, {"d"},
                                      {16}, loc);
+
+    getTopTransform.merge({"d0", "d1", "d2", "d3", "d4", "d5"}, {0, 1, 2, 3, 4, 5}, {"d"}, {1, 1, 1, 1, 1, 16}, false);
+    /*
     getTopTransform.passThrough({"d5"}, {5}, {"d"});
     getTopTransform.ignore("d0");
     getTopTransform.ignore("d1");
     getTopTransform.ignore("d2");
     getTopTransform.ignore("d3");
     getTopTransform.ignore("d4");
-
+    void TopDownCTBuilder::merge(ArrayRef<StringRef> lowerNames,
+                             ArrayRef<uint32_t> lowerDims, StringRef upperName,
+                             ArrayRef<int64_t> sizes, bool isUnfold) {
+*/
     miopen::TransformMapAttr getTopTransformAttr = getTopTransform.get();
     auto cvTransformed = b.create<miopen::TransformOp>(loc, clonedVec, getTopTransformAttr);
 
