@@ -166,7 +166,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
 
     // 2. clone twcopy for <addend> -> regs
     cloningMap.map(miTWCopy->getOperand(0), inp);
-    //cloningMap.map(miTWCopy->getOperand(1), clonedVec->getResult(0));
+    cloningMap.map(miTWCopy->getOperand(1), clonedVec->getResult(0));
 
     auto nTWCopy = b.clone(*miTWCopy, cloningMap);
 
@@ -191,7 +191,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     getTopTransform.merge({"d0", "d1", "d2", "d3", "d4", "d5"}, {0, 1, 2, 3, 4, 5}, {"d"}, {1, 1, 1, 1, 1, 16}, false);
     miopen::TransformMapAttr getTopTransformAttr = getTopTransform.get();
     auto cvTransformed = b.create<miopen::TransformOp>(loc, clonedVec, getTopTransformAttr);
-    cloningMap.map(miTWCopy->getOperand(1), cvTransformed->getResult(0));
+
     return cvTransformed->getResult(0);
   }
 
@@ -474,8 +474,8 @@ struct ThreadwiseCopyV2RewritePattern
     Attribute noTransforms = b.getArrayAttr({});
     //auto reverseTransforms = b.getArrayAttr({noTransforms, op.transforms()[0].cast<ArrayAttr>()});
 
-    ArrayAttr sourceTransformsOnOp = op.transforms()[0].cast<ArrayAttr>();
-    ArrayAttr destTransformsOnOp = op.transforms()[1].cast<ArrayAttr>();
+    ArrayAttr sourceTransformsOnOp = op.transforms()[1].cast<ArrayAttr>();
+    ArrayAttr destTransformsOnOp = op.transforms()[0].cast<ArrayAttr>();
     ArrayAttr sourceTransforms, destTransforms;
     Value source, dest;
     std::tie(source, sourceTransforms) =
