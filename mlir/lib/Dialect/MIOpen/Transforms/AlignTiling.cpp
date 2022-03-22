@@ -187,14 +187,19 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     nTWCopy->setAttr("globalArg", b.getIndexAttr(0));
 
     //FIXME shrink back the dimension so linalg can have 1d arguments.
-    miopen::TopDownCTBuilder getTopTransform(b, {"d0", "d1", "d2", "d3", "d4", "d5"},
-                                     {1, 1, 1, 1, 1, 16}, loc);
+/*    miopen::TopDownCTBuilder getTopTransform(b, {"d0"},
+                                     {16}, loc);
     getTopTransform.passThrough({"d"}, {0}, {"d5"});
-    getTopTransform.ignore("d0");
-    getTopTransform.ignore("d1");
-    getTopTransform.ignore("d2");
-    getTopTransform.ignore("d3");
-    getTopTransform.ignore("d4");
+  */  
+    miopen::BottomUpCTBuilder getTopTransform(b, {"d"},
+                                     {16}, loc);
+    miopen::BottomUpCTTopDimsWrapper topTransformWrapper(getTopTransform, {"d0", "d1", "d2", "d3", "d4", "d5"});
+    topTransformWrapper.passThrough({"d"}, {5}, {"d5"});
+    topTransformWrapper.addDim({"d0"}, 0);
+    topTransformWrapper.addDim({"d1"}, 1);
+    topTransformWrapper.addDim({"d2"}, 2);
+    topTransformWrapper.addDim({"d3"}, 3);
+    topTransformWrapper.addDim({"d4"}, 4);
 
     miopen::TransformMapAttr getTopTransformAttr = getTopTransform.get();
     auto cvTransformed = b.create<miopen::TransformOp>(loc, clonedVec, getTopTransformAttr);
