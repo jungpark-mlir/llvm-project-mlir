@@ -191,10 +191,10 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
                                      {16}, loc);
     getTopTransform.passThrough({"d"}, {0}, {"d5"});
   */  
-    miopen::BottomUpCTBuilder getTopTransform(b, {"d"},
+    miopen::BottomUpCTBuilder getTopTransform(b, {"d5"},
                                      {16}, loc);
     miopen::BottomUpCTTopDimsWrapper topTransformWrapper(getTopTransform, {"d0", "d1", "d2", "d3", "d4", "d5"});
-    topTransformWrapper.passThrough({"d"}, {5}, {"d5"});
+    topTransformWrapper.passThrough("d5");
     topTransformWrapper.addDim({"d0"}, 0);
     topTransformWrapper.addDim({"d1"}, 1);
     topTransformWrapper.addDim({"d2"}, 2);
