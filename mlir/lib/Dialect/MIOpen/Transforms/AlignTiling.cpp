@@ -190,6 +190,11 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     miopen::TopDownCTBuilder getTopTransform(b, {"d"},
                                      {16}, loc);
     getTopTransform.passThrough({"d5"}, {5}, {"d"});
+    getTopTransform.passThrough("d0");
+    getTopTransform.passThrough("d1");
+    getTopTransform.passThrough("d2");
+    getTopTransform.passThrough("d3");
+    getTopTransform.passThrough("d4");
 
     miopen::TransformMapAttr getTopTransformAttr = getTopTransform.get();
     auto cvTransformed = b.create<miopen::TransformOp>(loc, clonedVec, getTopTransformAttr);
