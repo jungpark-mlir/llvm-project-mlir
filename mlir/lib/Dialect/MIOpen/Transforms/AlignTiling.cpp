@@ -178,16 +178,28 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     auto nVecSlice = b.clone(*miVecSlice, cloningMap);
 
     auto regVecType = miVecSlice.getType().template cast<VectorType>();
+    auto shape = inp.getType().cast<ShapedType>().getShape();
+
     // FIXME get rank from inp
-    SmallVector<int64_t, 2> regShape{1, 1, 1, 1, 1, regVecType.getNumElements()};
+    SmallVector<int64_t, 6> regShape;
+    SmallVector<Value, 6> indexVector;
+    Value c0 = b.create<arith::ConstantIndexOp>(loc, 0);
+    for (uint i = 0; i < shape.size(); ++i) {
+      regShape.push_back(1);
+      indexVector.push_back(c0);
+    }
+    regShape[shape.size() - 1] = regVecType.getNumElements();
+
+    //SmallVector<int64_t, 2> regShape{1, 1, 1, 1, 1, regVecType.getNumElements()};
     auto elemType = regVecType.getElementType();
     auto regType = MemRefType::get(regShape, elemType, {}, 5);
     auto loc = nVecSlice->getLoc();
     auto clonedVec = b.create<miopen::GpuAllocOp>(loc, regType);
 
-    Value c0 = b.create<arith::ConstantIndexOp>(loc, 0);
+    
     //FIXME
-    auto indices = ValueRange({c0, c0, c0, c0, c0, c0});
+    //auto indices = ValueRange({c0, c0, c0, c0, c0, c0});
+    auto indices = ValueRange(indexVector);
     b.create<vector::StoreOp>(loc, nVecSlice->getResult(0), clonedVec, indices);
 
     // 2. clone twcopy for <addend> -> regs
@@ -197,7 +209,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     auto nTWCopy = b.clone(*miTWCopy, cloningMap);
 
     // 3. swap input coords with output coords
-    auto shape = inp.getType().cast<ShapedType>().getShape();
+
 
     for (uint i = 0; i < shape.size(); ++i) {
       uint inIdx = 2 + i;
@@ -207,18 +219,11 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
       nTWCopy->setOperand(outIdx, inCoord);
       nTWCopy->setOperand(inIdx, outCoord);
     }
-    // 4. keep bound attr
+    // 4. keep bound and transforms, source/dest will be swapped in later stage.
     // 5. Adjust the copy to show the correct argument as global
     nTWCopy->setAttr("globalArg", b.getIndexAttr(0));
 
     //FIXME shrink back the dimension so linalg can have 1d arguments.
-/*    miopen::TopDownCTBuilder getTopTransform(b, {"d"},
-                                     {16}, loc);
-    getTopTransform.merge({"d0", "d1", "d2", "d3", "d4", "d5"}, {0, 1, 2, 3, 4, 5}, {"d"}, {1, 1, 1, 1, 1, 16}, false);
-    miopen::TransformMapAttr getTopTransformAttr = getTopTransform.get();
-    auto cvTransformed = b.create<miopen::TransformOp>(loc, clonedVec, getTopTransformAttr);
-    return cvTransformed->getResult(0);
-*/
     auto cvCollapsed = createCollapseShapeOp(b, loc, clonedVec->getResult(0));
     return cvCollapsed;
   }
