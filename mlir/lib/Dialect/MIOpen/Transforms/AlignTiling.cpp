@@ -358,15 +358,13 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
         return fail;
       }
       // first trace to back to regs, then forward to twcopy
-
-      // FIXME NOW : this if-else can still update the vector-transforms while it fails to test the first 'if'
-      /*
       if (auto twinp_t = traceToThreadwiseCopy<miopen::ThreadwiseCopyOp>(
               inp, transforms)) {
         // 1.2. Only one input should trace to twcopy
         assert(!twinpV1);
         twinpV1 = twinp_t;
-      } else*/ if (auto twinp_t =
+        break;
+      } else if (auto twinp_t =
                      traceToThreadwiseCopy<miopen::ThreadwiseCopyV2Op>(
                          inp, transforms)) {
         assert(!twinpV2);
