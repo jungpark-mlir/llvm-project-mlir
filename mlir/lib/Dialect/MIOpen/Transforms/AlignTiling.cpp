@@ -140,6 +140,32 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     return nAlloc->getResult(0);
   }
 
+  Value createCollapseShapeOp(OpBuilder &b, Location loc, Value source) {
+    auto ctx = b.getContext();
+    auto sourceType = source.getType().cast<ShapedType>();
+    assert(sourceType.hasStaticShape() &&
+           "Only memrefs with static shapes are allowed");
+
+    auto shape = sourceType.getShape();
+    uint64_t collapsedDim = 1;
+    SmallVector<AffineExpr, 2> exprs;
+    for (uint32_t dim = 0; dim < shape.size(); ++dim) {
+      collapsedDim *= shape[dim];
+      exprs.push_back(getAffineDimExpr(dim, ctx));
+    }
+
+    SmallVector<int64_t, 1> collapsedShape;
+    SmallVector<ReassociationExprs, 1> reassocs;
+    collapsedShape.push_back(collapsedDim);
+    reassocs.push_back(exprs);
+
+    auto collapsedType =
+        MemRefType::get(collapsedShape, sourceType.getElementType());
+    Value result =
+        b.create<memref::CollapseShapeOp>(loc, collapsedType, source, reassocs);
+    return result;
+  }
+
   Value makeTransformingCopy(PatternRewriter &b, Operation *miTWCopy,
                            Value inp) const {
 
@@ -193,7 +219,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     auto cvTransformed = b.create<miopen::TransformOp>(loc, clonedVec, getTopTransformAttr);
     return cvTransformed->getResult(0);
 */
-    auto cvCollapsed = miopen::createCollapseShapeOp(b, loc, clonedVec->getResult(0));
+    auto cvCollapsed = createCollapseShapeOp(b, loc, clonedVec->getResult(0));
     return cvCollapsed;
   }
 
