@@ -186,13 +186,15 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     nTWCopy->setAttr("globalArg", b.getIndexAttr(0));
 
     //FIXME shrink back the dimension so linalg can have 1d arguments.
-    miopen::TopDownCTBuilder getTopTransform(b, {"d"},
+/*    miopen::TopDownCTBuilder getTopTransform(b, {"d"},
                                      {16}, loc);
     getTopTransform.merge({"d0", "d1", "d2", "d3", "d4", "d5"}, {0, 1, 2, 3, 4, 5}, {"d"}, {1, 1, 1, 1, 1, 16}, false);
     miopen::TransformMapAttr getTopTransformAttr = getTopTransform.get();
     auto cvTransformed = b.create<miopen::TransformOp>(loc, clonedVec, getTopTransformAttr);
-
     return cvTransformed->getResult(0);
+*/
+    auto cvCollapsed = miopen::createCollapseShapeOp(b, loc, clonedVec->getResult(0));
+    return cvCollapsed;
   }
 
   Value applyTransforms(PatternRewriter &b, Operation *miTWCopy, Value inp,
