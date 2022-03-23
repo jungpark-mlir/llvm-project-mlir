@@ -497,8 +497,8 @@ struct ThreadwiseCopyV2RewritePattern
       return failure();
 
     Attribute noTransforms = b.getArrayAttr({});
-    //auto reverseTransforms = b.getArrayAttr({noTransforms, op.transforms()[0].cast<ArrayAttr>()});
 
+    // source and dest transforms are swapped here because it's first touched here.
     ArrayAttr sourceTransformsOnOp = op.transforms()[1].cast<ArrayAttr>();
     ArrayAttr destTransformsOnOp = op.transforms()[0].cast<ArrayAttr>();
     ArrayAttr sourceTransforms, destTransforms;
@@ -516,10 +516,9 @@ struct ThreadwiseCopyV2RewritePattern
         op->getAttrOfType<IntegerAttr>("data_per_copy").getInt();
     auto toLoad = op.dest();
     auto loadType = toLoad.getType().dyn_cast<MemRefType>();
-    // FIXME
+    auto shape = loadType.cast<ShapedType>().getShape();
     auto vecType = VectorType::get(dataPerCopy, loadType.getElementType());
-    // FIXME
-    bounds[5] /= dataPerCopy;
+    bounds[shape.size() - 1] /= dataPerCopy;
 
     Value c0 = b.create<arith::ConstantIndexOp>(loc, 0);
     ArrayAttr srcLeftOob, srcRightOob;
