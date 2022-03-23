@@ -160,7 +160,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     reassocs.push_back(exprs);
 
     auto collapsedType =
-        MemRefType::get(collapsedShape, sourceType.getElementType());
+        MemRefType::get(collapsedShape, sourceType.getElementType(), 5);
     Value result =
         b.create<memref::CollapseShapeOp>(loc, collapsedType, source, reassocs);
     return result;
