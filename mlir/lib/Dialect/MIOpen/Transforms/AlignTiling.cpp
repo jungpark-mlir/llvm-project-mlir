@@ -275,6 +275,8 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
           }
           if (allTWCopy)
             return inp;
+          else
+            break;
         }
       }
     }
