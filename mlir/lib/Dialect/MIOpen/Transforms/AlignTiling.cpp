@@ -238,7 +238,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     // 2. also create threadwise_copy from global to regs
     //    TODO(sjw): make sure output buffer writes (means these inputs will be
     //    buffer reads)
-    if (miTWCopy.template getDefiningOp<miopen::ThreadwiseCopyOp>()) {
+    if (auto copyType = dyn_cast<miopen::ThreadwiseCopyOp>(miTWCopy)) {
       return makeThreadwiseCopy(b, miTWCopy, ret);
     } else {
       return makeTransformingCopy(b, miTWCopy, ret);
