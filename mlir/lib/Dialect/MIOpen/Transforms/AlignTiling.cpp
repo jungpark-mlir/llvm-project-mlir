@@ -140,7 +140,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     return nAlloc->getResult(0);
   }
 
-  Value createCollapseShapeOp(OpBuilder &b, Location loc, Value source) {
+  Value createCollapseShapeOp(PatternRewriter &b, Location loc, Value source) {
     auto ctx = b.getContext();
     auto sourceType = source.getType().cast<ShapedType>();
     assert(sourceType.hasStaticShape() &&
