@@ -179,8 +179,6 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     auto loc = nVecSlice->getLoc();
     auto regVecType = miVecSlice.getType().template cast<VectorType>();
     auto shape = inp.getType().cast<ShapedType>().getShape();
-
-    // FIXME get rank from inp
     SmallVector<int64_t, 6> regShape;
     SmallVector<Value, 6> indexVector;
     Value c0 = b.create<arith::ConstantIndexOp>(loc, 0);
@@ -189,15 +187,9 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
       indexVector.push_back(c0);
     }
     regShape[shape.size() - 1] = regVecType.getNumElements();
-
-    //SmallVector<int64_t, 2> regShape{1, 1, 1, 1, 1, regVecType.getNumElements()};
     auto elemType = regVecType.getElementType();
     auto regType = MemRefType::get(regShape, elemType, {}, 5);
     auto clonedVec = b.create<miopen::GpuAllocOp>(loc, regType);
-
-    
-    //FIXME
-    //auto indices = ValueRange({c0, c0, c0, c0, c0, c0});
     auto indices = ValueRange(indexVector);
     b.create<vector::StoreOp>(loc, nVecSlice->getResult(0), clonedVec, indices);
 
@@ -208,8 +200,6 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     auto nTWCopy = b.clone(*miTWCopy, cloningMap);
 
     // 3. swap input coords with output coords
-
-
     for (uint i = 0; i < shape.size(); ++i) {
       uint inIdx = 2 + i;
       uint outIdx = 2 + shape.size() + i;
@@ -222,7 +212,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     // 5. Adjust the copy to show the correct argument as global
     nTWCopy->setAttr("globalArg", b.getIndexAttr(0));
 
-    //FIXME shrink back the dimension so linalg can have 1d arguments.
+    // 6. shrink the dim back to original so it can match the linalg dimensions
     auto cvCollapsed = createCollapseShapeOp(b, loc, clonedVec->getResult(0));
     return cvCollapsed;
   }
@@ -248,8 +238,11 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     // 2. also create threadwise_copy from global to regs
     //    TODO(sjw): make sure output buffer writes (means these inputs will be
     //    buffer reads)
-    //return makeThreadwiseCopy(b, miTWCopy, ret);
-    return makeTransformingCopy(b, miTWCopy, ret);
+    if (miTWCopy.template getDefiningOp<miopen::ThreadwiseCopyOp>()) {
+      return makeThreadwiseCopy(b, miTWCopy, ret);
+    } else {
+      return makeTransformingCopy(b, miTWCopy, ret);
+    }
   }
 
   template <typename Ttwcopy>
