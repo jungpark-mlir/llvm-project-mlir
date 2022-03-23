@@ -528,7 +528,8 @@ struct ThreadwiseCopyV2RewritePattern
     b.setInsertionPointToStart(copyLoop.getBody());
     Value loaded = b.create<miopen::BufferLoadOp>(loc, vecType, source, srcLeftOob, srcRightOob,
                                         copyLoop.getLowerCoords(/*domain=*/0));
-    b.create<vector::StoreOp>(loc, loaded, dest, ArrayRef<ValueRange>{c0, c0, c0, c0, c0, copyLoop.getLowerCoords(/*domain=*/1)[0]});
+    auto indicies = ValueRange({c0, c0, c0, c0, c0, copyLoop.getLowerCoords(/*domain=*/1)[0]});
+    b.create<vector::StoreOp>(loc, loaded, dest, indicies);
 
     op.erase();
     return success();
