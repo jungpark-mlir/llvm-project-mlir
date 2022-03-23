@@ -176,7 +176,7 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     // 1. clone vector into reg alloc
     BlockAndValueMapping cloningMap;
     auto nVecSlice = b.clone(*miVecSlice, cloningMap);
-
+    auto loc = nVecSlice->getLoc();
     auto regVecType = miVecSlice.getType().template cast<VectorType>();
     auto shape = inp.getType().cast<ShapedType>().getShape();
 
@@ -193,7 +193,6 @@ template <typename T> struct MILARewritePattern : public OpRewritePattern<T> {
     //SmallVector<int64_t, 2> regShape{1, 1, 1, 1, 1, regVecType.getNumElements()};
     auto elemType = regVecType.getElementType();
     auto regType = MemRefType::get(regShape, elemType, {}, 5);
-    auto loc = nVecSlice->getLoc();
     auto clonedVec = b.create<miopen::GpuAllocOp>(loc, regType);
 
     
