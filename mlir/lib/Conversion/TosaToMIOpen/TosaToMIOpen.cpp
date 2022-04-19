@@ -114,6 +114,7 @@ makeMIOpenConv2D(ConversionPatternRewriter &rw, Operation *op, Value input,
   StringRef arch = "gfx906";
   uint32_t num_cu = 64;
   bool xdlopsV2 = false;
+  StringAttr perf_config = nullptr;
 
   if (auto attr = op->getAttrOfType<StringAttr>("arch"))
     arch = attr.getValue();
@@ -129,6 +130,9 @@ makeMIOpenConv2D(ConversionPatternRewriter &rw, Operation *op, Value input,
     xdlopsV2 = attr.getValue();
   else if (auto attr = func->getAttrOfType<BoolAttr>("xdlopsV2"))
     xdlopsV2 = attr.getValue();
+
+  if (auto attr = op->getAttrOfType<StringAttr>("perf_config"))
+    perf_config = attr;
 
   // translate attributes
   int32_t padTop = pad[0].dyn_cast<IntegerAttr>().getInt();
