@@ -147,7 +147,7 @@ def MIGraphX_ConvolutionOp :
         inShape.getDimSize(2),
         filterShape.getDimSize(0)}, inType);
       return build($_builder, $_state, outputType, input, filter, padding, stride, dilation,
-        group, padding_mode);
+        group, padding_mode, xdlopsV2, perf_config);
     }]>];
 
   let assemblyFormat = "`(`$input `,` $filter`)` attr-dict `:` `(`type($input) `,` type($filter) `)` `->` type($output)";
