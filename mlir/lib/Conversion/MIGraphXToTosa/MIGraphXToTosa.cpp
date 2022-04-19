@@ -89,8 +89,6 @@ public:
 
     // translate attributes
     auto padAttr = op->getAttr("padding").cast<ArrayAttr>();
-    auto xdlopsV2Attr = op->getAttr("xdlopsV2").cast<BoolAttr>();
-    auto perfConfigAttr = op->getAttr("perf_config").cast<StringAttr>();
     auto strideAttr = op->getAttr("stride").cast<ArrayAttr>();
     auto dilationAttr = op->getAttr("dilation").cast<ArrayAttr>();
     int64_t padTop = padAttr[0].dyn_cast<IntegerAttr>().getInt();
@@ -122,8 +120,12 @@ public:
                             rewriter.getI64IntegerAttr(padLeft),
                             rewriter.getI64IntegerAttr(padRight),
                         }));
-    cop->setAttr("xdlopsV2", xdlopsV2Attr);
-    cop->setAttr("perf_config", xdlopsV2Attr);
+
+    // Convert optional attributes
+    if (auto attr = op->getAttr("xdlopsV2"))
+      cop->setAttr("xdlopsV2", attr.cast<BoolAttr>());
+    if (auto attr = op->getAttr("perf_config"))
+      cop->setAttr("perf_config", attr.cast<StringAttr>());
 
     // transpose the output back to NCHW so that it can match following
     // operators.
