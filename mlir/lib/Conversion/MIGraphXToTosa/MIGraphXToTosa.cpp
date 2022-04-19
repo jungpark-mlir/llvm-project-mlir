@@ -90,7 +90,7 @@ public:
     // translate attributes
     auto padAttr = op->getAttr("padding").cast<ArrayAttr>();
     auto xdlopsV2Attr = op->getAttr("xdlopsV2").cast<BoolAttr>();
-    auto perfConfigAttr = op->getAttr("perf_config").cast<mlir::StrtingAttr>();
+    auto perfConfigAttr = op->getAttr("perf_config").cast<StringAttr>();
     auto strideAttr = op->getAttr("stride").cast<ArrayAttr>();
     auto dilationAttr = op->getAttr("dilation").cast<ArrayAttr>();
     int64_t padTop = padAttr[0].dyn_cast<IntegerAttr>().getInt();
