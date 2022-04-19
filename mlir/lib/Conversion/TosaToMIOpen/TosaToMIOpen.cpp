@@ -114,7 +114,6 @@ makeMIOpenConv2D(ConversionPatternRewriter &rw, Operation *op, Value input,
   StringRef arch = "gfx906";
   uint32_t num_cu = 64;
   bool xdlopsV2 = false;
-  StringAttr perf_config = nullptr;
 
   if (auto attr = op->getAttrOfType<StringAttr>("arch"))
     arch = attr.getValue();
@@ -130,9 +129,6 @@ makeMIOpenConv2D(ConversionPatternRewriter &rw, Operation *op, Value input,
     xdlopsV2 = attr.getValue();
   else if (auto attr = func->getAttrOfType<BoolAttr>("xdlopsV2"))
     xdlopsV2 = attr.getValue();
-
-  if (auto attr = op->getAttrOfType<StringAttr>("perf_config"))
-    perf_config = attr;
 
   // translate attributes
   int32_t padTop = pad[0].dyn_cast<IntegerAttr>().getInt();
@@ -162,8 +158,8 @@ makeMIOpenConv2D(ConversionPatternRewriter &rw, Operation *op, Value input,
   cop->setAttr("arch", rw.getStringAttr(arch));
   cop->setAttr("num_cu", rw.getI32IntegerAttr(num_cu));
   cop->setAttr("xdlopsV2", rw.getBoolAttr(xdlopsV2));
-  if (perf_config)
-    cop->setAttr("perf_config", perf_config);
+  if (auto attr = op->getAttrOfType<StringAttr>("perf_config"))
+    cop->setAttr("perf_config", attr);
 
   // convolution config attributes
   cop->setAttr("filter_layout",
