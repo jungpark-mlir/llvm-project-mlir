@@ -1,0 +1,62 @@
+// ./bin/miopen-opt --cse --pass-pipeline="func.func(convert-affine-for-to-gpu{gpu-block-dims=3 gpu-thread-dims=1})" --lower-affine --canonicalize ./t1.ir |./bin/miopen-gen -ph -rand none - | ./bin/mlir-rocm-runner --shared-libs=/home/llvm-project-mlir/build/lib/librocm-runtime-wrappers.so,/home/llvm-project-mlir/build
+// ./bin/miopen-opt --cse --pass-pipeline="func.func(convert-affine-for-to-gpu{gpu-block-dims=3 gpu-thread-dims=1})" --lower-affine --canonicalize ./t1.ir |./bin/miopen-gen -ph -rand none - >t1.out
+// /home/rocprofiler_pkg/rocprof --stats ./bin/mlir-rocm-runner --shared-libs=/home/llvm-project-mlir/build/lib/librocm-runtime-wrappers.so,/home/llvm-project-mlir/build/external/llvm-project/llvm/lib/libmlir_runner_utils.so --entry-point-result=void t1.out
+
+#map = affine_map<(d0, d1) -> (d0 * 2 + d1)>
+// Not necessary but only to get 4D memref which is compatible with current test infra.
+#map1 = affine_map<(d0, d1) -> (d0 * 4 + d1)>
+module {
+  //func @main0(%arg0: memref<256x128x28x28xf32>, %arg1: memref<256x128x13x13x4x4xf32>) attributes {kernel} {
+  func @main0(%arg0: memref<256x128x28x28xf32>, %arg1: memref<256x128x52x52xf32>) attributes {kernel} {
+    %c0i = arith.constant 0 : index
+    %c0 = arith.constant 0 : i32
+    %c1i = arith.constant 1 : index
+    %c1 = arith.constant 1 : i32
+    %c2i = arith.constant 2 : index
+    %c2 = arith.constant 2 : i32
+    %c3i = arith.constant 3 : index
+    %c3 = arith.constant 3 : i32
+    affine.for %arg2 = 0 to 256 {
+      affine.for %arg3 = 0 to 128 {
+        affine.for %arg4 = 0 to 13 {
+          affine.for %arg5 = 0 to 13 {
+            %in_tile = memref.alloca() : memref<4x4xf32>
+            %out_tile = memref.alloca() : memref<4x4xf32>
+            // load input tile
+            affine.for %arg6 = 0 to 4 {
+              %0 = affine.apply #map(%arg4, %arg6)
+              %1 = affine.apply #map(%arg5, %c0i)
+              %4 = arith.index_cast %arg2 : index to i32
+              %5 = arith.index_cast %arg3 : index to i32
+              %6 = arith.index_cast %0 : index to i32
+              %7 = arith.index_cast %1 : index to i32
+              %8 = amdgpu.raw_buffer_load {boundsCheck = true, targetIsRDNA = false} %arg0[%4, %5, %6, %7] : memref<256x128x28x28xf32>, i32, i32, i32, i32 -> vector<4xf32>
+              %9 = vector.extractelement %8[%c0i : index] : vector<4xf32>
+              memref.store %9, %in_tile[%arg6, %c0i] : memref<4x4xf32>
+              %10 = vector.extractelement %8[%c1i : index] : vector<4xf32>
+              memref.store %10, %in_tile[%arg6, %c1i] : memref<4x4xf32>
+              %11 = vector.extractelement %8[%c2i : index] : vector<4xf32>
+              memref.store %11, %in_tile[%arg6, %c2i] : memref<4x4xf32>
+              %12 = vector.extractelement %8[%c3i : index] : vector<4xf32>
+              memref.store %12, %in_tile[%arg6, %c3i] : memref<4x4xf32>
+            }
+
+            affine.for %arg7 = 0 to 4 {
+              %0 = affine.apply #map1(%arg4, %arg7)
+              %1 = arith.index_cast %arg2 : index to i32
+              %2 = arith.index_cast %arg3 : index to i32
+              %3 = arith.index_cast %0 : index to i32
+              affine.for %arg8 = 0 to 4 {
+                %4 = affine.load %in_tile[%arg7, %arg8] : memref<4x4xf32>
+                %5 = affine.apply #map1(%arg5, %arg8)
+                %6 = arith.index_cast %5 : index to i32
+                amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %4 -> %arg1[%1, %2, %3, %6] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+              }
+            }
+          }
+        }
+      }
+    }
+    return
+  }
+}

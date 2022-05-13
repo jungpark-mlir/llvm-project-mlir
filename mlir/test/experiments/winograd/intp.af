@@ -1,0 +1,180 @@
+// ./bin/miopen-opt --affine-parallelize --lower-affine --cse ../mlir/test/experiments/winograd/intp.af
+// ./bin/miopen-opt --cse --pass-pipeline="func.func(convert-affine-for-to-gpu{gpu-block-dims=3 gpu-thread-dims=1})" ../mlir/test/experiments/winograd/intp.af
+
+// 0-8 1-9 2-10 3-11
+// 4+8 5+9 6+10 7+11
+// 8-4 9-5 10-6 11-7
+// 4-12 5-13 6-14 7-15
+
+// 0-8-2+10  1-9+2-10  -1+9+2-10  1-9-3+11
+// 4+8-6-10  5+9+6+10  -5-9+6+10  5+9-7-11
+// 8-4-10+6  9-5+10-6  -9+5+10-6  9-5-11+7
+// 4-12-6+14 5-13+6-14 -5+13+6-14 5-13-7+15
+
+#map = affine_map<(d0, d1) -> (d0 * 2 + d1)>
+// Not necessary but only to get 4D memref which is compatible with current test infra.
+#map1 = affine_map<(d0, d1) -> (d0 * 4 + d1)>
+module {
+  //func @main0(%arg0: memref<256x128x28x28xf32>, %arg1: memref<256x128x13x13x4x4xf32>) attributes {kernel} {
+  func @main0(%arg0: memref<256x128x28x28xf32>, %arg1: memref<256x128x52x52xf32>) attributes {kernel} {
+    affine.for %arg2 = 0 to 256 {
+      affine.for %arg3 = 0 to 128 {
+        affine.for %arg4 = 0 to 13 {
+          affine.for %arg5 = 0 to 13 {
+            %in_tile = memref.alloca() : memref<4x4xf32>
+            %out_tile = memref.alloca() : memref<4x4xf32>
+            // load input tile
+            affine.for %arg6 = 0 to 4 {
+              affine.for %arg7 = 0 to 4 {
+                %0 = affine.apply #map(%arg4, %arg6)
+                %1 = affine.apply #map(%arg5, %arg7)
+                //%2 = affine.load %arg0[%arg2, %arg3, %0, %1] : memref<256x128x28x28xf32>
+                //affine.store %2, %in_tile[%arg6, %arg7] : memref<4x4xf32>
+                %2 = memref.load %arg0[%arg2, %arg3, %0, %1] : memref<256x128x28x28xf32>
+                memref.store %2, %in_tile[%arg6, %arg7] : memref<4x4xf32>
+              }
+            }
+            %c0 = arith.constant 0 : index
+            %c1 = arith.constant 1 : index
+            %c2 = arith.constant 2 : index
+            %c3 = arith.constant 3 : index
+
+            // alloca to ssa
+            %i0 = memref.load %in_tile[%c0, %c0] : memref<4x4xf32>
+            %i1 = memref.load %in_tile[%c0, %c1] : memref<4x4xf32>
+            %i2 = memref.load %in_tile[%c0, %c2] : memref<4x4xf32>
+            %i3 = memref.load %in_tile[%c0, %c3] : memref<4x4xf32>
+            %i4 = memref.load %in_tile[%c1, %c0] : memref<4x4xf32>
+            %i5 = memref.load %in_tile[%c1, %c1] : memref<4x4xf32>
+            %i6 = memref.load %in_tile[%c1, %c2] : memref<4x4xf32>
+            %i7 = memref.load %in_tile[%c1, %c3] : memref<4x4xf32>
+            %i8 = memref.load %in_tile[%c2, %c0] : memref<4x4xf32>
+            %i9 = memref.load %in_tile[%c2, %c1] : memref<4x4xf32>
+            %i10 = memref.load %in_tile[%c2, %c2] : memref<4x4xf32>
+            %i11 = memref.load %in_tile[%c2, %c3] : memref<4x4xf32>
+            %i12 = memref.load %in_tile[%c3, %c0] : memref<4x4xf32>
+            %i13 = memref.load %in_tile[%c3, %c1] : memref<4x4xf32>
+            %i14 = memref.load %in_tile[%c3, %c2] : memref<4x4xf32>
+            %i15 = memref.load %in_tile[%c3, %c3] : memref<4x4xf32>
+
+// 0-8-2+10  1-9+2-10  -1+9+2-10  1-9-3+11
+// 4+8-6-10  5+9+6+10  -5-9+6+10  5+9-7-11
+// 8-4-10+6  9-5+10-6  -9+5+10-6  9-5-11+7
+// 4-12-6+14 5-13+6-14 -5+13+6-14 5-13-7+15
+
+            //  0-8-2+10
+            %t00 = arith.subf %i0, %i8 : f32
+            %t01 = arith.subf %t00, %i2 : f32
+            %out0 = arith.addf %t01, %i10 : f32
+
+            //  1-9+2-10
+            %t10 = arith.subf %i1, %i9 : f32
+            %t11 = arith.addf %t10, %i2 : f32
+            %out1 = arith.subf %t11, %i10 : f32
+
+            // -1+9+2-10
+            %t20 = arith.subf %i9, %i1 : f32
+            %t21 = arith.addf %t20, %i2 : f32
+            %out2 = arith.subf %t21, %i10 : f32
+
+            //  1-9-3+11
+            %t30 = arith.subf %i1, %i9 : f32
+            %t31 = arith.subf %t30, %i3 : f32
+            %out3 = arith.addf %t31, %i11 : f32
+
+            //  4+8-6-10
+            %t40 = arith.addf %i4, %i8 : f32
+            %t41 = arith.subf %t40, %i6 : f32
+            %out4 = arith.subf %t41, %i10 : f32
+
+            //  5+9+6+10
+            %t50 = arith.addf %i5, %i9 : f32
+            %t51 = arith.addf %t50, %i6 : f32
+            %out5 = arith.addf %t51, %i10 : f32
+
+            // -5-9+6+10
+            %t60 = arith.addf %i6, %i10 : f32
+            %t61 = arith.subf %t60, %i5 : f32
+            %out6 = arith.subf %t61, %i9 : f32
+
+            //  5+9-7-11
+            %t70 = arith.addf %i5, %i9 : f32
+            %t71 = arith.subf %t70, %i7 : f32
+            %out7 = arith.subf %t71, %i11 : f32
+
+            //  8-4-10+6
+            %t80 = arith.subf %i8, %i4 : f32
+            %t81 = arith.subf %t80, %i10 : f32
+            %out8 = arith.addf %t81, %i6 : f32
+
+            //  9-5+10-6
+            %t90 = arith.subf %i9, %i5 : f32
+            %t91 = arith.addf %t90, %i10 : f32
+            %out9 = arith.subf %t91, %i6 : f32
+
+            // -9+5+10-6
+            %ta0 = arith.subf %i5, %i9 : f32
+            %ta1 = arith.addf %ta0, %i10 : f32
+            %outa = arith.subf %ta1, %i6 : f32
+
+            //  9-5-11+7
+            %tb0 = arith.subf %i9, %i5 : f32
+            %tb1 = arith.subf %tb0, %i11 : f32
+            %outb = arith.addf %tb1, %i7 : f32
+
+            //  4-12-6+14
+            %tc0 = arith.subf %i4, %i12 : f32
+            %tc1 = arith.subf %tc0, %i6 : f32
+            %outc = arith.addf %tc1, %i14 : f32
+
+            //  5-13+6-14
+            %td0 = arith.subf %i5, %i13 : f32
+            %td1 = arith.addf %td0, %i6 : f32
+            %outd = arith.subf %td1, %i14 : f32
+
+            // -5+13+6-14
+            %te0 = arith.subf %i13, %i5 : f32
+            %te1 = arith.addf %te0, %i6 : f32
+            %oute = arith.subf %te1, %i14 : f32
+
+            //  5-13-7+15
+            %tf0 = arith.subf %i5, %i13 : f32
+            %tf1 = arith.addf %td0, %i7 : f32
+            %outf = arith.subf %td1, %i15 : f32
+
+            // ssa to alloca
+            memref.store %out0, %out_tile[%c0, %c0] : memref<4x4xf32>
+            memref.store %out1, %out_tile[%c0, %c1] : memref<4x4xf32>
+            memref.store %out2, %out_tile[%c0, %c2] : memref<4x4xf32>
+            memref.store %out3, %out_tile[%c0, %c3] : memref<4x4xf32>
+            memref.store %out4, %out_tile[%c1, %c0] : memref<4x4xf32>
+            memref.store %out5, %out_tile[%c1, %c1] : memref<4x4xf32>
+            memref.store %out6, %out_tile[%c1, %c2] : memref<4x4xf32>
+            memref.store %out7, %out_tile[%c1, %c3] : memref<4x4xf32>
+            memref.store %out8, %out_tile[%c2, %c0] : memref<4x4xf32>
+            memref.store %out9, %out_tile[%c2, %c1] : memref<4x4xf32>
+            memref.store %outa, %out_tile[%c2, %c2] : memref<4x4xf32>
+            memref.store %outb, %out_tile[%c2, %c3] : memref<4x4xf32>
+            memref.store %outc, %out_tile[%c3, %c0] : memref<4x4xf32>
+            memref.store %outd, %out_tile[%c3, %c1] : memref<4x4xf32>
+            memref.store %oute, %out_tile[%c3, %c2] : memref<4x4xf32>
+            memref.store %outf, %out_tile[%c3, %c3] : memref<4x4xf32>
+
+            affine.for %arg8 = 0 to 4 {
+              affine.for %arg9 = 0 to 4 {
+                %3 = affine.load %out_tile[%arg8, %arg9] : memref<4x4xf32>
+                %4 = affine.apply #map1(%arg4, %arg8)
+                %5 = affine.apply #map1(%arg5, %arg9)
+                //affine.store %3, %arg1[%arg2, %arg3, %arg4, %arg5, %arg8, %arg9] : memref<256x128x13x13x4x4xf32>
+                // Tile flattened, to make it 4D in total.
+                memref.store %3, %arg1[%arg2, %arg3, %4, %5] : memref<256x128x52x52xf32>
+              }
+            }
+
+          }
+        }
+      }
+    }
+    return
+  }
+}

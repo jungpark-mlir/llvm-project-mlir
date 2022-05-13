@@ -213,6 +213,12 @@ static cl::opt<int> paddingWidthRight("padding_w_r",
                                       cl::value_desc("attribute value"),
                                       cl::init(0));
 
+// use Winograd
+static cl::opt<int>
+    winoType("wino", cl::desc("generate winograd functions"),
+             cl::value_desc("0-input transform\n1-batched GEMM\n2-output transform\n3-filter transform"),
+             cl::init(-1));
+
 // use XDLOPS
 static cl::opt<bool>
     xdlopsV2("x2", cl::desc("To use XDLOPS V2 lowering pipeline"),
@@ -536,6 +542,7 @@ static void populateDefaults() {
       paddingHeightRight.setValue(0);
       paddingWidthLeft.setValue(0);
       paddingWidthRight.setValue(0);
+      winoType.setValue(-1);
     } else {
       groupSize.setValue(1);
       batchSize.setValue(128);
@@ -1945,6 +1952,44 @@ int main(int argc, char **argv) {
     module = ModuleOp::create(builder.getUnknownLoc());
   }
 
+  if (winoType>=0) {
+    auto ctx = module.getContext();
+    OpBuilder b(ctx);
+    SmallVector<AffineExpr, 2> perm;
+    perm.push_back(getAffineDimExpr(1, ctx));
+    perm.push_back(getAffineDimExpr(2, ctx));
+    //auto map = AffineMap::get(2, 0, perm, ctx);
+
+    auto elemType = b.getF32Type();
+    auto inType = MemRefType::get({batchSize, inputChannel, inputHeight, inputWidth}, elemType);
+    auto outType = MemRefType::get({batchSize, inputChannel, (inputHeight-2)/2, (inputWidth-2)/2, 4, 4}, elemType);
+    auto transformFunc = makeFuncDecl(module, "winoInputTP", {inType}, {outType});
+    auto block = transformFunc.addEntryBlock();
+    b.setInsertionPoint(block, block->begin());
+    auto loc = transformFunc->getLoc();
+    auto arg0 = block->getArgument(0);
+    auto loopOp = b.create<AffineForOp>(loc, 0, 1);
+    auto lb = OpBuilder::atBlockTerminator(loopOp.getBody(), b.getListener());
+    auto iv = loopOp.getInductionVar();
+      auto loop1Op = lb.create<AffineForOp>(loc, 0, 1);
+      auto lb1 = OpBuilder::atBlockTerminator(loop1Op.getBody(), b.getListener());
+      auto iv1 = loop1Op.getInductionVar();
+        auto loop2Op = lb1.create<AffineForOp>(loc, 0, 1);
+        auto lb2 = OpBuilder::atBlockTerminator(loop2Op.getBody(), b.getListener());
+        auto iv2 = loop2Op.getInductionVar();
+          auto loop3Op = lb2.create<AffineForOp>(loc, 0, 1);
+          auto lb3 = OpBuilder::atBlockTerminator(loop3Op.getBody(), b.getListener());
+          auto iv3 = loop3Op.getInductionVar();
+            SmallVector<mlir::Value, 4> indicies;
+            indicies.push_back(iv);
+            indicies.push_back(iv1);
+            indicies.push_back(iv2);
+            indicies.push_back(iv3);
+            auto loadIn = lb3.create<AffineLoadOp>(loc, arg0, indicies);
+
+
+
+  } else {
   if (!hasUserKernel) {
     auto convConfig = populateConvConfig.getValue();
 
@@ -2059,7 +2104,7 @@ int main(int argc, char **argv) {
       exit(1);
     }
   }
-
+}
   // Set up the output file.
   auto output = openOutputFile(outputFilename, &errorMessage);
   if (!output) {

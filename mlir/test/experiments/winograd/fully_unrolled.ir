@@ -1,0 +1,188 @@
+// ./bin/miopen-opt --cse --pass-pipeline="func.func(convert-affine-for-to-gpu{gpu-block-dims=3 gpu-thread-dims=1})" --affine-loop-unroll --lower-affine --canonicalize ../mlir/test/experiments/winograd/fully_unrolled.ir |./bin/miopen-gen -ph -rand none - >fully.out
+// /home/rocprofiler_pkg/rocprof --stats ./bin/mlir-rocm-runner --shared-libs=/home/llvm-project-mlir/build/lib/librocm-runtime-wrappers.so,/home/llvm-project-mlir/build/external/llvm-project/llvm/lib/libmlir_runner_utils.so --entry-point-result=void ./fully.out
+
+#map0 = affine_map<(d0, d1) -> (d0 * 2 + d1)>
+#map1 = affine_map<(d0) -> (d0 * 2)>
+#map2 = affine_map<(d0, d1) -> (d0 * 4 + d1)>
+#map3 = affine_map<(d0) -> (d0 * 4)>
+#map4 = affine_map<(d0) -> (d0 * 4 + 1)>
+#map5 = affine_map<(d0) -> (d0 * 4 + 2)>
+#map6 = affine_map<(d0) -> (d0 * 4 + 3)>
+#map7 = affine_map<(d0) -> (d0 + 1)>
+#map8 = affine_map<(d0) -> (d0 + 2)>
+#map9 = affine_map<(d0) -> (d0 + 3)>
+module {
+  func @main0(%arg0: memref<256x128x28x28xf32>, %arg1: memref<256x128x52x52xf32>) attributes {kernel} {
+    %c0 = arith.constant 0 : index
+    %c3 = arith.constant 3 : index
+    %c2 = arith.constant 2 : index
+    %c1 = arith.constant 1 : index
+    affine.for %arg2 = 0 to 256 {
+      affine.for %arg3 = 0 to 128 {
+        affine.for %arg4 = 0 to 13 {
+          affine.for %arg5 = 0 to 13 {
+            %0 = affine.apply #map0(%arg4, %c0)
+            %1 = affine.apply #map1(%arg5)
+            %2 = arith.index_cast %arg2 : index to i32
+            %3 = arith.index_cast %arg3 : index to i32
+            %4 = arith.index_cast %0 : index to i32
+            %5 = arith.index_cast %1 : index to i32
+            %6 = amdgpu.raw_buffer_load {boundsCheck = true, targetIsRDNA = false} %arg0[%2, %3, %4, %5] : memref<256x128x28x28xf32>, i32, i32, i32, i32 -> vector<4xf32>
+            %9 = vector.extractelement %6[%c0 : index] : vector<4xf32>
+            %12 = vector.extractelement %6[%c1 : index] : vector<4xf32>
+            %15 = vector.extractelement %6[%c2 : index] : vector<4xf32>
+            %18 = vector.extractelement %6[%c3 : index] : vector<4xf32>
+            %21 = affine.apply #map7(%c0)
+            %22 = affine.apply #map0(%arg4, %21)
+            %23 = arith.index_cast %22 : index to i32
+            %24 = amdgpu.raw_buffer_load {boundsCheck = true, targetIsRDNA = false} %arg0[%2, %3, %23, %5] : memref<256x128x28x28xf32>, i32, i32, i32, i32 -> vector<4xf32>
+            %27 = vector.extractelement %24[%c0 : index] : vector<4xf32>
+            %28 = vector.extractelement %24[%c1 : index] : vector<4xf32>
+            %29 = vector.extractelement %24[%c2 : index] : vector<4xf32>
+            %30 = vector.extractelement %24[%c3 : index] : vector<4xf32>
+            %31 = affine.apply #map8(%c0)
+            %32 = affine.apply #map0(%arg4, %31)
+            %33 = arith.index_cast %32 : index to i32
+            %34 = amdgpu.raw_buffer_load {boundsCheck = true, targetIsRDNA = false} %arg0[%2, %3, %33, %5] : memref<256x128x28x28xf32>, i32, i32, i32, i32 -> vector<4xf32>
+            %37 = vector.extractelement %34[%c0 : index] : vector<4xf32>
+            %38 = vector.extractelement %34[%c1 : index] : vector<4xf32>
+            %39 = vector.extractelement %34[%c2 : index] : vector<4xf32>
+            %40 = vector.extractelement %34[%c3 : index] : vector<4xf32>
+            %41 = affine.apply #map9(%c0)
+            %42 = affine.apply #map0(%arg4, %41)
+            %43 = arith.index_cast %42 : index to i32
+            %44 = amdgpu.raw_buffer_load {boundsCheck = true, targetIsRDNA = false} %arg0[%2, %3, %43, %5] : memref<256x128x28x28xf32>, i32, i32, i32, i32 -> vector<4xf32>
+            %47 = vector.extractelement %44[%c0 : index] : vector<4xf32>
+            %48 = vector.extractelement %44[%c1 : index] : vector<4xf32>
+            %49 = vector.extractelement %44[%c2 : index] : vector<4xf32>
+            %50 = vector.extractelement %44[%c3 : index] : vector<4xf32>
+
+            //  %9 %12 %15 %18
+            // %27 %28 %29 %30
+            // %37 %38 %39 %40
+            // %47 %48 %49 %50
+
+// 0-8-2+10  1-9+2-10  -1+9+2-10  1-9-3+11
+// 4+8-6-10  5+9+6+10  -5-9+6+10  5+9-7-11
+// 8-4-10+6  9-5+10-6  -9+5+10-6  9-5-11+7
+// 4-12-6+14 5-13+6-14 -5+13+6-14 5-13-7+15
+
+            //  0-8-2+10
+            %t00 = arith.subf %9, %37 : f32
+            %t01 = arith.subf %t00, %15 : f32
+            %out0 = arith.addf %t01, %39 : f32
+
+            //  1-9+2-10
+            %t10 = arith.subf %12, %38 : f32
+            %t11 = arith.addf %t10, %15 : f32
+            %out1 = arith.subf %t11, %39 : f32
+
+            // -1+9+2-10
+            %t20 = arith.subf %38, %12 : f32
+            %t21 = arith.addf %t20, %15 : f32
+            %out2 = arith.subf %t21, %39 : f32
+
+            //  1-9-3+11
+            %t30 = arith.subf %12, %38 : f32
+            %t31 = arith.subf %t30, %18 : f32
+            %out3 = arith.addf %t31, %40 : f32
+
+            //  4+8-6-10
+            %t40 = arith.addf %27, %37 : f32
+            %t41 = arith.subf %t40, %29 : f32
+            %out4 = arith.subf %t41, %39 : f32
+
+            //  5+9+6+10
+            %t50 = arith.addf %28, %38 : f32
+            %t51 = arith.addf %t50, %29 : f32
+            %out5 = arith.addf %t51, %39 : f32
+
+            // -5-9+6+10
+            %t60 = arith.addf %29, %39 : f32
+            %t61 = arith.subf %t60, %28 : f32
+            %out6 = arith.subf %t61, %38 : f32
+
+            //  5+9-7-11
+            %t70 = arith.addf %28, %38 : f32
+            %t71 = arith.subf %t70, %30 : f32
+            %out7 = arith.subf %t71, %40 : f32
+
+            //  8-4-10+6
+            %t80 = arith.subf %37, %27 : f32
+            %t81 = arith.subf %t80, %39 : f32
+            %out8 = arith.addf %t81, %29 : f32
+
+            //  9-5+10-6
+            %t90 = arith.subf %38, %28 : f32
+            %t91 = arith.addf %t90, %39 : f32
+            %out9 = arith.subf %t91, %29 : f32
+
+            // -9+5+10-6
+            %ta0 = arith.subf %28, %38 : f32
+            %ta1 = arith.addf %ta0, %39 : f32
+            %outa = arith.subf %ta1, %29 : f32
+
+            //  9-5-11+7
+            %tb0 = arith.subf %38, %28 : f32
+            %tb1 = arith.subf %tb0, %40 : f32
+            %outb = arith.addf %tb1, %30 : f32
+
+            //  4-12-6+14
+            %tc0 = arith.subf %27, %47 : f32
+            %tc1 = arith.subf %tc0, %29 : f32
+            %outc = arith.addf %tc1, %49 : f32
+
+            //  5-13+6-14
+            %td0 = arith.subf %28, %48 : f32
+            %td1 = arith.addf %td0, %29 : f32
+            %outd = arith.subf %td1, %49 : f32
+
+            // -5+13+6-14
+            %te0 = arith.subf %48, %28 : f32
+            %te1 = arith.addf %te0, %29 : f32
+            %oute = arith.subf %te1, %49 : f32
+
+            //  5-13-7+15
+            %tf0 = arith.subf %28, %48 : f32
+            %tf1 = arith.addf %td0, %30 : f32
+            %outf = arith.subf %td1, %50 : f32
+
+            %7 = affine.apply #map2(%arg4, %c0)
+            %8 = arith.index_cast %7 : index to i32
+            %10 = affine.apply #map3(%arg5)
+            %11 = arith.index_cast %10 : index to i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %out0 -> %arg1[%2, %3, %8, %11] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            %13 = affine.apply #map4(%arg5)
+            %14 = arith.index_cast %13 : index to i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %out1 -> %arg1[%2, %3, %8, %14] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            %16 = affine.apply #map5(%arg5)
+            %17 = arith.index_cast %16 : index to i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %out2 -> %arg1[%2, %3, %8, %17] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            %19 = affine.apply #map6(%arg5)
+            %20 = arith.index_cast %19 : index to i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %out3 -> %arg1[%2, %3, %8, %20] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            %25 = affine.apply #map2(%arg4, %21)
+            %26 = arith.index_cast %25 : index to i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %out4 -> %arg1[%2, %3, %26, %11] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %out5 -> %arg1[%2, %3, %26, %14] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %out6 -> %arg1[%2, %3, %26, %17] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %out7 -> %arg1[%2, %3, %26, %20] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            %35 = affine.apply #map2(%arg4, %31)
+            %36 = arith.index_cast %35 : index to i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %out8 -> %arg1[%2, %3, %36, %11] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %out9 -> %arg1[%2, %3, %36, %14] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %outa -> %arg1[%2, %3, %36, %17] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %outb -> %arg1[%2, %3, %36, %20] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            %45 = affine.apply #map2(%arg4, %41)
+            %46 = arith.index_cast %45 : index to i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %outc -> %arg1[%2, %3, %46, %11] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %outd -> %arg1[%2, %3, %46, %14] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %oute -> %arg1[%2, %3, %46, %17] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+            amdgpu.raw_buffer_store {boundsCheck = true, targetIsRDNA = false} %outf -> %arg1[%2, %3, %46, %20] : f32 -> memref<256x128x52x52xf32>, i32, i32, i32, i32
+          }
+        }
+      }
+    }
+    return
+  }
+}
