@@ -50,6 +50,21 @@ def MIOpen_Conv2DOp :
   }];
 }
 
+def MIOpen_Conv2DTOp :
+    MIOpen_Op<"conv2d_t">,
+    Arguments<(ins RankedTensorOf<[F32, F16, BF16, I8], [4]>:$filter,
+                   RankedTensorOf<[F32, F16, BF16, I8], [4]>:$input,
+                   RankedTensorOf<[F32, F16, BF16, I32], [4]>:$output)> {
+  let summary = "2D convolution on tensor";
+  let description = [{
+    The `miopen.conv2d_t` op provides stepstone between Linalg on tensor and bufferized conv2DOp.
+  }];
+  let hasVerifier = 1;
+  let assemblyFormat = [{
+    `(` operands `)` attr-dict `:` type(operands)
+  }];
+}
+
 def MIOpen_Conv2DBwdDataOp :
     MIOpen_Op<"conv2d_bwd_data">,
     Arguments<(ins MemRefRankOf<[F32, F16, BF16], [5]>:$filter,
