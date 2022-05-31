@@ -53,8 +53,8 @@ def MIOpen_Conv2DOp :
 def MIOpen_Conv2DTOp :
     MIOpen_Op<"conv2d_t">,
     Arguments<(ins RankedTensorOf<[F32, F16, BF16, I8]>:$filter,
-                   RankedTensorOf<[F32, F16, BF16, I8]>:$input,
-                   RankedTensorOf<[F32, F16, BF16, I8]>:$output)> {
+                   RankedTensorOf<[F32, F16, BF16, I8]>:$input>,
+	  Results<(outs RankedTensorOf<[F32, F16, BF16, I8]>:$output)> {
   let summary = "2D convolution on tensor";
   let description = [{
     The `miopen.conv2d_t` op provides stepstone between Linalg on tensor and bufferized conv2DOp.
