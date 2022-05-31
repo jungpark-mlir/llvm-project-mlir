@@ -59,7 +59,6 @@ def MIOpen_Conv2DTOp :
   let description = [{
     The `miopen.conv2d_t` op provides stepstone between Linalg on tensor and bufferized conv2DOp.
   }];
-  let hasVerifier = 1;
   let assemblyFormat = [{
     `(` operands `)` attr-dict `:` type(operands)
   }];
