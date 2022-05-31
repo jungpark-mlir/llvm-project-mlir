@@ -342,7 +342,7 @@ public:
     }
     auto convOp = dyn_cast<tosa::Conv2DOp>(operands[0].getDefiningOp());
     if (!(convOp)) {
-      return rewriter.notifyMatchFailure(convOp, [&](::mlir::Diagnostic &diag) {
+      return rewriter.notifyMatchFailure(operands[0].getDefiningOp(), [&](::mlir::Diagnostic &diag) {
         diag << "Second is not tosa::conv2d";
       });
     }
