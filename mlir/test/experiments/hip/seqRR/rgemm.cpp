@@ -77,13 +77,13 @@ __global__ void rgemm(float* A, float* B, float* C) {
     // values are at 0, 256, 512
     float temp;
     if (tidx == 0){
-      float temp = local[0] + local[256] + local[512];
+      temp = local[0] + local[256] + local[512];
     }
 
     local[tidx*2] = inB0;
     local[tidx*2 + 1] = inB1;
 
-    int turn = 1;
+    turn = 1;
     // sum tree
     for (int i=0; i<LOG2K; i++) { //until 2^8 = 256
       //__syncthreads();
