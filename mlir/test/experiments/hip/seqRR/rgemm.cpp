@@ -38,7 +38,7 @@ THE SOFTWARE.
 #define WGSIZE 768
 #define M 256
 #define K 768
-#define N 2
+#define N 1
 #define LOG2K 8
 #define TILE 2
 
@@ -83,6 +83,7 @@ __global__ void rgemm(float* A, float* B, float* C) {
 
     asm volatile("s_waitcnt lgkmcnt(0) \n s_barrier");
     float mean = local[0];
+    asm volatile("s_waitcnt lgkmcnt(0) \n s_barrier");
     local[tidx*2] = inA0 - mean;
     local[tidx*2 + 1] = inA1 - mean;
 
