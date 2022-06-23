@@ -53,8 +53,8 @@ __global__ void rgemm(float* A, float* B, float* C) {
     float inA0, inA1, inB0, inB1;
     inA0 = A[tidx*2 + tidy*K];
     inA1 = A[tidx*2 + 1 + tidy*K];
-    inB0 = B[tidz + tidx*2*N];
-    inB1 = B[tidz + (tidx*2 + 1)*N];
+    //inB0 = B[tidz + tidx*2*N];
+    //inB1 = B[tidz + (tidx*2 + 1)*N];
 
     local[tidx*2] = inA0;
     local[tidx*2 + 1] = inA1;
@@ -78,10 +78,13 @@ __global__ void rgemm(float* A, float* B, float* C) {
     float temp;
     if (tidx == 0){
       temp = local[0] + local[256] + local[512];
+      local[0] = temp / K;
     }
 
-    local[tidx*2] = inB0;
-    local[tidx*2 + 1] = inB1;
+    asm volatile("s_waitcnt lgkmcnt(0) \n s_barrier");
+    float mean = local[0];
+    local[tidx*2] = inA0 - mean;
+    local[tidx*2 + 1] = inA1 - mean;
 
     turn = 1;
     // sum tree
