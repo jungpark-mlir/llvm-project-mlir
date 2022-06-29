@@ -190,9 +190,66 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
   GemmContext gemmSize = GemmContext::fromConvolution(opType, dims);
 
   std::string perfConfig;
+  if (dims.x == 1
+    && dims.y == 1
+    && dims.ho == 14
+    && dims.wo == 14
+    && dims.c == 1024
+    && dims.k == 256
+    && dims.n == 256 )
+    perfConfig = "64,128,4,64,32,4,1,1";
+
+    if (dims.x == 1
+    && dims.y == 1
+    && dims.ho == 14
+    && dims.wo == 14
+    && dims.c == 1024
+    && dims.k == 256
+    && dims.n == 32 )
+    perfConfig = "64,128,4,32,64,4,1,1";
+
+    if (dims.x == 1
+    && dims.y == 1
+    && dims.ho == 14
+    && dims.wo == 14
+    && dims.c == 256
+    && dims.k == 1024
+    && dims.n == 256 )
+    perfConfig = "64,128,4,64,32,4,1,1";
+
+    if (dims.x == 1
+    && dims.y == 1
+    && dims.ho == 14
+    && dims.wo == 14
+    && dims.c == 256
+    && dims.k == 1024
+    && dims.n == 32 )
+    perfConfig = "128,128,4,128,64,4,1,1";
+
+    if (dims.x == 3
+    && dims.y == 3
+    && dims.ho == 14
+    && dims.wo == 14
+    && dims.c == 256
+    && dims.k == 256
+    && dims.n == 256 )
+    perfConfig = "128,128,8,64,64,4,1,1";
+
+    if (dims.x == 3
+    && dims.y == 3
+    && dims.ho == 14
+    && dims.wo == 14
+    && dims.c == 256
+    && dims.k == 256
+    && dims.n == 32 )
+    perfConfig = "64,128,8,64,32,4,1,1";
+
+
+
   if (auto perfConfigAttr =
           op->template getAttrOfType<StringAttr>("perf_config")) {
     perfConfig = perfConfigAttr.getValue().str();
+    llvm::errs() << "Dump perfConfig: " << perfConfig <<"\n";
   }
   auto xdlopsV2Attr = op->template getAttrOfType<BoolAttr>("xdlopsV2");
   if (xdlopsV2Attr && xdlopsV2Attr.getValue() == true) {
