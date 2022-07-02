@@ -56,7 +56,7 @@ __global__ void rgemm(float* A, float* B, float* C) {
       if((tidx % turn) == 0){
         float lValue = local[tidx*turn*2];
         float rValue = local[tidx*turn*2 + turn];
-        local[tidx] = lValue + rValue;
+        local[tidx*turn*2] = lValue + rValue;
       }
       turn *= 2;
     }
