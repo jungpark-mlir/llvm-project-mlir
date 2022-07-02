@@ -75,6 +75,7 @@ int main() {
     float* gpuMatA;
     float* gpuMatB;
     float* gpuResult;
+    float* Matrix;
 
     hipDeviceProp_t devProp;
     hipGetDeviceProperties(&devProp, 0);
@@ -110,7 +111,7 @@ int main() {
     hipMemcpy(hostResult, gpuResult, M*N * sizeof(float), hipMemcpyDeviceToHost);
 
     for (i = 0; i < M*N; i++) {
-        std::cout<<i <<": "<<((float*)hostResult)[i] <<"\n";
+        std::cout<<i <<": "<<hostResult[i] <<"\n";
     }
 
     // verify the results
