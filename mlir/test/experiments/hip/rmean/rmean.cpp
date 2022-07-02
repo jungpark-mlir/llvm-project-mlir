@@ -113,9 +113,9 @@ int main() {
 
     for (i = 0; i < M*N; i++) {
         int verify = 0;
-        for (int j; j<K; j++)
+        for (int j=0; j<K; j++)
           verify += i*K + j;
-        float result = (float)verify;
+        float result = (float)(verify/K) * 0.01f;
         std::cout<<i <<": "<<hostResult[i] <<" vs "<<result<<"\n";
     }
 
