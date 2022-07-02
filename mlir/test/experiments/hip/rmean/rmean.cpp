@@ -112,7 +112,10 @@ int main() {
     hipMemcpy(hostResult, gpuResult, M*N * sizeof(float), hipMemcpyDeviceToHost);
 
     for (i = 0; i < M*N; i++) {
-        std::cout<<i <<": "<<hostResult[i] <<"\n";
+        int verfy = 0;
+        for (int j; j<K; j++)
+          verify += i*K + j;
+        std::cout<<i <<": "<<hostResult[i] <<" vs "<<(verify/K)<<"\n";
     }
 
     // verify the results
