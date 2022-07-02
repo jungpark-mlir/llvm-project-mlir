@@ -115,7 +115,8 @@ int main() {
         int verify = 0;
         for (int j; j<K; j++)
           verify += i*K + j;
-        std::cout<<i <<": "<<hostResult[i] <<" vs "<<(float)verify/(float)K/0.01f<<"\n";
+        float result = ((float)verify * 0.01f)/(float)K;
+        std::cout<<i <<": "<<hostResult[i] <<" vs "<<result<<"\n";
     }
 
     // verify the results
