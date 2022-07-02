@@ -117,6 +117,10 @@ int main() {
           verify += i*K + j;
         float result = (float)(verify/K) * 0.01f;
         std::cout<<i <<": "<<hostResult[i] <<" vs "<<result<<"\n";
+        float diff = hostResult[i] - result;
+        diff *= diff;
+        if (diff > 0.0001)
+            std::cout<<"Fails to verify!!!\n";
     }
 
     // verify the results
