@@ -35,14 +35,15 @@ THE SOFTWARE.
 __global__ void rgemm(float* A, float* B, float* C) {
     __shared__ float local[K];
     int tidx = hipThreadIdx_x;
+    int bidx = hipBlockIdx_x;
     int tidy = hipThreadIdx_y;
     int tidz = hipThreadIdx_z;
 
 // A[256,768]
 // grid K(768 / 2), M(256), N(768)
     float inA0, inA1;
-    inA0 = A[tidx*2 + tidy*K];
-    inA1 = A[tidx*2 + 1 + tidy*K];
+    inA0 = A[tidx*2 + bidx*K];
+    inA1 = A[tidx*2 + 1 + bidx*K];
 
     local[tidx*2] = inA0;
     local[tidx*2 + 1] = inA1;
@@ -66,7 +67,7 @@ __global__ void rgemm(float* A, float* B, float* C) {
     if (tidx == 0){
       float final = local[0] + local[256] + local[512];
       //float final = local[0];
-      C[tidz + tidy*N] = final / K;
+      C[bidx] = final / K;
     }
 }
 
@@ -104,7 +105,7 @@ int main() {
     hipMemcpy(gpuMatA, Matrix, M*K * sizeof(float), hipMemcpyHostToDevice);
 
     // Lauching kernel from host
-    hipLaunchKernelGGL(rgemm, dim3(1, M, N),
+    hipLaunchKernelGGL(rgemm, dim3(M, 1, 1),
                     dim3(K/2, 1, 1), 0, 0, gpuMatA, gpuMatB, gpuResult);
 
     // Memory transfer from device to host
