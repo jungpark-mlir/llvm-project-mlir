@@ -54,9 +54,9 @@ __global__ void rgemm(float* A, float* B, float* C) {
       //__syncthreads();
       asm volatile("s_waitcnt lgkmcnt(0) \n s_barrier");
       if((tidx % turn) == 0){
-        float lValue = local[tidx*turn*2];
-        float rValue = local[tidx*turn*2 + turn];
-        local[tidx*turn*2] = lValue + rValue;
+        float lValue = local[tidx*2];
+        float rValue = local[tidx*2 + turn];
+        local[tidx*2] = lValue + rValue;
       }
       turn *= 2;
     }
