@@ -38,26 +38,30 @@ THE SOFTWARE.
 #define WGSIZE 768
 #define M 256
 #define K 768
-#define N 2
-#define LOG2K 8
+#define N 32
+#define LOG2K 7
 #define TILE 2
 
 __global__ void rgemm(float* A, float* B, float* C) {
     __shared__ float local[K];
     int tidx = hipThreadIdx_x;
-    int tidy = hipThreadIdx_y;
-    int tidz = hipThreadIdx_z;
+    int tidy = hipBlockIdx_y;
+    int tidz = hipBlockIdx_z;
 
 // A[256,768] B[768,768]
 // grid K(768 / 2), M(256), N(768)
-    float inA0, inA1, inB0, inB1;
-    inA0 = A[tidx*2 + tidy*K];
-    inA1 = A[tidx*2 + 1 + tidy*K];
-    inB0 = B[tidz + tidx*2*N];
-    inB1 = B[tidz + (tidx*2 + 1)*N];
+    float4* p4A;
+    float4* p4B;
+    p4A = (float4*)A;
+    p4B = (float4*)B;
 
-    local[tidx*2] = inA0 * inB0;
-    local[tidx*2 + 1] = inA1 * inB1;
+    float4 inA, inB;
+    inA = p4A[tidx + tidy*K/4];
+    //NT
+    inB = p4B[tidx + tidz*N/4];
+
+    local[tidx*2] = inA.x*inB.x + inA.y*inB.y;
+    local[tidx*2 + 1] = inA.z*inB.z + inA.w*inB.w;
 
     int turn = 1;
     // sum tree
@@ -65,9 +69,9 @@ __global__ void rgemm(float* A, float* B, float* C) {
       //__syncthreads();
       asm volatile("s_waitcnt lgkmcnt(0) \n s_barrier");
       if((tidx % turn) == 0){
-        float lValue = local[tidx*turn*2];
-        float rValue = local[tidx*turn*2 + turn];
-        local[tidx] = lValue + rValue;
+        float lValue = local[tidx*2];
+        float rValue = local[tidx*2 + turn];
+        local[tidx*2] = lValue + rValue;
       }
       turn *= 2;
     }
@@ -76,7 +80,7 @@ __global__ void rgemm(float* A, float* B, float* C) {
     asm volatile("s_waitcnt lgkmcnt(0) \n s_barrier");
     // values are at 0, 256, 512
     if (tidx == 0){
-      float final = local[0] + local[256] + local[512];
+      float final = local[0] + local[256];
       //float final = local[0];
       C[tidz + tidy*N] = final;
     }
@@ -117,7 +121,7 @@ int main() {
 
     // Lauching kernel from host
     hipLaunchKernelGGL(rgemm, dim3(1, M, N),
-                    dim3(K/2, 1, 1), 0, 0, gpuMatA, gpuMatB, gpuResult);
+                    dim3(K/4, 1, 1), 0, 0, gpuMatA, gpuMatB, gpuResult);
 
     // Memory transfer from device to host
     hipMemcpy(hostResult, gpuResult, M*N * sizeof(float), hipMemcpyDeviceToHost);
