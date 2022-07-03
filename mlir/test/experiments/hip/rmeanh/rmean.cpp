@@ -31,7 +31,7 @@ THE SOFTWARE.
 #define K 768
 #define N 1
 #define LOG2K 8
-typedef uint16_t HALF
+typedef uint16_t HALF;
 __global__ void rgemm(HALF* A, HALF* B, HALF* C) {
     __shared__ HALF local[K];
     int tidx = hipThreadIdx_x;
