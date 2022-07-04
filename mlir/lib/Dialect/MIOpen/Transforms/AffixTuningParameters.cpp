@@ -244,6 +244,49 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
     && dims.n == 32 )
     perfConfig = "64,128,8,64,32,4,1,1";
 
+// conv6 - needs pad 1, stride 2 but ignoring here
+// 32 Dump perfConfig: 128,128,4,64,128,4,1,1
+// 256 Dump perfConfig: 128,256,4,128,64,4,1,1
+    if (dims.x == 3
+    && dims.y == 3
+    && dims.ho == 28
+    && dims.wo == 28
+    && dims.c == 128
+    && dims.k == 128
+    && dims.n == 256 )
+    perfConfig = "128,256,4,128,64,4,1,1";
+
+    if (dims.x == 3
+    && dims.y == 3
+    && dims.ho == 28
+    && dims.wo == 28
+    && dims.c == 128
+    && dims.k == 128
+    && dims.n == 32 )
+    perfConfig = "128,128,4,64,128,4,1,1";
+
+// conv5
+//32 Dump perfConfig: 128,128,4,64,64,4,1,1
+//256 Dump perfConfig: 64,256,4,64,64,4,1,1
+
+    if (dims.x == 1
+    && dims.y == 1
+    && dims.ho == 28
+    && dims.wo == 28
+    && dims.c == 128
+    && dims.k == 512
+    && dims.n == 256 )
+    perfConfig = "64,256,4,64,64,4,1,1";
+
+    if (dims.x == 1
+    && dims.y == 1
+    && dims.ho == 28
+    && dims.wo == 28
+    && dims.c == 128
+    && dims.k == 512
+    && dims.n == 32 )
+    perfConfig = "128,128,4,64,64,4,1,1";
+
 
 
   if (auto perfConfigAttr =
