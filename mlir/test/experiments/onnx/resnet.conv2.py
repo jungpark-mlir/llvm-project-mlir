@@ -34,7 +34,7 @@ def main() -> None:
     model_output_channels = 256
     Y = onnx.helper.make_tensor_value_info(model_output_name,
                                            onnx.TensorProto.FLOAT,
-                                           [256, model_output_channels, 14, 14])
+                                           [bsize, model_output_channels, 14, 14])
 
     # Create a Conv node (NodeProto).
     # https://github.com/onnx/onnx/blob/rel-1.9.0/docs/Operators.md#conv
