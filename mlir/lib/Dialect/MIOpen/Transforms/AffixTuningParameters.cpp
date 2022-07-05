@@ -196,8 +196,9 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
     && dims.wo == 14
     && dims.c == 1024
     && dims.k == 256
-    && dims.n == 256 )
+    && dims.n == 256 ){
     perfConfig = "64,128,4,64,32,4,1,1";
+    llvm::errs() << "2-256: " << perfConfig <<"\n"; }
 
     if (dims.x == 1
     && dims.y == 1
@@ -205,8 +206,9 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
     && dims.wo == 14
     && dims.c == 1024
     && dims.k == 256
-    && dims.n == 32 )
+    && dims.n == 32 ){
     perfConfig = "64,128,4,32,64,4,1,1";
+    llvm::errs() << "2-32: " << perfConfig <<"\n"; }
 
     if (dims.x == 1
     && dims.y == 1
@@ -214,8 +216,9 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
     && dims.wo == 14
     && dims.c == 256
     && dims.k == 1024
-    && dims.n == 256 )
+    && dims.n == 256 ){
     perfConfig = "64,128,4,64,32,4,1,1";
+    llvm::errs() << "8-256: " << perfConfig <<"\n"; }
 
     if (dims.x == 1
     && dims.y == 1
@@ -223,8 +226,9 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
     && dims.wo == 14
     && dims.c == 256
     && dims.k == 1024
-    && dims.n == 32 )
+    && dims.n == 32 ){
     perfConfig = "128,128,4,128,64,4,1,1";
+    llvm::errs() << "8-32: " << perfConfig <<"\n"; }
 
     if (dims.x == 3
     && dims.y == 3
@@ -232,8 +236,9 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
     && dims.wo == 14
     && dims.c == 256
     && dims.k == 256
-    && dims.n == 256 )
+    && dims.n == 256 ){
     perfConfig = "128,128,8,64,64,4,1,1";
+    llvm::errs() << "9-256: " << perfConfig <<"\n"; }
 
     if (dims.x == 3
     && dims.y == 3
@@ -241,8 +246,9 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
     && dims.wo == 14
     && dims.c == 256
     && dims.k == 256
-    && dims.n == 32 )
+    && dims.n == 32 ){
     perfConfig = "64,128,8,64,32,4,1,1";
+    llvm::errs() << "9-32: " << perfConfig <<"\n"; }
 
 // conv6 - needs pad 1, stride 2 but ignoring here
 // 32 Dump perfConfig: 128,128,4,64,128,4,1,1
@@ -253,8 +259,9 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
     && dims.wo == 28
     && dims.c == 128
     && dims.k == 128
-    && dims.n == 256 )
+    && dims.n == 256 ){
     perfConfig = "128,256,4,128,64,4,1,1";
+    llvm::errs() << "6-256: " << perfConfig <<"\n"; }
 
     if (dims.x == 3
     && dims.y == 3
@@ -262,8 +269,9 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
     && dims.wo == 28
     && dims.c == 128
     && dims.k == 128
-    && dims.n == 32 )
+    && dims.n == 32 ){
     perfConfig = "128,128,4,64,128,4,1,1";
+    llvm::errs() << "6-32: " << perfConfig <<"\n"; }
 
 // conv5
 //32 Dump perfConfig: 128,128,4,64,64,4,1,1
@@ -275,8 +283,9 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
     && dims.wo == 28
     && dims.c == 128
     && dims.k == 512
-    && dims.n == 256 )
+    && dims.n == 256 ){
     perfConfig = "64,256,4,64,64,4,1,1";
+    llvm::errs() << "5-256: " << perfConfig <<"\n"; }
 
     if (dims.x == 1
     && dims.y == 1
@@ -284,8 +293,9 @@ void AffixTuningParameters::affixTuningParametersImpl(T &op) {
     && dims.wo == 28
     && dims.c == 128
     && dims.k == 512
-    && dims.n == 32 )
+    && dims.n == 32 ){
     perfConfig = "128,128,4,64,64,4,1,1";
+    llvm::errs() << "5-32: " << perfConfig <<"\n"; }
 
 
 
