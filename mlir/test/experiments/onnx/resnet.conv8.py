@@ -23,17 +23,18 @@ def main() -> None:
     # Create a dummy convolutional neural network.
 
     # IO tensors (ValueInfoProto).
+    bsize = 256
     model_input_name0 = "X0"
-    X0 = onnx.helper.make_tensor_value_info(model_input_name0, onnx.TensorProto.FLOAT, [256, 256, 14, 14])
+    X0 = onnx.helper.make_tensor_value_info(model_input_name0, onnx.TensorProto.FLOAT, [bsize, 256, 14, 14])
 
     model_const_name0 = "C0"
-    C0 = onnx.helper.make_tensor_value_info(model_const_name0, onnx.TensorProto.FLOAT, [256, 1024, 14, 14])
+    C0 = onnx.helper.make_tensor_value_info(model_const_name0, onnx.TensorProto.FLOAT, [bsize, 1024, 14, 14])
 
     model_output_name = "Y"
     model_output_channels = 1024
     Y = onnx.helper.make_tensor_value_info(model_output_name,
                                            onnx.TensorProto.FLOAT,
-                                           [256, model_output_channels, 14, 14])
+                                           [bsize, model_output_channels, 14, 14])
 
     # Create a Conv node (NodeProto).
     # https://github.com/onnx/onnx/blob/rel-1.9.0/docs/Operators.md#conv
