@@ -285,10 +285,10 @@ public:
               loc, reshapeType, input_t, rewriter.getArrayAttr(newShapeAttr));
         }
 
-        ArrayRef<int64_t> broadcastShape =
-            op->getType().cast<ShapedType>().getShape();
+        ShapedType broadcastTy = op->getResult(0).getType().cast<ShapedType>();
+        ArrayRef<int64_t> broadcastShape = broadcastTy.getShape();
         // help tosa.matmul to have broadcast input
-        if (broadcastShape != outShape) {
+        if (broadcastTy != outputTy) {
           Attribute constantAttr;
           if (outElemType.isa<FloatType>()) {
             constantAttr = rewriter.getFloatAttr(outElemType, 0.0);
@@ -296,11 +296,11 @@ public:
             constantAttr = rewriter.getIntegerAttr(outElemType, 0);
           }
           auto denseAttr = DenseElementsAttr::get(
-              RankedTensorType::get(outShape, outElemType), constantAttr);
+              RankedTensorType::get(broadcastShape, outElemType), constantAttr);
           auto constantVal = rewriter.create<tosa::ConstOp>(
               op.getLoc(), denseAttr.getType(), denseAttr);
-          newOperand = rewriter.create<tosa::AddOp>(loc, outputTy, newOperand,
-                                                    constantVal);
+          newOperand = rewriter.create<tosa::AddOp>(loc, broadcastTy,
+                                                    newOperand, constantVal);
         }
 
         // replace the uses
