@@ -285,7 +285,7 @@ public:
         }
 
         // help tosa.matmul to have broadcast input
-        if (isa<tosa::matmulOp>(expandedOp)) {
+        if (isa<tosa::MatMulOp>(expandedOp)) {
           Attribute constantAttr;
           if (outElemType.isa<FloatType>()) {
             constantAttr = rewriter.getFloatAttr(outElemType, 0.0);
