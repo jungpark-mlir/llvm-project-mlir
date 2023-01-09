@@ -297,7 +297,7 @@ public:
         auto constantVal = rewriter.create<tosa::ConstOp>(
             op.getLoc(), denseAttr.getType(), denseAttr);
         newOperand =
-            rewriter.create<tosa::AddOp>(loc, outputTy, input_t, newOperand);
+            rewriter.create<tosa::AddOp>(loc, outputTy, newOperand, constantVal);
 
         // replace the uses
         for (auto &operand : expandedOp->getOpOperands()) {
