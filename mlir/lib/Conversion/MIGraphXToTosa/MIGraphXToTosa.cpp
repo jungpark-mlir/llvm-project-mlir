@@ -256,8 +256,7 @@ public:
       // isa binary operation,
       if (isBroadcastable(expandedOp, op)) {
         // get shape of the use
-        ShapedType outputTy =
-            expandedOp->getResultTypes()[0].cast<ShapedType>();
+        ShapedType outputTy = op.getType().cast<ShapedType>();
         ArrayRef<int64_t> outShape = outputTy.getShape();
         Type outElemType = outputTy.getElementType();
         uint32_t outRank = outShape.size();
@@ -286,18 +285,20 @@ public:
         }
 
         // help tosa.matmul to have broadcast input
-        Attribute constantAttr;
-        if (outElemType.isa<FloatType>()) {
-          constantAttr = rewriter.getFloatAttr(outElemType, 0.0);
-        } else if (outElemType.isa<IntegerType>()) {
-          constantAttr = rewriter.getIntegerAttr(outElemType, 0);
+        if (isa<tosa::matmulOp>(expandedOp)) {
+          Attribute constantAttr;
+          if (outElemType.isa<FloatType>()) {
+            constantAttr = rewriter.getFloatAttr(outElemType, 0.0);
+          } else if (outElemType.isa<IntegerType>()) {
+            constantAttr = rewriter.getIntegerAttr(outElemType, 0);
+          }
+          auto denseAttr = DenseElementsAttr::get(
+              RankedTensorType::get(outShape, outElemType), constantAttr);
+          auto constantVal = rewriter.create<tosa::ConstOp>(
+              op.getLoc(), denseAttr.getType(), denseAttr);
+          newOperand = rewriter.create<tosa::AddOp>(loc, outputTy, newOperand,
+                                                    constantVal);
         }
-        auto denseAttr = DenseElementsAttr::get(
-            RankedTensorType::get(outShape, outElemType), constantAttr);
-        auto constantVal = rewriter.create<tosa::ConstOp>(
-            op.getLoc(), denseAttr.getType(), denseAttr);
-        newOperand =
-            rewriter.create<tosa::AddOp>(loc, outputTy, newOperand, constantVal);
 
         // replace the uses
         for (auto &operand : expandedOp->getOpOperands()) {
