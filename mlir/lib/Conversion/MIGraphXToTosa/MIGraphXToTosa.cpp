@@ -41,7 +41,7 @@ static bool isBroadcastable(Operation *op, Operation *operand) {
 template <typename TosaOp, typename... Args>
 static TosaOp createOpAndInfer(mlir::PatternRewriter &rewriter,
                                mlir::Location loc, Type elemType,
-                               Args &&... args) {
+                               Args &&...args) {
   auto op =
       rewriter.create<TosaOp>(loc, UnrankedTensorType::get(elemType), args...);
   InferShapedTypeOpInterface shapeInterface =
@@ -244,7 +244,9 @@ public:
     auto operands = adaptor.getOperands();
     Location loc = op->getLoc();
     auto input_t = operands[0];
-    auto inShape = input_t.getType().cast<ShapedType>().getShape();
+    ShapedType inputTy = input_t.getType().cast<ShapedType>();
+    ArrayRef<int64_t> inShape = inputTy.getShape();
+    Type elementTy = inputTy.getElementType();
     uint32_t inRank = inShape.size();
 
     for (auto &use : op->getResult(0).getUses()) {
@@ -254,13 +256,14 @@ public:
       // isa binary operation,
       if (isBroadcastable(expandedOp, op)) {
         // get shape of the use
-        auto outShape =
-            expandedOp->getResultTypes()[0].cast<ShapedType>().getShape();
-        auto outElemType =
-            expandedOp->getResultTypes()[0].cast<ShapedType>().getElementType();
+        ShapedType outputTy =
+            expandedOp->getResultTypes()[0].cast<ShapedType>();
+        ArrayRef<int64_t> outShape = outputTy.getShape();
+        Type outElemType = outputTy.getElementType();
         uint32_t outRank = outShape.size();
 
         Value newOperand = input_t;
+
         if (outRank != inShape.size()) {
           SmallVector<int64_t, 5> newShape;
           SmallVector<Attribute, 5> newShapeAttr;
@@ -277,10 +280,24 @@ public:
           }
 
           // reshape
-          auto outType = RankedTensorType::get(newShape, outElemType);
+          auto reshapeType = RankedTensorType::get(newShape, outElemType);
           newOperand = rewriter.create<tosa::ReshapeOp>(
-              loc, outType, input_t, rewriter.getArrayAttr(newShapeAttr));
+              loc, reshapeType, input_t, rewriter.getArrayAttr(newShapeAttr));
         }
+
+        // help tosa.matmul to have broadcast input
+        Attribute constantAttr;
+        if (outElemType.isa<FloatType>()) {
+          constantAttr = rewriter.getFloatAttr(outElemType, 0.0);
+        } else if (outElemType.isa<IntegerType>()) {
+          constantAttr = rewriter.getIntegerAttr(outElemType, 0);
+        }
+        auto denseAttr = DenseElementsAttr::get(
+            RankedTensorType::get(outShape, outElemType), constantAttr);
+        auto constantVal = rewriter.create<tosa::ConstOp>(
+            op.getLoc(), denseAttr.getType(), denseAttr);
+        newOperand =
+            rewriter.create<tosa::AddOp>(loc, outputType, input_t, newOperand);
 
         // replace the uses
         for (auto &operand : expandedOp->getOpOperands()) {
