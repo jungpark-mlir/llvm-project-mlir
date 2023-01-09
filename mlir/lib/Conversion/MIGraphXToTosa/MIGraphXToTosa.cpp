@@ -255,8 +255,9 @@ public:
         continue;
       // isa binary operation,
       if (isBroadcastable(expandedOp, op)) {
-        // get shape of the use
-        ShapedType outputTy = op.getType().cast<ShapedType>();
+        // get shape of the use, uses can have different rank
+        ShapedType outputTy =
+            expandedOp->getResultTypes()[0].cast<ShapedType>();
         ArrayRef<int64_t> outShape = outputTy.getShape();
         Type outElemType = outputTy.getElementType();
         uint32_t outRank = outShape.size();
@@ -284,8 +285,10 @@ public:
               loc, reshapeType, input_t, rewriter.getArrayAttr(newShapeAttr));
         }
 
+        ArrayRef<int64_t> broadcastShape =
+            op->getType().cast<ShapedType>().getShape();
         // help tosa.matmul to have broadcast input
-        if (isa<tosa::MatMulOp>(expandedOp)) {
+        if (broadcastShape != outShape) {
           Attribute constantAttr;
           if (outElemType.isa<FloatType>()) {
             constantAttr = rewriter.getFloatAttr(outElemType, 0.0);
