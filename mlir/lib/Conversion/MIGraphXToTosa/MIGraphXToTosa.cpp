@@ -286,8 +286,8 @@ public:
         ArrayRef<int64_t> bcShape = broadcastTy.getShape();
         uint32_t bcRank = bcShape.size();
         // help tosa.matmul to have broadcast input
-        if (isa<migraphx::dotOp>(expandedOp)) {
-          if (op == expandedOp.getOperand(1)) { // mat B broadcast
+        if (isa<migraphx::DotOp>(expandedOp)) {
+          if (op == expandedOp->getOperand(1)) { // mat B broadcast
             // Only support broadcasting batch dimension
             if ((inShape[inRank - 1] != bcShape[bcRank - 1]) ||
                 (inShape[inRank - 2] != bcShape[bcRank - 2])) {
@@ -301,9 +301,17 @@ public:
             // reshape as 1x(B*M)xK
             ArrayRef<int64_t> newAShape = {1, batchSizeA * bcShape[bcRank - 2],
                                            bcShape[bcRank - 1]};
+            SmallVector<Attribute, 3> newAShapeAttr;
+            newAShapeAttr.push_back(rewriter.getI64IntegerAttr(1));
+            newAShapeAttr.push_back(
+                rewriter.getI64IntegerAttr(batchSizeA * bcShape[bcRank - 2]));
+            newAShapeAttr.push_back(
+                rewriter.getI64IntegerAttr(bcShape[bcRank - 1]));
+
             auto newAType = RankedTensorType::get(newAShape, outElemType);
             newOperand = rewriter.create<tosa::ReshapeOp>(
-                loc, newAType, newOperand, rewriter.getArrayAttr(newAShape));
+                loc, newAType, newOperand,
+                rewriter.getArrayAttr(newAShapeAttr));
           } else {
             return failure();
           }
