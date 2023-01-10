@@ -41,7 +41,7 @@ static bool isBroadcastable(Operation *op, Operation *operand) {
 template <typename TosaOp, typename... Args>
 static TosaOp createOpAndInfer(mlir::PatternRewriter &rewriter,
                                mlir::Location loc, Type elemType,
-                               Args &&... args) {
+                               Args &&...args) {
   auto op =
       rewriter.create<TosaOp>(loc, UnrankedTensorType::get(elemType), args...);
   InferShapedTypeOpInterface shapeInterface =
@@ -244,7 +244,7 @@ public:
     auto operands = adaptor.getOperands();
     Location loc = op->getLoc();
     auto input_t = operands[0];
-    auto inShape = input_t.getType().cast<ShapedType>().getShape();
+    ArrayRef<int64_t> inShape = input_t.getType().cast<ShapedType>().getShape();
     uint32_t inRank = inShape.size();
 
     for (auto &use : op->getResult(0).getUses()) {
@@ -282,6 +282,32 @@ public:
               loc, outType, input_t, rewriter.getArrayAttr(newShapeAttr));
         }
 
+        ShapedType broadcastTy = op->getResult(0).getType().cast<ShapedType>();
+        ArrayRef<int64_t> bcShape = broadcastTy.getShape();
+        uint32_t bcRank = bcShape.size();
+        // help tosa.matmul to have broadcast input
+        if (isa<migraphx::dotOp>(expandedOp)) {
+          if (op == expandedOp.getOperand(1)) { // mat B broadcast
+            // Only support broadcasting batch dimension
+            if ((inShape[inRank - 1] != bcShape[bcRank - 1]) ||
+                (inShape[inRank - 2] != bcShape[bcRank - 2])) {
+              return failure();
+            }
+            int64_t batchSizeA = 1;
+            // get flattened batch size
+            for (uint32_t i = 0; i < bcRank - 2; i++) {
+              batchSizeA *= bcShape[i];
+            }
+            // reshape as 1x(B*M)xK
+            ArrayRef<int64_t> newAShape = {1, batchSizeA * bcShape[bcRank - 2],
+                                           bcShape[bcRank - 1]};
+            auto newAType = RankedTensorType::get(newAShape, outElemType);
+            newOperand = rewriter.create<tosa::ReshapeOp>(
+                loc, newAType, newOperand, rewriter.getArrayAttr(newAShape));
+          } else {
+            return failure();
+          }
+        }
         // replace the uses
         for (auto &operand : expandedOp->getOpOperands()) {
           if (operand.get() == op) {
