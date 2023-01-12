@@ -14,6 +14,7 @@
 #include "llvm/DebugInfo/DWARF/DWARFContext.h"
 #include "llvm/DebugInfo/DWARF/DWARFExpression.h"
 #include "llvm/Object/ObjectFile.h"
+#include "llvm/Support/Endian.h"
 #include <memory>
 #include <vector>
 
@@ -40,7 +41,7 @@ class ObjFileAddressMap : public AddressesMap {
 public:
   ObjFileAddressMap(DWARFContext &Context, const Options &Options,
                     object::ObjectFile &ObjFile)
-      : Opts(Options) {
+      : Opts(Options), Context(Context) {
     // Remember addresses of existing text sections.
     for (const object::SectionRef &Sect : ObjFile.sections()) {
       if (!Sect.isText())
@@ -75,7 +76,7 @@ public:
             DIE.getTag() == dwarf::DW_TAG_label) &&
            "Wrong type of input die");
 
-    if (Optional<uint64_t> LowPC =
+    if (std::optional<uint64_t> LowPC =
             dwarf::toAddress(DIE.find(dwarf::DW_AT_low_pc))) {
       if (!isDeadAddress(*LowPC, DIE.getDwarfUnit()->getVersion(),
                          Opts.Tombstone,
@@ -137,17 +138,36 @@ public:
 
   void clear() override { DWARFAddressRanges.clear(); }
 
-  llvm::Expected<uint64_t> relocateIndexedAddr(uint64_t, uint64_t) override {
-    // should not be called.
-    return object::createError("no relocations in linked binary");
+  llvm::Expected<uint64_t> relocateIndexedAddr(uint64_t StartOffset,
+                                               uint64_t EndOffset) override {
+    // No relocations in linked binary. Return just address value.
+
+    const char *AddrPtr =
+        Context.getDWARFObj().getAddrSection().Data.data() + StartOffset;
+    support::endianness Endianess =
+        Context.getDWARFObj().isLittleEndian() ? support::little : support::big;
+
+    assert(EndOffset > StartOffset);
+    switch (EndOffset - StartOffset) {
+    case 1:
+      return *AddrPtr;
+    case 2:
+      return support::endian::read16(AddrPtr, Endianess);
+    case 4:
+      return support::endian::read32(AddrPtr, Endianess);
+    case 8:
+      return support::endian::read64(AddrPtr, Endianess);
+    }
+
+    llvm_unreachable("relocateIndexedAddr unhandled case!");
   }
 
 protected:
   // returns true if specified address range is inside address ranges
   // of executable sections.
   bool isInsideExecutableSectionsAddressRange(uint64_t LowPC,
-                                              Optional<uint64_t> HighPC) {
-    Optional<AddressRange> Range =
+                                              std::optional<uint64_t> HighPC) {
+    std::optional<AddressRange> Range =
         TextAddressRanges.getRangeThatContains(LowPC);
 
     if (HighPC)
@@ -156,7 +176,7 @@ protected:
     return Range.has_value();
   }
 
-  uint64_t isBFDDeadAddressRange(uint64_t LowPC, Optional<uint64_t> HighPC,
+  uint64_t isBFDDeadAddressRange(uint64_t LowPC, std::optional<uint64_t> HighPC,
                                  uint16_t Version) {
     if (LowPC == 0)
       return true;
@@ -167,7 +187,8 @@ protected:
     return !isInsideExecutableSectionsAddressRange(LowPC, HighPC);
   }
 
-  uint64_t isMAXPCDeadAddressRange(uint64_t LowPC, Optional<uint64_t> HighPC,
+  uint64_t isMAXPCDeadAddressRange(uint64_t LowPC,
+                                   std::optional<uint64_t> HighPC,
                                    uint16_t Version, uint8_t AddressByteSize) {
     if (Version <= 4 && HighPC) {
       if (LowPC == (dwarf::computeTombstoneAddress(AddressByteSize) - 1))
@@ -182,7 +203,7 @@ protected:
     return false;
   }
 
-  bool isDeadAddressRange(uint64_t LowPC, Optional<uint64_t> HighPC,
+  bool isDeadAddressRange(uint64_t LowPC, std::optional<uint64_t> HighPC,
                           uint16_t Version, TombstoneKind Tombstone,
                           uint8_t AddressByteSize) {
     switch (Tombstone) {
@@ -202,13 +223,15 @@ protected:
 
   bool isDeadAddress(uint64_t LowPC, uint16_t Version, TombstoneKind Tombstone,
                      uint8_t AddressByteSize) {
-    return isDeadAddressRange(LowPC, None, Version, Tombstone, AddressByteSize);
+    return isDeadAddressRange(LowPC, std::nullopt, Version, Tombstone,
+                              AddressByteSize);
   }
 
 private:
   RangesTy DWARFAddressRanges;
   AddressRanges TextAddressRanges;
   const Options &Opts;
+  DWARFContext &Context;
 };
 
 static bool knownByDWARFUtil(StringRef SecName) {
@@ -275,7 +298,6 @@ Error linkDebugInfo(object::ObjectFile &File, const Options &Options,
   DWARFLinker DebugInfoLinker(&OutStreamer, DwarfLinkerClient::LLD);
 
   DebugInfoLinker.setEstimatedObjfilesAmount(1);
-  DebugInfoLinker.setAccelTableKind(DwarfLinkerAccelTableKind::None);
   DebugInfoLinker.setErrorHandler(ReportErr);
   DebugInfoLinker.setWarningHandler(ReportWarn);
   DebugInfoLinker.setNumThreads(Options.NumThreads);

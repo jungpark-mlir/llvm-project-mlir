@@ -25,7 +25,7 @@
 
 namespace mlir {
 namespace spirv {
-#define GEN_PASS_DEF_SPIRVUPDATEVCE
+#define GEN_PASS_DEF_SPIRVUPDATEVCEPASS
 #include "mlir/Dialect/SPIRV/Transforms/Passes.h.inc"
 } // namespace spirv
 } // namespace mlir
@@ -36,7 +36,7 @@ namespace {
 /// Pass to deduce minimal version/extension/capability requirements for a
 /// spirv::ModuleOp.
 class UpdateVCEPass final
-    : public spirv::impl::SPIRVUpdateVCEBase<UpdateVCEPass> {
+    : public spirv::impl::SPIRVUpdateVCEPassBase<UpdateVCEPass> {
   void runOnOperation() override;
 };
 } // namespace
@@ -102,7 +102,7 @@ void UpdateVCEPass::runOnOperation() {
 
   spirv::TargetEnvAttr targetAttr = spirv::lookupTargetEnv(module);
   if (!targetAttr) {
-    module.emitError("missing 'spv.target_env' attribute");
+    module.emitError("missing 'spirv.target_env' attribute");
     return signalPassFailure();
   }
 
@@ -118,7 +118,7 @@ void UpdateVCEPass::runOnOperation() {
   WalkResult walkResult = module.walk([&](Operation *op) -> WalkResult {
     // Op min version requirements
     if (auto minVersionIfx = dyn_cast<spirv::QueryMinVersionInterface>(op)) {
-      Optional<spirv::Version> minVersion = minVersionIfx.getMinVersion();
+      std::optional<spirv::Version> minVersion = minVersionIfx.getMinVersion();
       if (minVersion) {
         deducedVersion = std::max(deducedVersion, *minVersion);
         if (deducedVersion > allowedVersion) {
@@ -151,7 +151,7 @@ void UpdateVCEPass::runOnOperation() {
     // Special treatment for global variables, whose type requirements are
     // conveyed by type attributes.
     if (auto globalVar = dyn_cast<spirv::GlobalVariableOp>(op))
-      valueTypes.push_back(globalVar.type());
+      valueTypes.push_back(globalVar.getType());
 
     // Requirements from values' types
     SmallVector<ArrayRef<spirv::Extension>, 4> typeExtensions;
@@ -183,9 +183,4 @@ void UpdateVCEPass::runOnOperation() {
       deducedVersion, deducedCapabilities.getArrayRef(),
       deducedExtensions.getArrayRef(), &getContext());
   module->setAttr(spirv::ModuleOp::getVCETripleAttrName(), triple);
-}
-
-std::unique_ptr<OperationPass<spirv::ModuleOp>>
-mlir::spirv::createUpdateVersionCapabilityExtensionPass() {
-  return std::make_unique<UpdateVCEPass>();
 }

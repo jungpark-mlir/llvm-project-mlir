@@ -8,7 +8,7 @@
 
 #include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
 
-#include "mlir/Dialect/Arithmetic/IR/Arithmetic.h"
+#include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/CommonFolders.h"
 #include "mlir/IR/AffineExpr.h"
 #include "mlir/IR/AffineMap.h"
@@ -595,7 +595,7 @@ SuccessorOperands SwitchOp::getSuccessorOperands(unsigned index) {
 }
 
 Block *SwitchOp::getSuccessorForOperands(ArrayRef<Attribute> operands) {
-  Optional<DenseIntElementsAttr> caseValues = getCaseValues();
+  std::optional<DenseIntElementsAttr> caseValues = getCaseValues();
 
   if (!caseValues)
     return getDefaultDestination();
@@ -805,7 +805,8 @@ simplifySwitchFromSwitchOnSameCondition(SwitchOp op,
   SuccessorRange predDests = predSwitch.getCaseDestinations();
   auto it = llvm::find(predDests, currentBlock);
   if (it != predDests.end()) {
-    Optional<DenseIntElementsAttr> predCaseValues = predSwitch.getCaseValues();
+    std::optional<DenseIntElementsAttr> predCaseValues =
+        predSwitch.getCaseValues();
     foldSwitch(op, rewriter,
                predCaseValues->getValues<APInt>()[it - predDests.begin()]);
   } else {

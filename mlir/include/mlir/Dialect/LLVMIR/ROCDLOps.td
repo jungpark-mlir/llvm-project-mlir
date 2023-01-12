@@ -30,6 +30,12 @@ def ROCDL_Dialect : Dialect {
     /// Get the name of the attribute used to annotate external kernel
     /// functions.
     static StringRef getKernelFuncAttrName() { return "rocdl.kernel"; }
+    static constexpr ::llvm::StringLiteral getFlatWorkGroupSizeAttrName() {
+      return ::llvm::StringLiteral("rocdl.flat_work_group_size");
+    }
+    static constexpr ::llvm::StringLiteral getReqdWorkGroupSizeAttrName() {
+      return ::llvm::StringLiteral("rocdl.reqd_work_group_size");
+    }
   }];
 }
 
@@ -47,16 +53,17 @@ class ROCDL_Op<string mnemonic, list<Trait> traits = []> :
 
 class ROCDL_SpecialRegisterOp<string mnemonic,
     list<Trait> traits = []> :
-  ROCDL_Op<mnemonic, !listconcat(traits, [NoSideEffect])>,
+  ROCDL_Op<mnemonic, !listconcat(traits, [Pure])>,
   Results<(outs LLVM_Type:$res)>, Arguments<(ins)> {
-  string llvmBuilder = "$res = createIntrinsicCall(builder,"
-    # "llvm::Intrinsic::amdgcn_" # !subst(".","_", mnemonic) # ");";
+  string llvmBuilder = "$res = createIntrinsicCallWithRange(builder,"
+    # "llvm::Intrinsic::amdgcn_" # !subst(".","_", mnemonic)
+    # ", op->getAttrOfType<::mlir::DenseI32ArrayAttr>(\"range\"));";
   let assemblyFormat = "attr-dict `:` type($res)";
 }
 
 class ROCDL_DeviceFunctionOp<string mnemonic, string device_function,
                              int parameter, list<Trait> traits = []> :
-  ROCDL_Op<mnemonic, !listconcat(traits, [NoSideEffect])>,
+  ROCDL_Op<mnemonic, !listconcat(traits, [Pure])>,
   Results<(outs LLVM_Type:$res)>, Arguments<(ins)> {
   string llvmBuilder = "$res = createDeviceFunctionCall(builder, \""
   # device_function # "\", " # parameter # ");";
