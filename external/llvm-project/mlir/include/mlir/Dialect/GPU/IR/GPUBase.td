@@ -53,13 +53,10 @@ def GPU_Dialect : Dialect {
     static unsigned getPrivateAddressSpace() { return 5; }
   }];
 
-  let dependentDialects = ["arith::ArithmeticDialect"];
+  let dependentDialects = ["arith::ArithDialect"];
   let useDefaultAttributePrinterParser = 1;
   let useDefaultTypePrinterParser = 1;
-
-  // TODO: This has overlapping accessors with generated when switched to
-  // prefixed. Fix and update to _Both & then _Prefixed.
-  let emitAccessorPrefix = kEmitAccessorPrefix_Raw;
+  let useFoldAPI = kEmitFoldAdaptorFolder;
 }
 
 def GPU_AsyncToken : DialectType<
@@ -71,6 +68,9 @@ def IsMMAMatrixTypePred : CPred<"$_self.isa<::mlir::gpu::MMAMatrixType>()">;
 
 def GPU_MMAMatrix : DialectType<
   GPU_Dialect, IsMMAMatrixTypePred, "MMAMatrix type">;
+
+// Memref type acceptable to gpu.subgroup_mma_{load|store}_matrix ops.
+def GPU_MMAMemRef : MemRefOf<[F16, F32, VectorOfRankAndType<[1], [F16, F32]>]>;
 
 class MMAMatrixOf<list<Type> allowedTypes> :
   ContainerType<AnyTypeOf<allowedTypes>, IsMMAMatrixTypePred,
@@ -100,7 +100,7 @@ def GPU_AsyncOpInterface : OpInterface<"AsyncOpInterface"> {
       }],
       "OperandRange", "getAsyncDependencies", (ins), [{}], [{
         ConcreteOp op = cast<ConcreteOp>(this->getOperation());
-        return op.asyncDependencies();
+        return op.getAsyncDependencies();
       }]
     >,
     InterfaceMethod<[{
@@ -115,10 +115,7 @@ def GPU_AsyncOpInterface : OpInterface<"AsyncOpInterface"> {
     InterfaceMethod<[{
         Query the result that represents the async token to depend on.
       }],
-      "OpResult", "getAsyncToken", (ins), [{}], [{
-        ConcreteOp op = cast<ConcreteOp>(this->getOperation());
-        return op.asyncToken().template dyn_cast_or_null<OpResult>();
-      }]
+      "Value", "getAsyncToken"
     >
   ];
 }

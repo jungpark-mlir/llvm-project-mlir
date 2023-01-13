@@ -13,7 +13,7 @@
 #include "mlir/Dialect/GPU/Transforms/Passes.h"
 
 #include "mlir/AsmParser/AsmParser.h"
-#include "mlir/Dialect/Arithmetic/IR/Arithmetic.h"
+#include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
 #include "mlir/Dialect/DLTI/DLTI.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
@@ -119,7 +119,7 @@ LogicalResult mlir::sinkOperationsIntoLaunchOp(
     gpu::LaunchOp launchOp,
     llvm::function_ref<bool(Operation *)> isSinkingBeneficiary) {
   assert(isSinkingBeneficiary);
-  Region &launchOpBody = launchOp.body();
+  Region &launchOpBody = launchOp.getBody();
 
   // Identify uses from values defined outside of the scope of the launch
   // operation.
@@ -144,13 +144,13 @@ LogicalResult mlir::sinkOperationsIntoLaunchOp(
     // Only replace uses within the launch op.
     for (auto pair : llvm::zip(op->getResults(), clonedOp->getResults()))
       replaceAllUsesInRegionWith(std::get<0>(pair), std::get<1>(pair),
-                                 launchOp.body());
+                                 launchOp.getBody());
   }
   return success();
 }
 
 /// Return the provided KernelDim3 as an array of i32 constants if possible.
-static DenseI32ArrayAttr constantDimsAttr(gpu::KernelDim3 dims) {
+static DenseI32ArrayAttr maybeConstantDimsAttr(gpu::KernelDim3 dims) {
   SmallVector<int32_t, 3> constants;
   MLIRContext *ctx = dims.x.getContext();
   for (Value v : {dims.x, dims.y, dims.z}) {
@@ -177,7 +177,7 @@ static gpu::GPUFuncOp outlineKernelFuncImpl(gpu::LaunchOp launchOp,
   // Create a builder with no insertion point, insertion will happen separately
   // due to symbol table manipulation.
   OpBuilder builder(launchOp.getContext());
-  Region &launchOpBody = launchOp.body();
+  Region &launchOpBody = launchOp.getBody();
 
   // Identify uses from values defined outside of the scope of the launch
   // operation.
@@ -198,10 +198,12 @@ static gpu::GPUFuncOp outlineKernelFuncImpl(gpu::LaunchOp launchOp,
   // If we can infer bounds on the grid and/or block sizes from the arguments
   // to the launch op, propagate them to the generated kernel. This is safe
   // because multiple launches with the same body are not deduplicated.
-  if (auto blockBounds = constantDimsAttr(launchOp.getBlockSizeOperandValues()))
+  if (auto blockBounds =
+          maybeConstantDimsAttr(launchOp.getBlockSizeOperandValues()))
     outlinedFunc->setAttr(gpu::GPUFuncOp::getKnownBlockSizeAttrName(),
                           blockBounds);
-  if (auto gridBounds = constantDimsAttr(launchOp.getGridSizeOperandValues()))
+  if (auto gridBounds =
+          maybeConstantDimsAttr(launchOp.getGridSizeOperandValues()))
     outlinedFunc->setAttr(gpu::GPUFuncOp::getKnownGridSizeAttrName(),
                           gridBounds);
 
@@ -209,7 +211,7 @@ static gpu::GPUFuncOp outlineKernelFuncImpl(gpu::LaunchOp launchOp,
 
   // Map the arguments corresponding to the launch parameters like blockIdx,
   // threadIdx, etc.
-  Region &outlinedFuncBody = outlinedFunc.body();
+  Region &outlinedFuncBody = outlinedFunc.getBody();
   injectGpuIndexOperations(loc, outlinedFuncBody, launchOpBody, map);
 
   // Map arguments from gpu.launch region to the arguments of the gpu.func
@@ -263,12 +265,13 @@ static void convertToLaunchFuncOp(gpu::LaunchOp launchOp,
   OpBuilder builder(launchOp);
   // The launch op has an optional dynamic shared memory size. If it doesn't
   // exist, we use zero.
-  Value asyncToken = launchOp.asyncToken();
+  Value asyncToken = launchOp.getAsyncToken();
   auto launchFunc = builder.create<gpu::LaunchFuncOp>(
       launchOp.getLoc(), kernelFunc, launchOp.getGridSizeOperandValues(),
-      launchOp.getBlockSizeOperandValues(), launchOp.dynamicSharedMemorySize(),
-      operands, asyncToken ? asyncToken.getType() : nullptr,
-      launchOp.asyncDependencies());
+      launchOp.getBlockSizeOperandValues(),
+      launchOp.getDynamicSharedMemorySize(), operands,
+      asyncToken ? asyncToken.getType() : nullptr,
+      launchOp.getAsyncDependencies());
   launchOp.replaceAllUsesWith(launchFunc);
   launchOp.erase();
 }
@@ -391,7 +394,7 @@ private:
 
     SmallVector<Operation *, 8> symbolDefWorklist = {kernelFunc};
     while (!symbolDefWorklist.empty()) {
-      if (Optional<SymbolTable::UseRange> symbolUses =
+      if (std::optional<SymbolTable::UseRange> symbolUses =
               SymbolTable::getSymbolUses(symbolDefWorklist.pop_back_val())) {
         for (SymbolTable::SymbolUse symbolUse : *symbolUses) {
           StringRef symbolName =

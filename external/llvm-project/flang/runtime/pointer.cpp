@@ -87,9 +87,9 @@ void RTNAME(PointerAssociateLowerBounds)(Descriptor &pointer,
 void RTNAME(PointerAssociateRemapping)(Descriptor &pointer,
     const Descriptor &target, const Descriptor &bounds, const char *sourceFile,
     int sourceLine) {
+  int rank{pointer.rank()};
   pointer = target;
   pointer.raw().attribute = CFI_attribute_pointer;
-  int rank{pointer.rank()};
   Terminator terminator{sourceFile, sourceLine};
   SubscriptValue byteStride{/*captured from first dimension*/};
   std::size_t boundElementBytes{bounds.ElementBytes()};
@@ -142,6 +142,19 @@ int RTNAME(PointerDeallocate)(Descriptor &pointer, bool hasStat,
     return ReturnError(terminator, StatBaseNull, errMsg, hasStat);
   }
   return ReturnError(terminator, pointer.Destroy(true, true), errMsg, hasStat);
+}
+
+int RTNAME(PointerDeallocatePolymorphic)(Descriptor &pointer,
+    const typeInfo::DerivedType *derivedType, bool hasStat,
+    const Descriptor *errMsg, const char *sourceFile, int sourceLine) {
+  int stat{RTNAME(PointerDeallocate)(
+      pointer, hasStat, errMsg, sourceFile, sourceLine)};
+  if (stat == StatOk) {
+    DescriptorAddendum *addendum{pointer.Addendum()};
+    INTERNAL_CHECK(addendum != nullptr);
+    addendum->set_derivedType(derivedType);
+  }
+  return stat;
 }
 
 bool RTNAME(PointerIsAssociated)(const Descriptor &pointer) {
