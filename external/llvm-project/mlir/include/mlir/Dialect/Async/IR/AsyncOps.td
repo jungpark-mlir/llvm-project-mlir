@@ -78,7 +78,7 @@ def Async_LaunchOp :
 
   let arguments = (ins FlatSymbolRefAttr:$callee,
                        Variadic<Async_TokenType>:$dependencies,
-                       Variadic<AnyType>:$operands);
+                       Variadic<AnyType>:$launchOperands);
 
   let results = (outs Async_TokenType:$token,
                       Variadic<AnyType>:$results);
@@ -87,12 +87,12 @@ def Async_LaunchOp :
     OpBuilder<(ins "func::FuncOp":$kernelFunc, "ValueRange":$dependencies,
                    "ValueRange":$kernelOperands)>,
     OpBuilder<(ins "FlatSymbolRefAttr":$callee, "TypeRange":$results,
-      CArg<"ValueRange", "{}">:$operands), [{
-      $_state.addOperands(operands);
+      CArg<"ValueRange", "{}">:$launchOperands), [{
+      $_state.addOperands(launchOperands);
       $_state.addAttribute("callee", callee);
       $_state.addTypes(results);
       auto operandSegmentSizes = $_builder.getDenseI32ArrayAttr(
-        {0, static_cast<int32_t>(operands.size())});
+        {0, static_cast<int32_t>(launchOperands.size())});
       $_state.addAttribute(operand_segment_sizesAttrName($_state.name),
                            operandSegmentSizes);
 
