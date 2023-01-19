@@ -30,7 +30,7 @@
 #include "mlir/Dialect/Rock/utility/transformMapUtils.h"
 
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
-#include "mlir/Dialect/Arithmetic/IR/Arithmetic.h"
+#include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/GPU/IR/GPUDialect.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
@@ -1540,7 +1540,7 @@ void RockGridwiseGemmToBlockwisePass::runOnOperation() {
   MLIRContext *ctx = &getContext();
   ConversionTarget target(*ctx);
   target.addIllegalOp<rock::GridwiseGemmOp, rock::GridwiseGemmV2Op>();
-  target.addLegalDialect<arith::ArithmeticDialect, rock::RockDialect,
+  target.addLegalDialect<arith::ArithDialect, rock::RockDialect,
                          memref::MemRefDialect, AffineDialect,
                          vector::VectorDialect>();
 
@@ -1554,7 +1554,7 @@ void RockGridwiseGemmToBlockwisePass::runOnOperation() {
   // FIXME: Move this into a later pass after the fusion refactoring.
   ConversionTarget writeAllTarget(*ctx);
   writeAllTarget.addIllegalOp<ThreadwiseWriteAllOp>();
-  writeAllTarget.addLegalDialect<arith::ArithmeticDialect, rock::RockDialect>();
+  writeAllTarget.addLegalDialect<arith::ArithDialect, rock::RockDialect>();
   RewritePatternSet writeAllPatterns(ctx);
   writeAllPatterns.add<ThreadwiseWriteAllRewritePattern>(ctx);
   if (failed(applyPartialConversion(getOperation(), writeAllTarget,

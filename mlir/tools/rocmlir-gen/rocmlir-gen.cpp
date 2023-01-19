@@ -14,7 +14,7 @@
 #include "mlir/Conversion/RocMLIRPasses.h"
 #include "mlir/Conversion/RockToGPU/RockToGPU.h"
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
-#include "mlir/Dialect/Arithmetic/IR/Arithmetic.h"
+#include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/GPU/IR/GPUDialect.h"
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
@@ -2496,7 +2496,7 @@ int main(int argc, char **argv) {
   MLIRContext context(registry);
   context.loadDialect<rock::RockDialect, func::FuncDialect, scf::SCFDialect,
                       AffineDialect, memref::MemRefDialect, math::MathDialect,
-                      arith::ArithmeticDialect, vector::VectorDialect,
+                      arith::ArithDialect, vector::VectorDialect,
                       gpu::GPUDialect, linalg::LinalgDialect>();
 
   // Parse pass names in main to ensure static initialization completed.

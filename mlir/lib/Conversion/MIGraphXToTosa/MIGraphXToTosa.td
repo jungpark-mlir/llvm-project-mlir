@@ -12,7 +12,7 @@ include "mlir/IR/PatternBase.td"
 include "mlir/Dialect/Tosa/IR/TosaOps.td"
 include "mlir/Dialect/Func/IR/FuncOps.td"
 include "mlir/Dialect/MIGraphX/MIGraphXOps.td"
-include "mlir/Dialect/Arithmetic/IR/ArithmeticOps.td"
+include "mlir/Dialect/Arith/IR/ArithOps.td"
 
 def : Pat<(MIGraphX_AddOp $input1, $input2), (Tosa_AddOp $input1, $input2)>;
 def : Pat<(MIGraphX_SubOp $input1, $input2), (Tosa_SubOp $input1, $input2)>;

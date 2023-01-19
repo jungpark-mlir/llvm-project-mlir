@@ -20,7 +20,7 @@
 // the threadwise lowering
 //
 //===-----------------------------------------------------===//
-#include "mlir/Dialect/Arithmetic/IR/Arithmetic.h"
+#include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Rock/IR/Rock.h"
 #include "mlir/Dialect/Rock/IR/TransformMapBuilder.h"
 #include "mlir/Dialect/Rock/Passes.h"
@@ -696,7 +696,7 @@ void RockLowerBlockwiseGemmToThreadwisePass::runOnOperation() {
   ConversionTarget target(*ctx);
   target.addIllegalOp<FillOp, BlockwiseGemmOp, BlockwiseGemmV2Op, GlobalLoadOp,
                       GlobalStoreOp>();
-  target.addLegalDialect<arith::ArithmeticDialect, rock::RockDialect,
+  target.addLegalDialect<arith::ArithDialect, rock::RockDialect,
                          AffineDialect, memref::MemRefDialect>();
 
   RewritePatternSet patterns(ctx);
