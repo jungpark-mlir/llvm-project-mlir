@@ -489,7 +489,7 @@ def Rock_YieldOp :
 
 // Transforming for
 def Rock_TransformingForOp :
-    Rock_Op<"transforming_for", [RecursiveSideEffects,
+    Rock_Op<"transforming_for", [RecursivelySpeculatable, RecursiveMemoryEffects,
       DeclareOpInterfaceMethods<LoopLikeOpInterface, ["isDefinedOutsideOfLoop"]>,
       AttrSizedOperandSegments,
       SingleBlockImplicitTerminator<"::mlir::rock::YieldOp">]>,
