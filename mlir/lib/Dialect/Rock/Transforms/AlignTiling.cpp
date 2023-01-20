@@ -225,7 +225,7 @@ static Value reconfigureLAGeneric(PatternRewriter &b,
   auto invertOutIdxMap = inversePermutation(outIdxMap);
   SmallVector<AffineMap, 5> laGenericAMaps;
   SmallVector<Value, 5> newInputs;
-  for (auto pair : llvm::zip(laGeneric.inputs(), idxMaps)) {
+  for (auto pair : llvm::zip(laGeneric.getInputs(), idxMaps)) {
     if (Value inp = std::get<0>(pair)) {
       AffineMap inpIdxMap = std::get<1>(pair);
       auto outToInMap = inpIdxMap.compose(invertOutIdxMap);
@@ -244,16 +244,16 @@ static Value reconfigureLAGeneric(PatternRewriter &b,
   laGenericAMaps.push_back(
       AffineMap::getMultiDimIdentityMap(regType.getRank(), ctx));
 
-  laGeneric.inputsMutable().assign(newInputs);
-  laGeneric.outputsMutable().assign(laOut);
+  laGeneric.getInputsMutable().assign(newInputs);
+  laGeneric.getOutputsMutable().assign(laOut);
 
   // 2.2. Reset affine maps
-  laGeneric.indexing_mapsAttr(b.getAffineMapArrayAttr(laGenericAMaps));
+  laGeneric.getIndexingMapsAttr(b.getAffineMapArrayAttr(laGenericAMaps));
 
   // 2.3. Reset iterator types
   SmallVector<StringAttr, 5> laGenericIteratorArr(regType.getRank(),
                                                   b.getStringAttr("parallel"));
-  laGeneric.iterator_typesAttr(b.getArrayAttr(ArrayRef<Attribute>(
+  laGeneric.getIteratorTypesAttr(b.getArrayAttr(ArrayRef<Attribute>(
       laGenericIteratorArr.begin(), laGenericIteratorArr.end())));
   return laOut;
 }
@@ -262,7 +262,8 @@ static LogicalResult findGlobalStore(linalg::GenericOp laGeneric,
                                      Value &inputLeadingToGlobalStore,
                                      GlobalStoreOp &gemmStoreOp) {
   for (auto pair :
-       llvm::zip(laGeneric.inputs(), laGeneric.getIndexingMapsArray())) {
+       llvm::zip(laGeneric.getInputs(), laGeneric.getIndexingMapsArray
+       ())) {
     AffineMap inpIdxMap = std::get<1>(pair);
     Value input = std::get<0>(pair);
     GlobalStoreOp maybeStore = traceToGlobalStore(input);
@@ -321,17 +322,17 @@ LogicalResult MILARewritePattern::matchAndRewrite(linalg::GenericOp laGeneric,
   // 0. Test compatibility
   // 0.0. Only fully parallel for now
   for (StringRef iterType :
-       laGeneric.iterator_types().getAsValueRange<StringAttr>())
+       laGeneric.getIteratorTypes().getAsValueRange<StringAttr>())
     if (iterType != "parallel")
       return failure();
 
-  Value out = *laGeneric.outputs().begin(); // may be another arg
+  Value out = *laGeneric.getOutputs().begin(); // may be another arg
   // 0.1. Test compatibility,  Only 1 output supported
-  if (laGeneric.outputs().size() > 1)
+  if (laGeneric.getOutputs().size() > 1)
     return failure();
 
   // 0.2. Sanity check, skip already fused.
-  for (auto inp : laGeneric.inputs()) {
+  for (auto inp : laGeneric.getInputs()) {
     if (auto fusedAlloc = inp.getDefiningOp<GpuAllocOp>()) {
       LLVM_DEBUG(llvm::dbgs() << "Found existing fusion, bailing\n");
       return failure();
@@ -368,7 +369,7 @@ LogicalResult MILARewritePattern::matchAndRewrite(linalg::GenericOp laGeneric,
   }
 
   SmallVector<AffineMap> idxMaps = laGeneric.getIndexingMapsArray();
-  for (auto pair : llvm::zip(idxMaps, laGeneric.inputs())) {
+  for (auto pair : llvm::zip(idxMaps, laGeneric.getInputs())) {
     AffineMap inpIdxMap = std::get<0>(pair);
     auto outToInMap = inpIdxMap.compose(invertOutIdxMap);
     Value inp = std::get<1>(pair);
