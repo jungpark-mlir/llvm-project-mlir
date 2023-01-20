@@ -8,7 +8,7 @@
 
 #include "mlir/Conversion/XModelToGPU/XModelToGPU.h"
 
-#include "mlir/Dialect/Arithmetic/IR/Arith.h"
+#include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Async/IR/Async.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/GPU/IR/GPUDialect.h"

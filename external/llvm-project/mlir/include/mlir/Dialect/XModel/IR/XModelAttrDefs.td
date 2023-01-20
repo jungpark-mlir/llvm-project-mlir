@@ -114,6 +114,7 @@ def XModel_KernelPackageAttr : XModel_Attr<"KernelPackage", [
       bool empty() const { return false; }
       void walkImmediateSubElements(function_ref<void(Attribute)> walkAttrsFn,
                                 function_ref<void(Type)> walkTypesFn) const;
+      Attribute replaceImmediateSubElements(ArrayRef<Attribute>, ArrayRef<Type>) const;
     }];
 
     let genVerifyDecl = 0;
