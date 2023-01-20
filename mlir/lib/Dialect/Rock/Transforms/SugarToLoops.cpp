@@ -230,7 +230,7 @@ struct TransformingForRewritePattern
 Optional<int64_t> isConstantValue(Value v) {
   auto *op = v.getDefiningOp();
   if (nullptr == op)
-    return llvm::None;
+    return std::nullopt;
   while (auto cast = dyn_cast<IndexCastOp>(op)) {
     op = cast.getIn().getDefiningOp();
   }
@@ -240,7 +240,7 @@ Optional<int64_t> isConstantValue(Value v) {
   if (auto indexOp = dyn_cast<ConstantIndexOp>(op)) {
     return indexOp.value();
   }
-  return llvm::None;
+  return std::nullopt;
 }
 
 struct IndexDiffUpdateRewritePattern
@@ -1298,13 +1298,13 @@ struct InWarpTransposeRewritePattern
                                 .getZExtValue());
     }
 
-    Optional<ArrayRef<uint32_t>> maybeInGroupPerm = llvm::None;
+    Optional<ArrayRef<uint32_t>> maybeInGroupPerm = std::nullopt;
     if (inGroupPermAttr != b.getI32ArrayAttr({0, 1, 2, 3})) {
       maybeInGroupPerm = inGroupPerm;
     }
 
     Value rotatedRight = emitRotations(loc, b, vector, laneId, Right, groupSize,
-                                       totalSize, llvm::None);
+                                       totalSize, std::nullopt);
     Value swizzled =
         emitSwizzles(loc, b, rotatedRight, groupSize, totalSize, inGroupPerm);
     Value rotatedLeft = emitRotations(loc, b, swizzled, laneId, Left, groupSize,

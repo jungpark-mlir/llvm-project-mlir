@@ -256,7 +256,7 @@ struct BlockwiseGemmRewritePattern
         loc, ArrayRef<ValueRange>{ldsBufferAStartCoords, registerStartCoords},
         ArrayRef<Attribute>{transformsA, b.getArrayAttr(threadACopyViewAttr)},
         ArrayRef<int64_t>{kPerThread, mRepeat, 1, mPerThread, kPack},
-        /*strides=*/llvm::None, /*forceUnroll=*/true, /*indexDiffs=*/true);
+        /*strides=*/std::nullopt, /*forceUnroll=*/true, /*indexDiffs=*/true);
     {
       OpBuilder::InsertionGuard copyAGuard(b);
       b.setInsertionPointToStart(copyALoop.getBody());
@@ -273,7 +273,7 @@ struct BlockwiseGemmRewritePattern
         loc, ArrayRef<ValueRange>{ldsBufferBStartCoords, registerStartCoords},
         ArrayRef<Attribute>{transformsB, b.getArrayAttr(threadBCopyViewAttr)},
         ArrayRef<int64_t>{kPerThread, nRepeat, 1, nPerThread, kPack},
-        /*strides=*/llvm::None, /*forceUnroll=*/true, /*indexDiffs=*/true);
+        /*strides=*/std::nullopt, /*forceUnroll=*/true, /*indexDiffs=*/true);
     {
       OpBuilder::InsertionGuard copyBGuard(b);
       b.setInsertionPointToStart(copyBLoop.getBody());

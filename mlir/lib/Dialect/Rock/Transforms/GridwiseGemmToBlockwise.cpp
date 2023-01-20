@@ -825,7 +825,7 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<GridwiseGemmOp> {
       auto convertLoop = b.create<TransformingForOp>(
           loc, ArrayRef<ValueRange>{{zeroConstantOp}},
           ArrayRef<Attribute>{b.getArrayAttr({})},
-          /*bounds=*/convertedCType.getShape(), /*strides=*/llvm::None,
+          /*bounds=*/convertedCType.getShape(), /*strides=*/std::nullopt,
           /*useIndexDiffs=*/true, /*forceUnroll=*/true);
       {
         OpBuilder::InsertionGuard guard(b);
@@ -1448,7 +1448,7 @@ struct GridwiseGemmV2RewritePattern
         loc, ArrayRef<ValueRange>{{zeroConstantOp}, {zeroConstantOp}},
         ArrayRef<Attribute>{b.getArrayAttr({}),
                             b.getArrayAttr(toRegCScalarAttr)},
-        /*bounds=*/regCAllocType.getShape(), /*strides=*/llvm::None,
+        /*bounds=*/regCAllocType.getShape(), /*strides=*/std::nullopt,
         forceUnroll, /*useIndexDiffs=*/true);
     {
       OpBuilder::InsertionGuard guard(b);

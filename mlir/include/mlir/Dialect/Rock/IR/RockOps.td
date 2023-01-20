@@ -481,7 +481,7 @@ def Rock_YieldOp :
   let arguments = (ins Variadic<AnyType>:$operands);
 
   let builders = [
-    OpBuilder<(ins), [{ build($_builder, $_state, llvm::None); }]>
+    OpBuilder<(ins), [{ build($_builder, $_state, std::nullopt); }]>
   ];
 
   let assemblyFormat = "attr-dict ($operands^ `:` type($operands))?";
@@ -583,25 +583,25 @@ def Rock_TransformingForOp :
     "ArrayRef<Attribute>":$transforms,
     "ArrayRef<int64_t>":$bounds, "Optional<ArrayRef<int64_t>>":$strides,
     "bool":$forceUnroll, "bool":$useIndexDiffs,
-    CArg<"ValueRange", "llvm::None">:$iterArgs)>,
+    CArg<"ValueRange", "std::nullopt">:$iterArgs)>,
 
     OpBuilder<(ins "ArrayRef<ValueRange>":$inits,
     "ArrayRef<Attribute>":$transforms,
     "ArrayAttr":$bounds, "ArrayAttr":$strides,
     "bool":$forceUnroll, "bool":$useIndexDiffs,
-    CArg<"ValueRange", "llvm::None">:$iterArgs)>,
+    CArg<"ValueRange", "std::nullopt">:$iterArgs)>,
 
     OpBuilder<(ins "ArrayRef<ValueRange>":$inits,
     "ArrayAttr":$transforms,
     "ArrayRef<int64_t>":$bounds, "Optional<ArrayRef<int64_t>>":$strides,
     "bool":$forceUnroll, "bool":$useIndexDiffs,
-    CArg<"ValueRange", "llvm::None">:$iterArgs)>,
+    CArg<"ValueRange", "std::nullopt">:$iterArgs)>,
 
     OpBuilder<(ins "ArrayRef<ValueRange>":$inits,
     "ArrayAttr":$transforms,
     "ArrayAttr":$bounds, "ArrayAttr":$strides,
     "bool":$forceUnroll, "bool":$useIndexDiffs,
-    CArg<"ValueRange", "llvm::None">:$iterArgs)>];
+    CArg<"ValueRange", "std::nullopt">:$iterArgs)>];
 
   let extraClassDeclaration = [{
     void moveOutOfLoop(ArrayRef<Operation *> ops);

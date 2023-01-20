@@ -63,7 +63,7 @@ public:
                   const std::string &chipFeatures = "",
                   const std::string &perfConfig = "", int num_cu = 0,
                   GemmFeatures features = GemmFeatures::none,
-                  const Optional<rock::ConvOpType> operation = llvm::None,
+                  const Optional<rock::ConvOpType> operation = std::nullopt,
                   const std::string &dataTypeStr = "f32",
                   int dilationHeight = 1, int dilationWidth = 1,
                   int strideHeight = 1, int strideWidth = 1,

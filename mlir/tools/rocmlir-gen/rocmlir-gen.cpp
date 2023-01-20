@@ -564,10 +564,10 @@ struct KernelIF {
 };
 
 struct GenParams {
-  llvm::Optional<rock::KernelType> operation = llvm::None;
+  llvm::Optional<rock::KernelType> operation = std::nullopt;
   Type dtype = nullptr;
   rock::GemmFeatures features = rock::GemmFeatures::none;
-  llvm::Optional<const rock::Conv2dGenerator::Config *> convConfig = llvm::None;
+  llvm::Optional<const rock::Conv2dGenerator::Config *> convConfig = std::nullopt;
   StringRef arch;
 };
 
@@ -905,7 +905,7 @@ static func::FuncOp createGPUWrapper(ModuleOp module, const KernelIF &kernel) {
         b.createOrFold<arith::ConstantIndexOp>(loc, kernelRepeats);
     Value step = b.createOrFold<arith::ConstantIndexOp>(loc, 1);
     b.create<scf::ForOp>(loc, zeroOp, kernelRepeatsOp, step,
-                         /*args=*/llvm::None, emitWrappedCall);
+                         /*args=*/std::nullopt, emitWrappedCall);
   } else {
     emitWrappedCall(b, loc, nullptr, {});
   }
@@ -928,7 +928,7 @@ static Type typeFromString(StringRef name, MLIRContext *ctx) {
                                     .Case("f16", Float16Type::get(ctx))
                                     .Case("bf16", BFloat16Type::get(ctx))
                                     .Case("i8", IntegerType::get(ctx, 8))
-                                    .Default(llvm::None);
+                                    .Default(std::nullopt);
   if (!result) {
     llvm::errs() << "Unknown data type: " << name << "\n";
     exit(1);
@@ -2652,7 +2652,7 @@ int main(int argc, char **argv) {
       if (isGemm) {
         Type elemType = typeFromString(tensorDataType, &context);
         genParams.dtype = elemType;
-        genParams.convConfig = llvm::None;
+        genParams.convConfig = std::nullopt;
         genParams.arch = arch;
         (void)createGpuGemmKernel(module, genParams);
       } else {
