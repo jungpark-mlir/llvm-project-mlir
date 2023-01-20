@@ -38,7 +38,7 @@ CpuSystemDetect::CpuSystemDetect() {
     // System detect can't fail but we somehow missed the features;
     features.clear();
   }
-  uint32_t count = llvm::getHostNumPhysicalCores();
+  uint32_t count = llvm::get_physical_cores();
 
   // cleanup
   SystemDevice dev{
