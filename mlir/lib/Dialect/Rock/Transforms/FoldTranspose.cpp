@@ -199,7 +199,7 @@ LogicalResult InlineViewLikeOperandsLinalgRewritePattern::matchAndRewrite(
   unsigned int changedIOCount = 0;
 
   SmallVector<Operation *> toBeErasedViewLikeOps;
-  for (auto input : laGeneric.inputs()) {
+  for (auto input : laGeneric.getInputs()) {
     AffineMap resMap = laGeneric.getIndexingMapsArray()[ioCount++];
     Value rootOp;
     if (foldViewLikeOperands(rewriter, input, resMap, rootOp,
@@ -213,7 +213,7 @@ LogicalResult InlineViewLikeOperandsLinalgRewritePattern::matchAndRewrite(
     newMaps.push_back(resMap);
   }
   SmallVector<Value, 4U> newOutputs;
-  for (auto output : laGeneric.outputs()) {
+  for (auto output : laGeneric.getOutputs()) {
     AffineMap resMap = laGeneric.getIndexingMapsArray()[ioCount++];
     Value rootOp;
     if (foldViewLikeOperands(rewriter, output, resMap, rootOp,
@@ -299,7 +299,7 @@ struct RemoveTrivialTransposePattern
     // 0. Test compatibility
     // 0.0. Only fully parallel for now
     for (StringRef itr :
-         laGeneric.iterator_types().getAsValueRange<StringAttr>()) {
+         laGeneric.getIteratorTypes().getAsValueRange<StringAttr>()) {
       if (itr != "parallel") {
         return failure();
       }
@@ -312,13 +312,13 @@ struct RemoveTrivialTransposePattern
     });
 
     // 0.1. Test it only passes through 1:1 and no other calculation
-    if (laGeneric.inputs().size() != 1 || laGeneric.outputs().size() != 1 ||
+    if (laGeneric.getInputs().size() != 1 || laGeneric.getOutputs().size() != 1 ||
         !bPassing) {
       return failure();
     }
 
     // 0.2. linalg.generic lowered from tosa.transpose should have memref.alloc
-    Value out = *laGeneric.outputs().begin();
+    Value out = *laGeneric.ggetOutputs().begin();
     auto allocToDel = out.getDefiningOp<memref::AllocOp>();
     if (!allocToDel) {
       return failure();
@@ -389,7 +389,7 @@ struct FoldRockOutputTransforms : OpRewritePattern<linalg::GenericOp> {
 
     // Actually do the rewrites, if any
     SmallVector<AffineMap> idxMaps = laGeneric.getIndexingMapsArray();
-    SmallVector<Value> inputs = laGeneric.inputs();
+    SmallVector<Value> inputs = laGeneric.getInputs();
     for (auto &tuple : toReplace) {
       unsigned opIndex = std::get<0>(tuple);
       Value opValue = std::get<1>(tuple);

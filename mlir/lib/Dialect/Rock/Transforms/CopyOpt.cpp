@@ -134,7 +134,9 @@ struct MICORewritePattern : public OpRewritePattern<memref::AllocOp> {
     // 0. Test compatibility
     // 0.0 Global Memory Space
     auto allocType = op.getType().template cast<MemRefType>();
-    auto memSpace = allocType.getMemorySpaceAsInt();
+    auto memSpace = allocType.getMemorySpace().dyn_cast_or_null<gpu::AddressSpaceAttr>();
+    if (!memSpace)
+      return fail;
     if (memSpace == gpu::GPUDialect::getWorkgroupAddressSpace() ||
         memSpace == gpu::GPUDialect::getPrivateAddressSpace())
       return fail;
