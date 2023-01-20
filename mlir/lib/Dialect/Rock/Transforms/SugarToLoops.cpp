@@ -148,7 +148,7 @@ struct TransformingForRewritePattern
     }
 
     // Create code to actually transform the coordinates
-    BlockAndValueMapping cloneMap;
+    IRMapping cloneMap;
     for (uint32_t i = 0; i < nDomains; ++i) {
       Block::BlockArgListType lower = op.getLowerCoords(i);
       ArrayAttr transforms = op.getTransforms(i);

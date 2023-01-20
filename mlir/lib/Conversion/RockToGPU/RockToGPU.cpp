@@ -28,7 +28,7 @@
 #include "mlir/Dialect/GPU/IR/GPUDialect.h"
 #include "mlir/Dialect/Rock/IR/Rock.h"
 #include "mlir/Dialect/Rock/Passes.h"
-#include "mlir/IR/BlockAndValueMapping.h"
+#include "mlir/IR/IRMapping.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/SymbolTable.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
@@ -165,7 +165,7 @@ void LowerRockOpsToGPUPass::runOnOperation() {
     }
 
     // associate arguments for newly created GPUFuncOp.
-    BlockAndValueMapping map;
+    IRMapping map;
     for (auto pair : llvm::zip(theFunc.getArguments(), gpuFunc.getArguments()))
       map.map(std::get<0>(pair), std::get<1>(pair));
 

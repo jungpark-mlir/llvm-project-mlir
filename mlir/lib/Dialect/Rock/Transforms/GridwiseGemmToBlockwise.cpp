@@ -35,7 +35,7 @@
 #include "mlir/Dialect/GPU/IR/GPUDialect.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/Vector/IR/VectorOps.h"
-#include "mlir/IR/BlockAndValueMapping.h"
+#include "mlir/IR/IRMapping.h"
 #include "mlir/IR/Diagnostics.h"
 #include "mlir/IR/Value.h"
 #include "mlir/Pass/PassManager.h"
@@ -732,7 +732,7 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<GridwiseGemmOp> {
       // We don't update in the clone becasue we might accidentally replace
       // other zeroes.
       Value iv = loopOp.getInductionVar();
-      BlockAndValueMapping loadAUpdates, loadBUpdates;
+      IRMapping loadAUpdates, loadBUpdates;
       auto blockwiseLoadAClone = cast<TransformingForOp>(
           b.clone(*blockwiseLoadA.getOperation(), loadAUpdates));
       blockwiseLoadAClone.setOperand(
@@ -760,7 +760,7 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<GridwiseGemmOp> {
       b.create<LDSBarrierOp>(loc);
 
       // Emit blockwise stores
-      BlockAndValueMapping storeAUpdates, storeBUpdates;
+      IRMapping storeAUpdates, storeBUpdates;
       storeAUpdates.map(blockwiseLoadA.getResult(0),
                         blockwiseLoadAClone.getResult(0));
       storeBUpdates.map(blockwiseLoadB.getResult(0),
@@ -774,7 +774,7 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<GridwiseGemmOp> {
     b.create<LDSBarrierOp>(loc);
 
     // Emit blockwise GEMM for the loop tail.
-    BlockAndValueMapping tailGemmCloneMap;
+    IRMapping tailGemmCloneMap;
     b.clone(*blockwiseGemmOp, tailGemmCloneMap);
 
     // Apparently, the canonicalizer doesn't get rid of empty loops without
@@ -1243,7 +1243,7 @@ struct GridwiseGemmV2RewritePattern
       // We don't update in the clone becasue we might accidentally replace
       // other zeroes.
       Value iv = loopOp.getInductionVar();
-      BlockAndValueMapping loadAUpdates, loadBUpdates;
+      IRMapping loadAUpdates, loadBUpdates;
       auto blockwiseLoadAClone = cast<TransformingForOp>(
           b.clone(*blockwiseLoadA.getOperation(), loadAUpdates));
       blockwiseLoadAClone.setOperand(
@@ -1273,7 +1273,7 @@ struct GridwiseGemmV2RewritePattern
       b.create<LDSBarrierOp>(loc);
 
       // Emit blockwise stores
-      BlockAndValueMapping storeAUpdates, storeBUpdates;
+      IRMapping storeAUpdates, storeBUpdates;
       storeAUpdates.map(blockwiseLoadA.getResult(0),
                         blockwiseLoadAClone.getResult(0));
       storeBUpdates.map(blockwiseLoadB.getResult(0),
@@ -1289,7 +1289,7 @@ struct GridwiseGemmV2RewritePattern
     b.create<LDSBarrierOp>(loc);
 
     // Emit blockwise GEMM for the loop tail.
-    BlockAndValueMapping tailGemmCloneMap;
+    IRMapping tailGemmCloneMap;
     auto blockwiseGemmV2TailOp = b.clone(*blockwiseGemmV2Op, tailGemmCloneMap);
 
     // Apparently, the canonicalizer doesn't get rid of empty loops without
