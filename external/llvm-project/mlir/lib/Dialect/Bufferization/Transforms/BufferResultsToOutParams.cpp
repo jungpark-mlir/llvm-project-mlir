@@ -125,10 +125,9 @@ updateCalls(ModuleOp module,
   bool didFail = false;
   SymbolTable symtab(module);
   module.walk([&](CallOpInterface op) {
-    func::CallOp callOp = dyn_cast<func::CallOp>(op);
-    auto callee = symtab.lookup<func::FuncOp>(callOp.getCallee());
+    auto callee = symtab.lookup<func::FuncOp>(op.getCallableForCallee());
     if (!callee) {
-      callOp.emitError() << "cannot find callee '" << callOp.getCallee() << "' in "
+      op.emitError() << "cannot find callee '" << op.getCallableForCallee() << "' in "
                      << "symbol table";
       didFail = true;
       return;
