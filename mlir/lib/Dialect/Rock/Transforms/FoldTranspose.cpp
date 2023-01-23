@@ -229,10 +229,8 @@ LogicalResult InlineViewLikeOperandsLinalgRewritePattern::matchAndRewrite(
   if (changedIOCount == 0)
     return failure();
 
-  SmallVector<StringRef> iteratorTypes = llvm::to_vector<4>(
-      laGeneric.getIteratorTypes().getAsValueRange<StringAttr>());
   auto newLaGenericOp = rewriter.create<linalg::GenericOp>(
-      loc, newInputs, newOutputs, newMaps, iteratorTypes);
+      loc, newInputs, newOutputs, newMaps, laGeneric.getIteratorTypes());
   rewriter.inlineRegionBefore(laGeneric->getRegion(0),
                               newLaGenericOp.getRegion(),
                               newLaGenericOp.getRegion().begin());

@@ -218,12 +218,12 @@ struct BlockwiseGemmRewritePattern
     // Alloc register for thread_a and thread_b.
     auto threadARegisterMemRefType =
         MemRefType::get(threadANumRegisters, elementType, {},
-                        gpu::GPUDialect::getPrivateAddressSpace());
+                        Attribute(gpu::GPUDialect::getPrivateAddressSpace()));
     auto threadAAllocOp = b.create<GpuAllocOp>(loc, threadARegisterMemRefType);
 
     auto threadBRegisterMemRefType =
         MemRefType::get(threadBNumRegisters, elementType, {},
-                        gpu::GPUDialect::getPrivateAddressSpace());
+                        Attribute(gpu::GPUDialect::getPrivateAddressSpace()));
     auto threadBAllocOp = b.create<GpuAllocOp>(loc, threadBRegisterMemRefType);
 
     // Define views of register tiles for copies
@@ -696,8 +696,8 @@ void RockLowerBlockwiseGemmToThreadwisePass::runOnOperation() {
   ConversionTarget target(*ctx);
   target.addIllegalOp<FillOp, BlockwiseGemmOp, BlockwiseGemmV2Op, GlobalLoadOp,
                       GlobalStoreOp>();
-  target.addLegalDialect<arith::ArithDialect, rock::RockDialect,
-                         AffineDialect, memref::MemRefDialect>();
+  target.addLegalDialect<arith::ArithDialect, rock::RockDialect, AffineDialect,
+                         memref::MemRefDialect>();
 
   RewritePatternSet patterns(ctx);
   patterns.add<FillRewritePattern, BlockwiseGemmRewritePattern,

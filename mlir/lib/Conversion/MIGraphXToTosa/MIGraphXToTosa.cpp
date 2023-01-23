@@ -209,7 +209,7 @@ public:
       // reshape
       auto outType = RankedTensorType::get(newShape, outElemType);
       newOperand = rewriter.create<tosa::ReshapeOp>(
-          loc, outType, input_t, rewriter.getArrayAttr(newShapeAttr));
+          loc, outType, input_t, rewriter.getDenseI64ArrayAttr(newShapeAttr));
     }
 
     for (auto &use : op->getResult(0).getUses()) {
@@ -384,7 +384,7 @@ public:
     if (outRank != 3 || rankA != rankB ||
         (outRank == 3 && orgDimsA != orgDimsB)) {
       auto rop = rewriter.create<tosa::ReshapeOp>(
-          loc, outputTy, mop, rewriter.getI64ArrayAttr(orgOutDims));
+          loc, outputTy, mop, rewriter.getDenseI64ArrayAttr(orgOutDims));
       rewriter.replaceOp(op, {rop});
       return success();
     }

@@ -118,8 +118,9 @@ getArchAttributes(Operation *op) {
 static FailureOr<rock::Conv2DOp>
 makeRockConv2D(ConversionPatternRewriter &rw, Operation *op, Value input,
                StringRef inputLayout, Value filter, StringRef filterLayout,
-               Value output, StringRef outputLayout, const ArrayAttr &pad,
-               const ArrayAttr &stride, const ArrayAttr &dilation) {
+               Value output, StringRef outputLayout,
+               const DenseI64ArrayAttr &pad, const DenseI64ArrayAttr &stride,
+               const DenseI64ArrayAttr &dilation) {
   Location loc = op->getLoc();
 
   // expand tensors from rank 4 (NHWC) to rank 5 (NHWCG)
@@ -130,22 +131,15 @@ makeRockConv2D(ConversionPatternRewriter &rw, Operation *op, Value input,
   StringAttr arch;
   Optional<uint32_t> num_cu;
   rock::GemmFeatures features;
+  ArrayRef<int64_t> pad = padAttr;
+  ArrayRef<int64_t> stride = strideAttr;
+  ArrayRef<int64_t> dilation = dilationAttr;
 
   std::tie(arch, num_cu, features) = getArchAttributes(op);
 
-  // translate attributes
-  int32_t padTop = pad[0].dyn_cast<IntegerAttr>().getInt();
-  int32_t padBottom = pad[1].dyn_cast<IntegerAttr>().getInt();
-  int32_t padLeft = pad[2].dyn_cast<IntegerAttr>().getInt();
-  int32_t padRight = pad[3].dyn_cast<IntegerAttr>().getInt();
-  int32_t strideHeight = stride[0].dyn_cast<IntegerAttr>().getInt();
-  int32_t strideWidth = stride[1].dyn_cast<IntegerAttr>().getInt();
-  int32_t dilationHeight = dilation[0].dyn_cast<IntegerAttr>().getInt();
-  int32_t dilationWidth = dilation[1].dyn_cast<IntegerAttr>().getInt();
-
-  SmallVector<int32_t, 4> paddingArray{padTop, padBottom, padLeft, padRight};
-  SmallVector<int32_t, 2> strideArray{strideHeight, strideWidth};
-  SmallVector<int32_t, 2> dilationArray{dilationHeight, dilationWidth};
+  ArrayRef<int64_t> paddingArray = pad;
+  ArrayRef<int64_t> strideArray = stride;
+  ArrayRef<int64_t> dilationArray = dilation;
 
   auto cop = rw.create<rock::Conv2DOp>(
       loc, outputExp.getType(), filterExp, inputExp, outputExp, arch,
