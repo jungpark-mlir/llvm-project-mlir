@@ -85,8 +85,8 @@ getArchAttributes(Operation *op) {
 
   // TODO(sjw): get these from options
   StringAttr arch = StringAttr::get(op->getContext(), "");
-  Optional<uint32_t> num_cu = None;
-  Optional<bool> xdlopsV2 = None;
+  Optional<uint32_t> num_cu = std::nullopt;
+  Optional<bool> xdlopsV2 = std::nullopt;
 
   if (auto attr = op->getAttrOfType<StringAttr>("arch"))
     arch = attr;
@@ -216,7 +216,7 @@ public:
 
     FailureOr<rock::Conv2DOp> rockConv = makeRockConv2D(
         rw, op, input, inputLayout, filter, filterLayout, output, outputLayout,
-        op.getPad(), op.getStride(), op.getDilation());
+        op.getPadAttr(), op.getStrideAttr(), op.getDilationAttr());
     if (failed(rockConv))
       return failure();
 

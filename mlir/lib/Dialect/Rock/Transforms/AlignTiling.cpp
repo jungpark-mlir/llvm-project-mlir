@@ -248,12 +248,12 @@ static Value reconfigureLAGeneric(PatternRewriter &b,
   laGeneric.getOutputsMutable().assign(laOut);
 
   // 2.2. Reset affine maps
-  laGeneric.getIndexingMapsAttr(b.getAffineMapArrayAttr(laGenericAMaps));
+  laGeneric.setIndexingMapsAttr(b.getAffineMapArrayAttr(laGenericAMaps));
 
   // 2.3. Reset iterator types
   SmallVector<StringAttr, 5> laGenericIteratorArr(regType.getRank(),
                                                   b.getStringAttr("parallel"));
-  laGeneric.getIteratorTypesAttr(b.getArrayAttr(ArrayRef<Attribute>(
+  laGeneric.setIteratorTypesAttr(b.getArrayAttr(ArrayRef<Attribute>(
       laGenericIteratorArr.begin(), laGenericIteratorArr.end())));
   return laOut;
 }
@@ -274,7 +274,7 @@ static LogicalResult findGlobalStore(linalg::GenericOp laGeneric,
         return failure();
       }
 
-      auto laGenericOut = laGeneric.getOutputOperand(0);
+      auto laGenericOut = laGeneric.getOutputs().begin();
       auto laGenericOutIdxMap = laGeneric.getTiedIndexingMap(laGenericOut);
       auto invertOutIdxMap = inversePermutation(laGenericOutIdxMap);
       auto outToInMap = inpIdxMap.compose(invertOutIdxMap);
