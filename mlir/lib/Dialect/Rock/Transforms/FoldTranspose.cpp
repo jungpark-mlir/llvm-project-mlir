@@ -312,13 +312,13 @@ struct RemoveTrivialTransposePattern
     });
 
     // 0.1. Test it only passes through 1:1 and no other calculation
-    if (laGeneric.getInputs().size() != 1 || laGeneric.getOutputs().size() != 1 ||
-        !bPassing) {
+    if (laGeneric.getInputs().size() != 1 ||
+        laGeneric.getOutputs().size() != 1 || !bPassing) {
       return failure();
     }
 
     // 0.2. linalg.generic lowered from tosa.transpose should have memref.alloc
-    Value out = *laGeneric.ggetOutputs().begin();
+    Value out = *laGeneric.getOutputs().begin();
     auto allocToDel = out.getDefiningOp<memref::AllocOp>();
     if (!allocToDel) {
       return failure();
@@ -351,8 +351,8 @@ struct FoldRockOutputTransforms : OpRewritePattern<linalg::GenericOp> {
     // We do this out-of-line so as to not invalidate our iterator
     SmallVector<std::tuple<unsigned, Value, AffineMap>> toReplace;
 
-    auto laGenericOut = laGeneric.getOutputOperand(0);
-    auto laGenericOutIdxMap = laGeneric.getTiedIndexingMap(laGenericOut);
+    auto laGenericOut = laGeneric.getDpsInitOperand(0);
+    auto laGenericOutIdxMap = laGeneric.getMatchingIndexingMap(laGenericOut);
 
     for (OpOperand &operand : laGeneric->getOpOperands()) {
       Value opValue = operand.get();
@@ -375,7 +375,7 @@ struct FoldRockOutputTransforms : OpRewritePattern<linalg::GenericOp> {
       if (!isa_and_nonnull<memref::AllocOp>(opValue.getDefiningOp()))
         continue;
 
-      AffineMap inpIdxMap = laGeneric.getTiedIndexingMap(&operand);
+      AffineMap inpIdxMap = laGeneric.getMatchingIndexingMap(&operand);
       auto invertInpIdxMap = inversePermutation(inpIdxMap);
       auto inToOutIdxMap = laGenericOutIdxMap.compose(invertInpIdxMap);
       SmallVector<uint32_t, 4> permutation;
@@ -418,7 +418,7 @@ struct FoldRockOutputTransforms : OpRewritePattern<linalg::GenericOp> {
       idxMaps[opIndex] = laGenericOutIdxMap;
       inputs[opIndex] = newAlloc;
     }
-    laGeneric->setAttr(laGeneric.indexing_mapsAttrName(),
+    laGeneric->setAttr(laGeneric.getIndexingMapsAttrName(),
                        b.getAffineMapArrayAttr(idxMaps));
     laGeneric.getInputsMutable().assign(inputs);
     return success(!toReplace.empty());
