@@ -230,7 +230,7 @@ LogicalResult InlineViewLikeOperandsLinalgRewritePattern::matchAndRewrite(
     return failure();
 
   auto newLaGenericOp = rewriter.create<linalg::GenericOp>(
-      loc, newInputs, newOutputs, newMaps, laGeneric.getIteratorTypes());
+      loc, newInputs, newOutputs, newMaps, laGeneric.getIteratorTypesArray());
   rewriter.inlineRegionBefore(laGeneric->getRegion(0),
                               newLaGenericOp.getRegion(),
                               newLaGenericOp.getRegion().begin());

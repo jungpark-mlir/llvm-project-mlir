@@ -216,14 +216,14 @@ struct BlockwiseGemmRewritePattern
     int64_t threadBNumRegisters = kPerThread * nC * kPack;
 
     // Alloc register for thread_a and thread_b.
-    auto threadARegisterMemRefType =
-        MemRefType::get(threadANumRegisters, elementType, {},
-                        Attribute(gpu::GPUDialect::getPrivateAddressSpace()));
+    auto privateMemoryAddressSpace = gpu::AddressSpaceAttr::get(
+        op->getContext(), gpu::GPUDialect::getPrivateAddressSpace());
+    auto threadARegisterMemRefType = MemRefType::get(
+        threadANumRegisters, elementType, {}, privateMemoryAddressSpace);
     auto threadAAllocOp = b.create<GpuAllocOp>(loc, threadARegisterMemRefType);
 
-    auto threadBRegisterMemRefType =
-        MemRefType::get(threadBNumRegisters, elementType, {},
-                        Attribute(gpu::GPUDialect::getPrivateAddressSpace()));
+    auto threadBRegisterMemRefType = MemRefType::get(
+        threadBNumRegisters, elementType, {}, privateMemoryAddressSpace);
     auto threadBAllocOp = b.create<GpuAllocOp>(loc, threadBRegisterMemRefType);
 
     // Define views of register tiles for copies
