@@ -131,10 +131,6 @@ makeRockConv2D(ConversionPatternRewriter &rw, Operation *op, Value input,
   StringAttr arch;
   Optional<uint32_t> num_cu;
   rock::GemmFeatures features;
-  ArrayRef<int64_t> pad = padAttr;
-  ArrayRef<int64_t> stride = strideAttr;
-  ArrayRef<int64_t> dilation = dilationAttr;
-
   std::tie(arch, num_cu, features) = getArchAttributes(op);
 
   ArrayRef<int64_t> paddingArray = pad;
