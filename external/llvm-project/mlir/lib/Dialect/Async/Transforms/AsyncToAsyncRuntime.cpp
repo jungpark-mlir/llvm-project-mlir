@@ -286,7 +286,7 @@ static CoroMachinery buildCoroutineLogic(Operation *execute, func::FuncOp func,
     builder.create<RuntimeResumeOp>(coro.coroHandle);
 
     // Add async.coro.suspend as a suspended block terminator.
-    builder.create<CoroSuspendOp>(coroSaveOp.getOperation(), coro.suspend,
+    builder.create<CoroSuspendOp>(coroSaveOp.getState(), coro.suspend,
                                   branch.getDest(), coro.cleanup);
 
     branch.erase();
@@ -444,7 +444,7 @@ convertLaunchOp(LaunchOp launch, bool toCoroutine) {
         // make dummy token
         auto retToken =
             cb.create<RuntimeCreateOp>(TokenType::get(ctx)).getResult();
-        cb.create<RuntimeSetAvailableOp>(retToken);
+        cb.create<RuntimeSetAvailableOp>(ValueRange(retToken));
 
         launch->replaceAllUsesWith(retToken);
         launch->erase();
