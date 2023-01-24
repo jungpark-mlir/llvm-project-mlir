@@ -105,7 +105,7 @@ def Rock_Conv2DBwdDataOp : Rock_Conv2DOpBase<"conv2d_bwd_data">
 
 def Rock_Conv2DBwdWeightOp : Rock_Conv2DOpBase<"conv2d_bwd_weight">
 {
-  dag additionalArgs = (ins std::optional<TensorOrMemRefRankOf<[F32], [5]>>:$workspace,
+  dag additionalArgs = (ins Optional<TensorOrMemRefRankOf<[F32], [5]>>:$workspace,
                             OptionalAttr<IndexAttr>:$kBlocks,
                             I32Attr:$numCu);
   let arguments = !con(commonConvArgs, additionalArgs);
