@@ -66,7 +66,7 @@ class Rock_Conv2DOpBase<string mnemonic, list<Type> inputTypes=[F32, F16, BF16],
                    I32ArrayLength<2>:$strides,
                    I32ArrayLength<2>:$dilations,
                    OptionalAttr<RockTuningParamAttrInterface>:$params);
-    let results = (outs Optional<AnyRankedTensor>:$result);
+    let results = (outs std::optional<AnyRankedTensor>:$result);
 }
 
 def Rock_Conv2DOp : Rock_Conv2DOpBase<"conv2d", [F32, F16, BF16, I8], [F32, F16, BF16, I32]> {
@@ -105,7 +105,7 @@ def Rock_Conv2DBwdDataOp : Rock_Conv2DOpBase<"conv2d_bwd_data">
 
 def Rock_Conv2DBwdWeightOp : Rock_Conv2DOpBase<"conv2d_bwd_weight">
 {
-  dag additionalArgs = (ins Optional<TensorOrMemRefRankOf<[F32], [5]>>:$workspace,
+  dag additionalArgs = (ins std::optional<TensorOrMemRefRankOf<[F32], [5]>>:$workspace,
                             OptionalAttr<IndexAttr>:$kBlocks,
                             I32Attr:$numCu);
   let arguments = !con(commonConvArgs, additionalArgs);
@@ -139,7 +139,7 @@ def Rock_GemmOp :
                    OptionalAttr<I32Attr>:$derivedBlockSize,
                    OptionalAttr<I32Attr>:$gridSize,
                    OptionalAttr<RockTuningParamAttrInterface>:$params)>,
-    Results<(outs Optional<AnyRankedTensor>:$result)> {
+    Results<(outs std::optional<AnyRankedTensor>:$result)> {
   let summary = "General matrix multiplication (GEMM)";
   let description = [{
     Performs the operation C += A * B.
@@ -175,7 +175,7 @@ def Rock_ZeroInitKernelOp :
                   OptionalAttr<I32Attr>:$blockSize,
                   OptionalAttr<I32Attr>:$gridSize,
                   OptionalAttr<IndexAttr>:$elemsPerThread)>,
-    Results<(outs Optional<AnyTensor>:$result)> {
+    Results<(outs std::optional<AnyTensor>:$result)> {
   let summary = "Zero-initialize a buffer";
 
   let description = [{
@@ -205,7 +205,7 @@ def Rock_ConvertingCopyKernelOp :
                   OptionalAttr<I32Attr>:$blockSize,
                   OptionalAttr<I32Attr>:$gridSize,
                   OptionalAttr<IndexAttr>:$elemsPerThread)>,
-    Results<(outs Optional<AnyTensor>:$result)> {
+    Results<(outs std::optional<AnyTensor>:$result)> {
   let summary = "Copy input to output, performing a type conversion";
 
   let description = [{
@@ -581,7 +581,7 @@ def Rock_TransformingForOp :
   let builders = [
     OpBuilder<(ins "ArrayRef<ValueRange>":$inits,
     "ArrayRef<Attribute>":$transforms,
-    "ArrayRef<int64_t>":$bounds, "Optional<ArrayRef<int64_t>>":$strides,
+    "ArrayRef<int64_t>":$bounds, "std::optional<ArrayRef<int64_t>>":$strides,
     "bool":$forceUnroll, "bool":$useIndexDiffs,
     CArg<"ValueRange", "std::nullopt">:$iterArgs)>,
 
@@ -593,7 +593,7 @@ def Rock_TransformingForOp :
 
     OpBuilder<(ins "ArrayRef<ValueRange>":$inits,
     "ArrayAttr":$transforms,
-    "ArrayRef<int64_t>":$bounds, "Optional<ArrayRef<int64_t>>":$strides,
+    "ArrayRef<int64_t>":$bounds, "std::optional<ArrayRef<int64_t>>":$strides,
     "bool":$forceUnroll, "bool":$useIndexDiffs,
     CArg<"ValueRange", "std::nullopt">:$iterArgs)>,
 
