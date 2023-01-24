@@ -35,8 +35,8 @@
 #include "mlir/Dialect/GPU/IR/GPUDialect.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/Vector/IR/VectorOps.h"
-#include "mlir/IR/IRMapping.h"
 #include "mlir/IR/Diagnostics.h"
+#include "mlir/IR/IRMapping.h"
 #include "mlir/IR/Value.h"
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Transforms/DialectConversion.h"
@@ -580,9 +580,10 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<GridwiseGemmOp> {
       return failure();
 
     // Allocate LDS.
-    auto ldsMemRefType =
-        MemRefType::get({ldsBlockSize}, elementType, {},
-                        gpu::GPUDialect::getWorkgroupAddressSpace());
+    auto workgroupMemoryAddressSpace = gpu::AddressSpaceAttr::get(
+        op->getContext(), gpu::GPUDialect::getWorkgroupAddressSpace());
+    auto ldsMemRefType = MemRefType::get(
+        {ldsBlockSize}, elementType, AffineMap{}, workgroupMemoryAddressSpace);
     auto ldsGpuAllocOp = b.create<GpuAllocOp>(loc, ldsMemRefType);
 
     // Subviews for matrix A tile in LDS buffer.
@@ -615,7 +616,7 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<GridwiseGemmOp> {
     int64_t threadCNumN = gemmNRepeat * nPerThread;
     int64_t threadCNumRegisters = threadCNumM * threadCNumN;
     auto threadCRegisterMemRefType =
-        MemRefType::get({threadCNumRegisters}, accumulatorType, {},
+        MemRefType::get({threadCNumRegisters}, accumulatorType, AffineMap{},
                         gpu::GPUDialect::getPrivateAddressSpace());
     Value registerMatrixCAllocOp =
         b.create<GpuAllocOp>(loc, threadCRegisterMemRefType);
@@ -1084,9 +1085,10 @@ struct GridwiseGemmV2RewritePattern
       return failure();
 
     // Allocate LDS.
-    auto ldsMemRefType =
-        MemRefType::get({ldsBlockSize}, elementType, {},
-                        gpu::GPUDialect::getWorkgroupAddressSpace());
+    auto workgroupMemoryAddressSpace = gpu::AddressSpaceAttr::get(
+        op->getContext(), gpu::GPUDialect::getWorkgroupAddressSpace());
+    auto ldsMemRefType = MemRefType::get(
+        {ldsBlockSize}, elementType, AffineMap{}, workgroupMemoryAddressSpace);
     auto ldsGpuAllocOp = b.create<GpuAllocOp>(loc, ldsMemRefType);
 
     // Subviews for Matrix A.
@@ -1199,18 +1201,20 @@ struct GridwiseGemmV2RewritePattern
         (!isKReduction) ? (kpacksPerBlock * nRepeats)
                         : (kpacksPerBlock / inputSpansPerMfmaIn * nRepeats);
     Type arrayAType, arrayBType;
+    auto privateMemoryAddressSpace = gpu::AddressSpaceAttr::get(
+        op->getContext(), gpu::GPUDialect::getPrivateAddressSpace());
     if (kpack > 1) {
       arrayAType =
           MemRefType::get({arrayASize}, VectorType::get({kpack}, elementType),
-                          {}, gpu::GPUDialect::getPrivateAddressSpace());
+                          AffineMap{}, privateMemoryAddressSpace);
       arrayBType =
           MemRefType::get({arrayBSize}, VectorType::get({kpack}, elementType),
-                          {}, gpu::GPUDialect::getPrivateAddressSpace());
+                          AffineMap{}, privateMemoryAddressSpace);
     } else {
-      arrayAType = MemRefType::get({arrayASize}, elementType, {},
-                                   gpu::GPUDialect::getPrivateAddressSpace());
-      arrayBType = MemRefType::get({arrayBSize}, elementType, {},
-                                   gpu::GPUDialect::getPrivateAddressSpace());
+      arrayAType = MemRefType::get({arrayASize}, elementType, AffineMap{},
+                                   privateMemoryAddressSpace);
+      arrayBType = MemRefType::get({arrayBSize}, elementType, AffineMap{},
+                                   privateMemoryAddressSpace);
     }
     auto arrayA = b.create<GpuAllocOp>(loc, arrayAType);
     auto arrayB = b.create<GpuAllocOp>(loc, arrayBType);
@@ -1222,9 +1226,9 @@ struct GridwiseGemmV2RewritePattern
     Type accumulatorType = obtainAccumulatorType(b, elementType, destType);
     VectorType accumulatorVectorType =
         vectorType.cloneWith({}, accumulatorType);
-    MemRefType regCAllocType = MemRefType::get(
-        nResultVectors, accumulatorVectorType, {},
-        /*memorySpace=*/gpu::GPUDialect::getPrivateAddressSpace());
+    MemRefType regCAllocType =
+        MemRefType::get(nResultVectors, accumulatorVectorType, AffineMap{},
+                        /*memorySpace=*/privateMemoryAddressSpace);
     Value regCAllocOp = b.create<rock::GpuAllocOp>(loc, regCAllocType);
 
     Value zeroConstantCOp = createZeroConstantOp(b, loc, vectorType);
@@ -1432,9 +1436,9 @@ struct GridwiseGemmV2RewritePattern
     }
 
     Value registerC = regCAllocOp;
-    auto convertedCType = MemRefType::get(
-        numElements, destType, {},
-        /*memorySpace=*/gpu::GPUDialect::getPrivateAddressSpace());
+    auto convertedCType =
+        MemRefType::get(numElements, destType, AffineMap{},
+                        /*memorySpace=*/privateMemoryAddressSpace);
     Value convertedC = b.create<rock::GpuAllocOp>(loc, convertedCType);
 
     BottomUpTMBuilder toRegCScalar(b, {"scalar"}, {numElements}, loc);

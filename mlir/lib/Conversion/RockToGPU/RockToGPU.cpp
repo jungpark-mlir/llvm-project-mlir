@@ -171,7 +171,7 @@ void LowerRockOpsToGPUPass::runOnOperation() {
       map.map(std::get<0>(pair), std::get<1>(pair));
 
     // clone function body into newly created GPUFuncOp.
-    Region &gpuFuncBody = gpuFunc.body();
+    Region &gpuFuncBody = gpuFunc.getBody();
     Region &funcBody = theFunc.getBody();
     funcBody.cloneInto(&gpuFuncBody, map);
 
