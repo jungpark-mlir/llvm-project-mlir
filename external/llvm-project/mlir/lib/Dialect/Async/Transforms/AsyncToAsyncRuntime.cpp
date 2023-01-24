@@ -1006,7 +1006,7 @@ void AsyncToAsyncRuntimePass::runOnOperation() {
       std::make_shared<llvm::DenseMap<func::FuncOp, CoroMachinery>>();
 
   module.walk([&](ExecuteOp execute) {
-    coros->insert(outlineExecuteOp(symbolTable, execute));
+    coros->insert(outlineExecuteOp(symbolTable, execute, enableCoroutines));
   });
 
   module.walk([&](LaunchOp launch) {
@@ -1130,8 +1130,10 @@ void AsyncFuncToAsyncRuntimePass::runOnOperation() {
   }
 }
 
-std::unique_ptr<OperationPass<ModuleOp>> mlir::createAsyncToAsyncRuntimePass() {
-  return std::make_unique<AsyncToAsyncRuntimePass>();
+std::unique_ptr<OperationPass<ModuleOp>> mlir::createAsyncToAsyncRuntimePass(bool enableCoroutines) {
+  AsyncToAsyncRuntimeOptions opts;
+  opts.enableCoroutines = enableCoroutines;
+  return std::make_unique<AsyncToAsyncRuntimePass>(opts);
 }
 
 std::unique_ptr<OperationPass<ModuleOp>>
