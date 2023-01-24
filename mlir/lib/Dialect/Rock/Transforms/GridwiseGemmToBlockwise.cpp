@@ -615,9 +615,11 @@ struct GridwiseGemmRewritePattern : public OpRewritePattern<GridwiseGemmOp> {
     int64_t threadCNumM = gemmMRepeat * mPerThread;
     int64_t threadCNumN = gemmNRepeat * nPerThread;
     int64_t threadCNumRegisters = threadCNumM * threadCNumN;
+    auto privateMemoryAddressSpace = gpu::AddressSpaceAttr::get(
+        op->getContext(), gpu::GPUDialect::getPrivateAddressSpace());
     auto threadCRegisterMemRefType =
         MemRefType::get({threadCNumRegisters}, accumulatorType, AffineMap{},
-                        gpu::GPUDialect::getPrivateAddressSpace());
+                        privateMemoryAddressSpace);
     Value registerMatrixCAllocOp =
         b.create<GpuAllocOp>(loc, threadCRegisterMemRefType);
     Value registerMatrixCViewOp = reshapeBuffer(

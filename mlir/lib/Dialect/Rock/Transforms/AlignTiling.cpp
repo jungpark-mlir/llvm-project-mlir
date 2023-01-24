@@ -262,8 +262,7 @@ static LogicalResult findGlobalStore(linalg::GenericOp laGeneric,
                                      Value &inputLeadingToGlobalStore,
                                      GlobalStoreOp &gemmStoreOp) {
   for (auto pair :
-       llvm::zip(laGeneric.getInputs(), laGeneric.getIndexingMapsArray
-       ())) {
+       llvm::zip(laGeneric.getInputs(), laGeneric.getIndexingMapsArray())) {
     AffineMap inpIdxMap = std::get<1>(pair);
     Value input = std::get<0>(pair);
     GlobalStoreOp maybeStore = traceToGlobalStore(input);
@@ -275,7 +274,7 @@ static LogicalResult findGlobalStore(linalg::GenericOp laGeneric,
       }
 
       auto laGenericOut = laGeneric.getOutputs().begin();
-      auto laGenericOutIdxMap = laGeneric.getTiedIndexingMap(laGenericOut);
+      auto laGenericOutIdxMap = laGeneric.getMatchingIndexingMap(laGenericOut);
       auto invertOutIdxMap = inversePermutation(laGenericOutIdxMap);
       auto outToInMap = inpIdxMap.compose(invertOutIdxMap);
       SmallVector<unsigned> permutedDims;
@@ -328,8 +327,11 @@ LogicalResult MILARewritePattern::matchAndRewrite(linalg::GenericOp laGeneric,
 
   Value out = *laGeneric.getOutputs().begin(); // may be another arg
   // 0.1. Test compatibility,  Only 1 output supported
-  if (laGeneric.getOutputs().size() > 1)
+  if (laGeneric.getOutputs().size() != 1) {
+    LLVM_DEBUG(llvm::dbgs()
+               << "Currently, multi-output fusion is not supported.\n");
     return failure();
+  }
 
   // 0.2. Sanity check, skip already fused.
   for (auto inp : laGeneric.getInputs()) {
@@ -337,12 +339,6 @@ LogicalResult MILARewritePattern::matchAndRewrite(linalg::GenericOp laGeneric,
       LLVM_DEBUG(llvm::dbgs() << "Found existing fusion, bailing\n");
       return failure();
     }
-  }
-
-  if (laGeneric.getNumOutputs() != 1) {
-    LLVM_DEBUG(llvm::dbgs()
-               << "Currently, multi-output fusion is not supported.\n");
-    return failure();
   }
 
   // 1. Trace input to global_store.
@@ -355,7 +351,7 @@ LogicalResult MILARewritePattern::matchAndRewrite(linalg::GenericOp laGeneric,
   }
   auto actualLAGenericOut = laGeneric.getOutputOperand(0);
   auto actualLAGenericOutIdxMap =
-      laGeneric.getTiedIndexingMap(actualLAGenericOut);
+      laGeneric.getMatchingIndexingMap(actualLAGenericOut);
   auto invertOutIdxMap = inversePermutation(actualLAGenericOutIdxMap);
   if (laGenericInputLeadingToGlobalStore.getType() !=
       actualLAGenericOut->get().getType()) {
