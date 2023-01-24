@@ -444,9 +444,9 @@ convertLaunchOp(LaunchOp launch, bool toCoroutine) {
         // make dummy token
         auto retToken =
             cb.create<RuntimeCreateOp>(TokenType::get(ctx)).getResult();
-        cb.create<RuntimeSetAvailableOp>(ValueRange(retToken));
+        cb.create<RuntimeSetAvailableOp>(retToken);
 
-        launch->replaceAllUsesWith(retToken);
+        launch->replaceAllUsesWith(ValueRange(retToken));
         launch->erase();
 
         return {};
