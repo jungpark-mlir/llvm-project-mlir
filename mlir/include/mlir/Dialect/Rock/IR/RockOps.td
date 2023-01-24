@@ -66,7 +66,7 @@ class Rock_Conv2DOpBase<string mnemonic, list<Type> inputTypes=[F32, F16, BF16],
                    I32ArrayLength<2>:$strides,
                    I32ArrayLength<2>:$dilations,
                    OptionalAttr<RockTuningParamAttrInterface>:$params);
-    let results = (outs std::optional<AnyRankedTensor>:$result);
+    let results = (outs Optional<AnyRankedTensor>:$result);
 }
 
 def Rock_Conv2DOp : Rock_Conv2DOpBase<"conv2d", [F32, F16, BF16, I8], [F32, F16, BF16, I32]> {
@@ -139,7 +139,7 @@ def Rock_GemmOp :
                    OptionalAttr<I32Attr>:$derivedBlockSize,
                    OptionalAttr<I32Attr>:$gridSize,
                    OptionalAttr<RockTuningParamAttrInterface>:$params)>,
-    Results<(outs std::optional<AnyRankedTensor>:$result)> {
+    Results<(outs Optional<AnyRankedTensor>:$result)> {
   let summary = "General matrix multiplication (GEMM)";
   let description = [{
     Performs the operation C += A * B.
@@ -175,7 +175,7 @@ def Rock_ZeroInitKernelOp :
                   OptionalAttr<I32Attr>:$blockSize,
                   OptionalAttr<I32Attr>:$gridSize,
                   OptionalAttr<IndexAttr>:$elemsPerThread)>,
-    Results<(outs std::optional<AnyTensor>:$result)> {
+    Results<(outs Optional<AnyTensor>:$result)> {
   let summary = "Zero-initialize a buffer";
 
   let description = [{
@@ -205,7 +205,7 @@ def Rock_ConvertingCopyKernelOp :
                   OptionalAttr<I32Attr>:$blockSize,
                   OptionalAttr<I32Attr>:$gridSize,
                   OptionalAttr<IndexAttr>:$elemsPerThread)>,
-    Results<(outs std::optional<AnyTensor>:$result)> {
+    Results<(outs Optional<AnyTensor>:$result)> {
   let summary = "Copy input to output, performing a type conversion";
 
   let description = [{
