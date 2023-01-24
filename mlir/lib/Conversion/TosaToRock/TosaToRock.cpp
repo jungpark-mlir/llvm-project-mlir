@@ -133,15 +133,18 @@ makeRockConv2D(ConversionPatternRewriter &rw, Operation *op, Value input,
   rock::GemmFeatures features;
   std::tie(arch, num_cu, features) = getArchAttributes(op);
 
+  ArrayRef<int64_t> pad64 = pad;
+  ArrayRef<int64_t> stride64 = stride;
+  ArrayRef<int64_t> dilation64 = dilation;
   SmallVector<int32_t, 4> paddingArray;
   SmallVector<int32_t, 2> strideArray;
   SmallVector<int32_t, 2> dilationArray;
-  for (auto i : pad)
+  for (auto i : pad64)
     paddingArray.push_back(i);
-  for (auto i : stride)
+  for (auto i : stride64)
     strideArray.push_back(i);
-  for (auto i : dilation)
-    dilation.push_back(i);
+  for (auto i : dilation64)
+    dilationArray.push_back(i);
 
   auto cop = rw.create<rock::Conv2DOp>(
       loc, outputExp.getType(), filterExp, inputExp, outputExp, arch,
