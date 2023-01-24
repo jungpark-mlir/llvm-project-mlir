@@ -446,7 +446,7 @@ convertLaunchOp(LaunchOp launch, bool toCoroutine) {
             cb.create<RuntimeCreateOp>(TokenType::get(ctx)).getResult();
         cb.create<RuntimeSetAvailableOp>(retToken);
 
-        launch->replaceAllUsesWith({retToken});
+        launch->replaceAllUsesWith(retToken);
         launch->erase();
 
         return {};
@@ -1130,7 +1130,8 @@ void AsyncFuncToAsyncRuntimePass::runOnOperation() {
   }
 }
 
-std::unique_ptr<OperationPass<ModuleOp>> mlir::createAsyncToAsyncRuntimePass(bool enableCoroutines) {
+std::unique_ptr<OperationPass<ModuleOp>>
+mlir::createAsyncToAsyncRuntimePass(bool enableCoroutines) {
   AsyncToAsyncRuntimeOptions opts;
   opts.enableCoroutines = enableCoroutines;
   return std::make_unique<AsyncToAsyncRuntimePass>(opts);
