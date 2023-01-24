@@ -122,7 +122,7 @@ mlir::Attribute TransformAttr::parse(mlir::AsmParser &parser, mlir::Type type) {
   }
 
   llvm::SMLoc typeLoc = parser.getCurrentLocation();
-  Optional<TransformType> transformType =
+  std::optional<TransformType> transformType =
       getTransformTypeForName(transformName);
   if (!transformType.has_value()) {
     parser.emitError(typeLoc, "expected a name of a known transform")
@@ -814,7 +814,7 @@ LogicalResult InsertSliceOp::verify() {
 //===-----------------------------------------------------===//
 
 static ArrayAttr maybeIndexArray(OpBuilder &b,
-                                 Optional<ArrayRef<int64_t>> vals) {
+                                 std::optional<ArrayRef<int64_t>> vals) {
   return vals
       .transform([&b](ArrayRef<int64_t> v) { return b.getIndexArrayAttr(v); })
       .value_or(ArrayAttr{});
@@ -824,7 +824,7 @@ void TransformingForOp::build(OpBuilder &b, OperationState &state,
                               ArrayRef<ValueRange> inits,
                               ArrayRef<Attribute> transforms,
                               ArrayRef<int64_t> bounds,
-                              Optional<ArrayRef<int64_t>> strides,
+                              std::optional<ArrayRef<int64_t>> strides,
                               bool forceUnroll, bool useIndexDiffs,
                               ValueRange iterArgs) {
   build(b, state, inits, b.getArrayAttr(transforms),
@@ -844,7 +844,7 @@ void TransformingForOp::build(OpBuilder &b, OperationState &state,
 void TransformingForOp::build(OpBuilder &b, OperationState &state,
                               ArrayRef<ValueRange> inits, ArrayAttr transforms,
                               ArrayRef<int64_t> bounds,
-                              Optional<ArrayRef<int64_t>> strides,
+                              std::optional<ArrayRef<int64_t>> strides,
                               bool forceUnroll, bool useIndexDiffs,
                               ValueRange iterArgs) {
   build(b, state, inits, transforms, b.getIndexArrayAttr(bounds),

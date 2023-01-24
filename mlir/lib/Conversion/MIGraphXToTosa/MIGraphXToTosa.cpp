@@ -358,9 +358,9 @@ public:
       RankedTensorType newBType = RankedTensorType::get(newDimsB, elementTy);
       newOutType = RankedTensorType::get(newDimsOut, elementTy);
       auto reshapeAOp = rewriter.create<tosa::ReshapeOp>(
-          loc, newAType, in_A, rewriter.getI64ArrayAttr(newDimsA));
+          loc, newAType, in_A, rewriter.getDenseI64ArrayAttr(newDimsA));
       auto reshapeBOp = rewriter.create<tosa::ReshapeOp>(
-          loc, newBType, in_B, rewriter.getI64ArrayAttr(newDimsB));
+          loc, newBType, in_B, rewriter.getDenseI64ArrayAttr(newDimsB));
 
       // reassign inputs.
       in_A = reshapeAOp;
