@@ -815,8 +815,8 @@ LogicalResult InsertSliceOp::verify() {
 
 static ArrayAttr maybeIndexArray(OpBuilder &b,
                                  std::optional<ArrayRef<int64_t>> vals) {
-  return vals
-      .transform([&b](ArrayRef<int64_t> v) { return b.getIndexArrayAttr(v); })
+  return llvm::transformOptional(
+             vals, [&b](ArrayRef<int64_t> v) { return b.getIndexArrayAttr(v); })
       .value_or(ArrayAttr{});
 }
 
