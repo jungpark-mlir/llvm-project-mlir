@@ -15,6 +15,7 @@
 #define MLIR_INTERFACES_CALLINTERFACES_H
 
 #include "mlir/IR/Builders.h"
+#include "mlir/IR/IRMapping.h"
 #include "mlir/IR/SymbolTable.h"
 #include "llvm/ADT/PointerUnion.h"
 

@@ -1452,7 +1452,7 @@ void AllocOp::getCanonicalizationPatterns(RewritePatternSet &results,
 }
 
 LogicalResult WarpSwizzleOp::verify() {
-  for (auto &&v : this->selector()) {
+  for (auto &&v : this->getSelector()) {
     int32_t val = v.cast<::mlir::IntegerAttr>().getValue().getZExtValue();
     if (val < 0 || val > 3) {
       return this->emitOpError("value outside of range in selector");
