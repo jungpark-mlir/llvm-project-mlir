@@ -196,20 +196,17 @@ public:
     Value newOperand = input_t;
     if (outRank != inShape.size()) {
       SmallVector<int64_t, 5> newShape;
-      SmallVector<Attribute, 5> newShapeAttr;
 
       // align the dimensions - by the given axis
       for (uint32_t i = 0; i < outRank; i++) {
-        newShapeAttr.push_back(rewriter.getI64IntegerAttr(1));
         newShape.push_back(1);
       }
-      newShapeAttr[axis] = rewriter.getI64IntegerAttr(inShape[0]);
       newShape[axis] = inShape[0];
 
       // reshape
       auto outType = RankedTensorType::get(newShape, outElemType);
       newOperand = rewriter.create<tosa::ReshapeOp>(
-          loc, outType, input_t, rewriter.getDenseI64ArrayAttr(newShapeAttr));
+          loc, outType, input_t, rewriter.getDenseI64ArrayAttr(newShape));
     }
 
     for (auto &use : op->getResult(0).getUses()) {
@@ -263,23 +260,20 @@ public:
         Value newOperand = input_t;
         if (outRank != inShape.size()) {
           SmallVector<int64_t, 5> newShape;
-          SmallVector<Attribute, 5> newShapeAttr;
 
           // align the dimensions - by the given in/out shape
           uint32_t i = 0;
           for (; i < outRank - inRank; i++) {
-            newShapeAttr.push_back(rewriter.getI64IntegerAttr(inShape[i]));
             newShape.push_back(inShape[i]);
           }
           for (; i < outRank; i++) {
-            newShapeAttr.push_back(rewriter.getI64IntegerAttr(1));
             newShape.push_back(1);
           }
 
           // reshape
           auto outType = RankedTensorType::get(newShape, outElemType);
           newOperand = rewriter.create<tosa::ReshapeOp>(
-              loc, outType, input_t, rewriter.getArrayAttr(newShapeAttr));
+              loc, outType, input_t, rewriter.getDenseI64ArrayAttr(newShape));
         }
 
         // replace the uses

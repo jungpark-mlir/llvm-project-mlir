@@ -28,8 +28,8 @@
 #include "mlir/Dialect/GPU/IR/GPUDialect.h"
 #include "mlir/Dialect/Rock/IR/Rock.h"
 #include "mlir/Dialect/Rock/Passes.h"
-#include "mlir/IR/IRMapping.h"
 #include "mlir/IR/BuiltinOps.h"
+#include "mlir/IR/IRMapping.h"
 #include "mlir/IR/SymbolTable.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 #include "mlir/Transforms/RegionUtils.h"
@@ -68,12 +68,13 @@ struct MIGPUAllocRewritePattern : public OpRewritePattern<rock::GpuAllocOp> {
     auto func = op->getParentOfType<gpu::GPUFuncOp>();
     Location loc = op->getLoc();
 
-    if (type.getMemorySpaceAsInt() ==
-        gpu::GPUDialect::getWorkgroupAddressSpace()) {
+    auto memSpaceValue = type.getMemorySpace()
+                             .dyn_cast_or_null<gpu::AddressSpaceAttr>()
+                             .getValue();
+    if (memSpaceValue == gpu::GPUDialect::getWorkgroupAddressSpace()) {
       Value attribution = func.addWorkgroupAttribution(type, loc);
       op.replaceAllUsesWith(attribution);
-    } else if (type.getMemorySpaceAsInt() ==
-               gpu::GPUDialect::getPrivateAddressSpace()) {
+    } else if (memSpaceValue == gpu::GPUDialect::getPrivateAddressSpace()) {
       Value attribution = func.addPrivateAttribution(type, loc);
       op.replaceAllUsesWith(attribution);
     } else {
