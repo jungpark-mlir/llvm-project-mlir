@@ -349,7 +349,7 @@ LogicalResult MILARewritePattern::matchAndRewrite(linalg::GenericOp laGeneric,
                              gemmStoreOp))) {
     return failure();
   }
-  auto actualLAGenericOut = laGeneric..getDpsInitOperand(0);
+  auto actualLAGenericOut = laGeneric.getDpsInitOperand(0);
   auto actualLAGenericOutIdxMap =
       laGeneric.getMatchingIndexingMap(actualLAGenericOut);
   auto invertOutIdxMap = inversePermutation(actualLAGenericOutIdxMap);
