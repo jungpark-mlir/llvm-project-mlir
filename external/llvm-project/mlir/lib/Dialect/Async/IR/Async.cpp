@@ -142,7 +142,7 @@ void LaunchOp::print(OpAsmPrinter &p) {
 
   // : (%value.type, ...)
   p << " : (";
-  llvm::interleaveComma(operands(), p,
+  llvm::interleaveComma(getOperands(), p,
                         [&](Value operand) mutable { p << operand.getType(); });
   p << ")";
 
