@@ -273,7 +273,7 @@ static LogicalResult findGlobalStore(linalg::GenericOp laGeneric,
         return failure();
       }
 
-      auto laGenericOut = laGeneric.getOutputs().begin();
+      auto laGenericOut = laGeneric.getDpsInitOperand(0);
       auto laGenericOutIdxMap = laGeneric.getMatchingIndexingMap(laGenericOut);
       auto invertOutIdxMap = inversePermutation(laGenericOutIdxMap);
       auto outToInMap = inpIdxMap.compose(invertOutIdxMap);
@@ -349,7 +349,7 @@ LogicalResult MILARewritePattern::matchAndRewrite(linalg::GenericOp laGeneric,
                              gemmStoreOp))) {
     return failure();
   }
-  auto actualLAGenericOut = laGeneric.getOutputOperand(0);
+  auto actualLAGenericOut = laGeneric..getDpsInitOperand(0);
   auto actualLAGenericOutIdxMap =
       laGeneric.getMatchingIndexingMap(actualLAGenericOut);
   auto invertOutIdxMap = inversePermutation(actualLAGenericOutIdxMap);
