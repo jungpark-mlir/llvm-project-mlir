@@ -838,10 +838,11 @@ struct BufferLoadRewritePattern : public OpRewritePattern<BufferLoadOp> {
     for (auto v : coords)
       coordsI32.push_back(b.create<IndexCastOp>(loc, b.getI32Type(), v));
     IntegerAttr indexOffset =
-        op.getOffset()
-            .transform([&b](const APInt &offset) -> IntegerAttr {
-              return b.getI32IntegerAttr(offset.getZExtValue());
-            })
+        llvm::transformOptional(op.getOffset(),
+                                [&b](const APInt &offset) -> IntegerAttr {
+                                  return b.getI32IntegerAttr(
+                                      offset.getZExtValue());
+                                })
             .value_or(IntegerAttr());
     b.replaceOpWithNewOp<amdgpu::RawBufferLoadOp>(
         op, loadedType, source, coordsI32, /*boundsCheck=*/true, indexOffset,
@@ -916,20 +917,21 @@ struct BufferStoreRewritePattern : public OpRewritePattern<BufferStoreOp> {
     for (Value v : coords)
       coordsI32.push_back(b.create<IndexCastOp>(loc, b.getI32Type(), v));
     IntegerAttr indexOffset =
-        op.getOffset()
-            .transform([&b](const APInt &offset) -> IntegerAttr {
-              return b.getI32IntegerAttr(offset.getZExtValue());
-            })
+        llvm::transformOptional(op.getOffset(),
+                                [&b](const APInt &offset) -> IntegerAttr {
+                                  return b.getI32IntegerAttr(
+                                      offset.getZExtValue());
+                                })
             .value_or(IntegerAttr());
 
     if (memoryOp == StoreMethod::AtomicAdd) {
       // TODO: test padding in atomic add kernels now that we can oob with them
       if (auto dataVector = data.getType().dyn_cast<VectorType>()) {
         int32_t nAtomics = dataVector.getNumElements();
-        int32_t offset = op.getOffset()
-                             .transform([](const APInt &v) -> int32_t {
-                               return v.getZExtValue();
-                             })
+        int32_t offset = llvm::transformOptional(op.getOffset(),
+                                                 [](const APInt &v) -> int32_t {
+                                                   return v.getZExtValue();
+                                                 })
                              .value_or(0);
         for (int32_t i = 0; i < nAtomics; ++i) {
           Value item = b.create<vector::ExtractElementOp>(
