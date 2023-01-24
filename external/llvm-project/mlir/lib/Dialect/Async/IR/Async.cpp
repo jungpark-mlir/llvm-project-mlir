@@ -67,7 +67,7 @@ void LaunchOp::build(OpBuilder &builder, OperationState &result,
                      func::FuncOp func, ValueRange dependencies,
                      ValueRange operands) {
   // set callee
-  result.addAttribute(calleeAttrName(result.name), SymbolRefAttr::get(func));
+  result.addAttribute(getCalleeAttrName(result.name), SymbolRefAttr::get(func));
 
   result.addOperands(dependencies);
   result.addOperands(operands);
@@ -77,7 +77,7 @@ void LaunchOp::build(OpBuilder &builder, OperationState &result,
   int32_t numOperands = operands.size();
   auto operandSegmentSizes =
       builder.getDenseI32ArrayAttr({numDependencies, numOperands});
-  result.addAttribute(operand_segment_sizesAttrName(result.name),
+  result.addAttribute(getOperandSegmentSizesAttrName(result.name),
                       operandSegmentSizes);
 
   // First result is always a token, and then `resultTypes` wrapped into
@@ -89,11 +89,11 @@ void LaunchOp::build(OpBuilder &builder, OperationState &result,
 
 /// Return the callee of this operation.
 CallInterfaceCallable LaunchOp::getCallableForCallee() {
-  return (*this)->getAttrOfType<SymbolRefAttr>(calleeAttrName());
+  return (*this)->getAttrOfType<SymbolRefAttr>(getCalleeAttrName());
 }
 
 /// Return the operands passed to the callee.
-Operation::operand_range LaunchOp::getCallOperands() { return operands(); }
+Operation::operand_range LaunchOp::getCallOperands() { return getOperands(); }
 
 /// Return the callee results.
 Operation::result_range LaunchOp::getCallResults() {
@@ -102,7 +102,7 @@ Operation::result_range LaunchOp::getCallResults() {
 
 /// Return the callee result types.
 Operation::result_type_range LaunchOp::getCallResultTypes() {
-  return results();
+  return getResults();
 }
 
 /// Recompute the operand_segment_sizes attribute.
@@ -121,24 +121,24 @@ void LaunchOp::updateSegmentSizes(MLIRContext *ctx) {
 
   auto operandSegmentSizes =
       DenseI32ArrayAttr::get(ctx, {numDependencies, numOperands});
-  (*this)->setAttr(operand_segment_sizesAttrName(), operandSegmentSizes);
+  (*this)->setAttr(getOperandSegmentSizesAttrName(), operandSegmentSizes);
 
   assert(!(*this)->hasAttr("result_segment_sizes"));
 }
 
 void LaunchOp::print(OpAsmPrinter &p) {
   // func ref
-  p << " " << (*this)->getAttr(calleeAttrName());
+  p << " " << (*this)->getAttr(getCalleeAttrName());
 
   // [%tokens,...]
-  if (!dependencies().empty())
-    p << " [" << dependencies() << "]";
+  if (!getDependencies().empty())
+    p << " [" << getDependencies() << "]";
 
   // (%value, ...)
-  p << " (" << operands() << ")";
+  p << " (" << getOperands() << ")";
 
   p.printOptionalAttrDictWithKeyword(
-      (*this)->getAttrs(), {operand_segment_sizesAttrName(), calleeAttrName()});
+      (*this)->getAttrs(), {getOperandSegmentSizesAttrName(), getCalleeAttrName()});
 
   // : (%value.type, ...)
   p << " : (";
@@ -162,7 +162,7 @@ ParseResult LaunchOp::parse(OpAsmParser &parser, OperationState &result) {
 
   if (parser.parseCustomAttributeWithFallback(
           calleeAttr, parser.getBuilder().getType<::mlir::NoneType>(),
-          calleeAttrName(result.name), result.attributes)) {
+          getCalleeAttrName(result.name), result.attributes)) {
     return ::mlir::failure();
   }
 
@@ -206,7 +206,7 @@ ParseResult LaunchOp::parse(OpAsmParser &parser, OperationState &result) {
   int32_t numOperands = result.operands.size() - numDependencies;
   auto operandSegmentSizes =
       DenseI32ArrayAttr::get(ctx, {numDependencies, numOperands});
-  result.addAttribute(operand_segment_sizesAttrName(result.name),
+  result.addAttribute(getOperandSegmentSizesAttrName(result.name),
                       operandSegmentSizes);
 
   return success();
@@ -239,10 +239,10 @@ LogicalResult LaunchOp::verifySymbolUses(SymbolTableCollection &symbolTable) {
 
   // Match operand types
   auto funcArgumentTypes = func.getArgumentTypes();
-  if (funcArgumentTypes.size() != operands().size())
+  if (funcArgumentTypes.size() != getOperands().size())
     return emitOpError("incorrect number of operands for callee");
 
-  for (auto tuple : llvm::zip(operands(), funcArgumentTypes)) {
+  for (auto tuple : llvm::zip(getOperands(), funcArgumentTypes)) {
     if (std::get<0>(tuple).getType() != std::get<1>(tuple))
       return emitOpError("requires matching operand types");
   }
@@ -255,7 +255,7 @@ LogicalResult LaunchOp::verify() {
   auto tokenTy = TokenType::get(ctx);
 
   // The dependencies must be async.tokens
-  for (auto dep : dependencies()) {
+  for (auto dep : getDependencies()) {
     if (dep.getType() != tokenTy)
       return emitOpError("requires all dependencies to be async.token");
   }
