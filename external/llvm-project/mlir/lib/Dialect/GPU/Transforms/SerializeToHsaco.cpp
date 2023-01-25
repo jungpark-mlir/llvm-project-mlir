@@ -28,7 +28,7 @@
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Linker/Linker.h"
 
-#include "lld/Common/Driver.h"
+#include "lld/Common/CommonLinkerContext.h"
 
 #include "llvm/MC/MCAsmBackend.h"
 #include "llvm/MC/MCAsmInfo.h"
