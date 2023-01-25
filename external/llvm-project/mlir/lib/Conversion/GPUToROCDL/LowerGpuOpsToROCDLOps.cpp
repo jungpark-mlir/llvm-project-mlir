@@ -257,7 +257,7 @@ struct WarpSwizzleOpLowering : ConvertOpToLLVMPattern<gpu::WarpSwizzleOp> {
     auto intrinsic = rewriter.create<ROCDL::DPPMovOp>(
         loc, llvmI32Type, adaptor.getIn(), dppCtrlConstImm, noMaskConstImm,
         noMaskConstImm, noBoundsControlConstImm);
-    rewriter.replaceOp(op, ValueRange(intrinsic));
+    rewriter.replaceOp(op, intrinsic.getResults());
     return success();
   }
 };
