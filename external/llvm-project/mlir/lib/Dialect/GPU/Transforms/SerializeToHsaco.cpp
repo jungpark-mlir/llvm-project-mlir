@@ -29,6 +29,7 @@
 #include "llvm/Linker/Linker.h"
 
 #include "lld/Common/CommonLinkerContext.h"
+#include "lld/Common/Driver.h"
 
 #include "llvm/MC/MCAsmBackend.h"
 #include "llvm/MC/MCAsmInfo.h"
