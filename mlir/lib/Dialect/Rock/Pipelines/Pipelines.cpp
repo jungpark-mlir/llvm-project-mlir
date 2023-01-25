@@ -85,7 +85,7 @@ void rock::buildBufferizePipeline(OpPassManager &pm,
   pm.addNestedPass<func::FuncOp>(createCSEPass());
 
   pm.addPass(createConvertTensorToLinalgPass());
-  pm.addNestedPass<func::FuncOp>(createLinalgInitTensorToAllocTensorPass());
+  pm.addNestedPass<func::FuncOp>(createEmptyTensorToAllocTensorPass());
   pm.addNestedPass<func::FuncOp>(createLinalgFoldUnitExtentDimsPass());
 
   bufferization::OneShotBufferizationOptions bufOpts;
@@ -93,9 +93,9 @@ void rock::buildBufferizePipeline(OpPassManager &pm,
   bufOpts.createDeallocs = noRock;
   bufOpts.bufferizeFunctionBoundaries = true;
   bufOpts.functionBoundaryTypeConversion =
-      bufferization::BufferizationOptions::LayoutMapOption::IdentityLayoutMap;
+      bufferization::LayoutMapOption::IdentityLayoutMap;
   bufOpts.unknownTypeConverterFn =
-      [](Value value, unsigned memorySpace,
+      [](Value value, Attribute memorySpace,
          const bufferization::BufferizationOptions &options) {
         return bufferization::getMemRefTypeWithStaticIdentityLayout(
             value.getType().cast<TensorType>(), memorySpace);
