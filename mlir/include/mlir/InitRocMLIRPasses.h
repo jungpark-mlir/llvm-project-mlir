@@ -44,11 +44,11 @@ inline void registerUpstreamPasses() {
   // Conversion passes
   registerConvertAffineToStandard();
   registerConvertAMDGPUToROCDL();
-  registerArithToLLVMConversion();
+  registerArithToLLVMConversionPass();
   registerConvertFuncToLLVM();
   registerConvertGpuOpsToROCDLOps();
   registerConvertMathToLLVM();
-  registerMemRefToLLVMConversion();
+  registerMemRefToLLVMConversionPass();
   registerReconcileUnrealizedCasts();
   registerSCFToControlFlow();
   registerTosaToArith();
