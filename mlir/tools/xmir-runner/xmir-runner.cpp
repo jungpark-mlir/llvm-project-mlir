@@ -50,7 +50,7 @@ namespace test {
 void registerTestDialect(DialectRegistry &);
 } // namespace test
 
-static LogicalResult runMLIRPasses(ModuleOp m) {
+static LogicalResult runMLIRPasses(Operation *op, JitRunnerOptions &options) {
   // Canonicalize target arch
   if (targetType == "GPU" && !targetArch.empty()) {
     RocmDeviceName devName;
