@@ -567,7 +567,8 @@ struct GenParams {
   llvm::Optional<rock::KernelType> operation = std::nullopt;
   Type dtype = nullptr;
   rock::GemmFeatures features = rock::GemmFeatures::none;
-  llvm::Optional<const rock::Conv2dGenerator::Config *> convConfig = std::nullopt;
+  llvm::Optional<const rock::Conv2dGenerator::Config *> convConfig =
+      std::nullopt;
   StringRef arch;
 };
 
@@ -1800,7 +1801,9 @@ static func::FuncOp createCpuGemmKernelWithMlir(ModuleOp module,
   b.create<linalg::GenericOp>(
       loc, ValueRange{aVal, bVal}, ValueRange{cVal},
       ArrayRef<AffineMap>{aMap, bMap, cMap},
-      ArrayRef<StringRef>{parallel, parallel, parallel, reduction},
+      ArrayRef<utils::IteratorType>{
+          utils::IteratorType::parallel, utils::IteratorType::parallel,
+          utils::IteratorType::parallel, utils::IteratorType::reduction},
       /*doc=*/"", /*library_call=*/"",
       [](OpBuilder &builder, Location loc, ValueRange elems) {
         Value a = elems[0], b = elems[1], c = elems[2];
