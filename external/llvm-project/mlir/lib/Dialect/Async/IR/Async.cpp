@@ -641,9 +641,6 @@ FunctionType CallOp::getCalleeType() {
   return FunctionType::get(getContext(), getOperandTypes(), getResultTypes());
 }
 
-/// Return the operands passed to the callee.
-Operation::operand_range CallOp::getCallOperands() { return getOperands(); }
-
 //===----------------------------------------------------------------------===//
 /// ReturnOp
 //===----------------------------------------------------------------------===//

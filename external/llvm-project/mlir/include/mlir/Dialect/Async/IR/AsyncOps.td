@@ -326,6 +326,9 @@ def Async_CallOp : Async_Op<"call",
     operand_range getArgOperands() {
       return {arg_operand_begin(), arg_operand_end()};
     }
+    operand_range getCallOperands() {
+      return {arg_operand_begin(), arg_operand_end()};
+    }
 
     operand_iterator arg_operand_begin() { return operand_begin(); }
     operand_iterator arg_operand_end() { return operand_end(); }
