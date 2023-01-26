@@ -101,7 +101,6 @@ def ArithToLLVMConversionPass : Pass<"convert-arith-to-llvm"> {
   let description = [{
     This pass converts supported Arith ops to LLVM dialect instructions.
   }];
-  let constructor = "mlir::arith::createArithToLLVMConversionPass()";
   let dependentDialects = ["LLVM::LLVMDialect"];
   let options = [
     Option<"indexBitwidth", "index-bitwidth", "unsigned",
