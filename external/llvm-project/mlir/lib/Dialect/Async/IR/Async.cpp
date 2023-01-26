@@ -138,7 +138,8 @@ void LaunchOp::print(OpAsmPrinter &p) {
   p << " (" << getOperands() << ")";
 
   p.printOptionalAttrDictWithKeyword(
-      (*this)->getAttrs(), {getOperandSegmentSizesAttrName(), getCalleeAttrName()});
+      (*this)->getAttrs(),
+      {getOperandSegmentSizesAttrName(), getCalleeAttrName()});
 
   // : (%value.type, ...)
   p << " : (";
@@ -639,6 +640,9 @@ LogicalResult CallOp::verifySymbolUses(SymbolTableCollection &symbolTable) {
 FunctionType CallOp::getCalleeType() {
   return FunctionType::get(getContext(), getOperandTypes(), getResultTypes());
 }
+
+/// Return the operands passed to the callee.
+Operation::operand_range CallOp::getCallOperands() { return getOperands(); }
 
 //===----------------------------------------------------------------------===//
 /// ReturnOp
