@@ -114,8 +114,8 @@ void xmodel::buildRunnerPipeline(OpPassManager &pm,
   pm.addNestedPass<func::FuncOp>(createGpuAsyncRegionPass());
 
   auto &funcPm2 = pm.nest<func::FuncOp>();
-  funcPm2.addPass(mlir::arith::createArithExpandOpsPass());
-  funcPm2.addPass(mlir::arith::createArithToLLVMConversionPass());
+  funcPm2.addPass(arith::createArithExpandOpsPass());
+  funcPm2.addPass(arith::createArithToLLVMConversionPass());
   funcPm2.addPass(createConvertMathToLLVMPass());
   pm.addPass(createConvertVectorToLLVMPass());
   pm.addPass(createMemRefToLLVMConversionPass());
