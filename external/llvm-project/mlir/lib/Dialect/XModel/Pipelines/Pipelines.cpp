@@ -115,7 +115,7 @@ void xmodel::buildRunnerPipeline(OpPassManager &pm,
 
   auto &funcPm2 = pm.nest<func::FuncOp>();
   funcPm2.addPass(arith::createArithExpandOpsPass());
-  funcPm2.addPass(arith::createArithToLLVMConversionPass());
+  funcPm2.addPass(createArithToLLVMConversionPass());
   funcPm2.addPass(createConvertMathToLLVMPass());
   pm.addPass(createConvertVectorToLLVMPass());
   pm.addPass(createMemRefToLLVMConversionPass());
