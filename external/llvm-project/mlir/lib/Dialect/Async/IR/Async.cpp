@@ -614,7 +614,7 @@ LogicalResult CallOp::verifySymbolUses(SymbolTableCollection &symbolTable) {
 
   // Verify that the operand and result types match the callee.
   auto fnType = fn.getFunctionType();
-  if (fnType.getNumInputs() != getNumOperands())
+  if (fnType.getNumInputs() != getLaunchOperands().size())
     return emitOpError("incorrect number of operands for callee");
 
   for (unsigned i = 0, e = fnType.getNumInputs(); i != e; ++i)
