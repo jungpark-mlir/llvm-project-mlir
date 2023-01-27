@@ -240,10 +240,10 @@ LogicalResult LaunchOp::verifySymbolUses(SymbolTableCollection &symbolTable) {
 
   // Match operand types
   auto funcArgumentTypes = func.getArgumentTypes();
-  if (funcArgumentTypes.size() != getOperands().size())
+  if (funcArgumentTypes.size() != getLaunchOperands().size())
     return emitOpError("incorrect number of operands for callee");
 
-  for (auto tuple : llvm::zip(getOperands(), funcArgumentTypes)) {
+  for (auto tuple : llvm::zip(getLaunchOperands(), funcArgumentTypes)) {
     if (std::get<0>(tuple).getType() != std::get<1>(tuple))
       return emitOpError("requires matching operand types");
   }
@@ -614,7 +614,7 @@ LogicalResult CallOp::verifySymbolUses(SymbolTableCollection &symbolTable) {
 
   // Verify that the operand and result types match the callee.
   auto fnType = fn.getFunctionType();
-  if (fnType.getNumInputs() != getLaunchOperands().size())
+  if (fnType.getNumInputs() != getNumOperands())
     return emitOpError("incorrect number of operands for callee");
 
   for (unsigned i = 0, e = fnType.getNumInputs(); i != e; ++i)
