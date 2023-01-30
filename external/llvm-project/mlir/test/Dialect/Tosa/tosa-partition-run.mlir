@@ -1,6 +1,6 @@
 // RUN: mlir-opt %s -pass-pipeline="builtin.module(func.func(tosa-to-linalg-named), \
 // RUN: func.func(tosa-to-linalg))" \
-// RUN: | mlir-opt  --tosa-to-tensor -tosa-to-arith \
+// RUN: | mlir-opt  --tosa-to-tensor -tosa-to-arith --empty-tensor-to-alloc-tensor\
 // RUN: -one-shot-bufferize="allow-return-allocs bufferize-function-boundaries" \
 // RUN: --buffer-deallocation --convert-linalg-to-loops \
 // RUN: -lower-affine -convert-linalg-to-llvm --convert-scf-to-cf \
@@ -20,7 +20,7 @@
 //
 // RUN: mlir-opt %s -pass-pipeline="builtin.module(func.func(tosa-to-linalg-named), \
 // RUN: func.func(tosa-to-linalg))" \
-// RUN: | mlir-opt  --tosa-to-tensor -tosa-to-arith \
+// RUN: | mlir-opt  --tosa-to-tensor -tosa-to-arith --empty-tensor-to-alloc-tensor\
 // RUN: -one-shot-bufferize="allow-return-allocs bufferize-function-boundaries" \
 // RUN: --buffer-deallocation --convert-linalg-to-loops \
 // RUN: -lower-affine -convert-linalg-to-llvm --convert-scf-to-cf \
