@@ -45,7 +45,7 @@ module attributes {torch.debug_module_name = "Conv2dNoPaddingModule"} {
     %5 = "tosa.cast"(%3) : (tensor<5x2x10x20xi32>) -> tensor<5x2x10x20xf32>
     %6 = "tosa.transpose"(%5, %1) : (tensor<5x2x10x20xf32>, tensor<4xi32>) -> tensor<5x10x20x2xf32>
     %7 = "tosa.transpose"(%4, %1) : (tensor<10x2x3x3xf32>, tensor<4xi32>) -> tensor<10x3x3x2xf32>
-    %8 = "tosa.conv2d"(%6, %7, %2) {dilation = [1, 1], pad = [0, 0, 0, 0], stride = [1, 1]} : (tensor<5x10x20x2xf32>, tensor<10x3x3x2xf32>, tensor<10xf32>) -> tensor<5x8x18x10xf32>
+    %8 = "tosa.conv2d"(%6, %7, %2) {dilation = array<i64: 1, 1>, pad = array<i64: 0, 0, 0, 0>, stride = array<i64: 1, 1>} : (tensor<5x10x20x2xf32>, tensor<10x3x3x2xf32>, tensor<10xf32>) -> tensor<5x8x18x10xf32>
     %9 = "tosa.transpose"(%8, %0) : (tensor<5x8x18x10xf32>, tensor<4xi32>) -> tensor<5x10x8x18xf32>
     %10 = bufferization.alloc_tensor() copy(%9) : tensor<5x10x8x18xf32>
     %11 = tensor.cast %10 : tensor<5x10x8x18xf32> to tensor<*xf32>
