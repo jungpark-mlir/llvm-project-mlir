@@ -144,20 +144,12 @@ public:
     cop->setAttr("expected_input_layout", rewriter.getStringAttr("nchw"));
     cop->setAttr("expected_output_layout", rewriter.getStringAttr("nkhw"));
 
-    cop->setAttr("dilation", rewriter.getArrayAttr({
-                                 rewriter.getI64IntegerAttr(dilationHeight),
-                                 rewriter.getI64IntegerAttr(dilationWidth),
-                             }));
-    cop->setAttr("stride", rewriter.getArrayAttr({
-                               rewriter.getI64IntegerAttr(strideHeight),
-                               rewriter.getI64IntegerAttr(strideWidth),
-                           }));
-    cop->setAttr("pad", rewriter.getArrayAttr({
-                            rewriter.getI64IntegerAttr(padTop),
-                            rewriter.getI64IntegerAttr(padBottom),
-                            rewriter.getI64IntegerAttr(padLeft),
-                            rewriter.getI64IntegerAttr(padRight),
-                        }));
+    cop->setAttr("dilation", rewriter.getDenseI64ArrayAttr(
+                                 {dilationHeight, dilationWidth}));
+    cop->setAttr("stride",
+                 rewriter.getDenseI64ArrayAttr({strideHeight, strideWidth}));
+    cop->setAttr("pad", rewriter.getDenseI64ArrayAttr(
+                            {padTop, padBottom, padLeft, padRight}));
 
     // Convert optional attributes
     if (auto attr = op->getAttrOfType<BoolAttr>("xdlopsV2"))
