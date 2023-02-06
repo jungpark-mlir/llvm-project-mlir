@@ -253,7 +253,7 @@ static Value reconfigureLAGeneric(PatternRewriter &b,
   // 2.3. Reset iterator types
   SmallVector<utils::IteratorType, 5> iteratorTypes;
   iteratorTypes.resize(regType.getRank(), utils::IteratorType::parallel);
-  laGeneric.setIteratorTypesAttr(iteratorTypes);
+  laGeneric.setIteratorTypesAttr(ArrayAttr::get(ctx, iteratorTypes));
   return laOut;
 }
 
@@ -319,7 +319,8 @@ LogicalResult MILARewritePattern::matchAndRewrite(linalg::GenericOp laGeneric,
 
   // 0. Test compatibility
   // 0.0. Only fully parallel for now
-  if (!llvm::all_of(laGeneric.getIteratorTypesArray(), isParallelIterator))
+  if (!llvm::all_of(laGeneric.getIteratorTypesArray(),
+                    linalg::isParallelIterator))
     return failure();
 
   Value out = *laGeneric.getOutputs().begin(); // may be another arg

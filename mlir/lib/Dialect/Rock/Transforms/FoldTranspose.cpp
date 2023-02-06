@@ -296,7 +296,8 @@ struct RemoveTrivialTransposePattern
                                 PatternRewriter &b) const override {
     // 0. Test compatibility
     // 0.0. Only fully parallel for now
-    if (!llvm::all_of(laGeneric.getIteratorTypesArray(), isParallelIterator))
+    if (!llvm::all_of(laGeneric.getIteratorTypesArray(),
+                      linalg::isParallelIterator))
       return failure();
 
     bool bPassing = false;
