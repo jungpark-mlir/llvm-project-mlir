@@ -250,7 +250,7 @@ def Rock_TransformOp :
      Type elemType = lowerType.getElementType();
      ShapedType upperType;
      if (auto mrType = lowerType.template dyn_cast<MemRefType>()) {
-       int memorySpace = mrType.getMemorySpaceAsInt();
+       auto memorySpace = mrType.getMemorySpace().dyn_cast_or_null<gpu::AddressSpaceAttr>();
        upperType = MemRefType::get(transform.getUpperBounds(), elemType,
         /*layout=*/{}, memorySpace);
      } else {

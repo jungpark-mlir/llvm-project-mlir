@@ -2055,7 +2055,7 @@ static func::FuncOp createVerifierFunc(ModuleOp module, const KernelIF &kernel,
     exit(1);
   }
 
-  auto mr1DUnkType = MemRefType::get({-1}, valElemType);
+  auto mr1DUnkType = MemRefType::get({mlir::ShapedType::kDynamic}, valElemType);
 
   bool isTestAndValSameType =
       (testOutType.isInteger(32) || testOutType.isF32());
