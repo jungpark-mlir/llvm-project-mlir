@@ -252,7 +252,7 @@ def Rock_TransformOp :
      if (auto mrType = lowerType.template dyn_cast<MemRefType>()) {
        auto memorySpace = mrType.getMemorySpace().dyn_cast_or_null<gpu::AddressSpaceAttr>();
        upperType = MemRefType::get(transform.getUpperBounds(), elemType,
-        /*layout=*/{}, memorySpace);
+        MemRefLayoutAttrInterface{}, memorySpace);
      } else {
        upperType = lowerType.cloneWith(transform.getUpperBounds(), elemType);
      }
