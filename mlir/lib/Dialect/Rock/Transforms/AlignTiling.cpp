@@ -253,9 +253,9 @@ static Value reconfigureLAGeneric(PatternRewriter &b,
 
   // 2.3. Reset iterator types
   SmallVector<Attribute, 5> iteratorTypes;
-  iteratorTypes.resize(regType.getRank(),
-                       IteratorTypeAttr::get(parser.getContext(),
-                                             utils::IteratorType::parallel));
+  iteratorTypes.resize(
+      regType.getRank(),
+      linarg::IteratorTypeAttr::get(ctx, utils::IteratorType::parallel));
   laGeneric.setIteratorTypesAttr(ArrayAttr::get(ctx, iteratorTypes));
   return laOut;
 }
