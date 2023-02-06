@@ -23,6 +23,7 @@
 
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
+#include "mlir/Dialect/Linalg/Utils/Utils.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/Rock/IR/Rock.h"
 #include "mlir/Dialect/Rock/IR/TransformMapBuilder.h"
@@ -251,8 +252,10 @@ static Value reconfigureLAGeneric(PatternRewriter &b,
   laGeneric.setIndexingMapsAttr(b.getAffineMapArrayAttr(laGenericAMaps));
 
   // 2.3. Reset iterator types
-  SmallVector<utils::IteratorType, 5> iteratorTypes;
-  iteratorTypes.resize(regType.getRank(), utils::IteratorType::parallel);
+  SmallVector<Attribute, 5> iteratorTypes;
+  iteratorTypes.resize(regType.getRank(),
+                       IteratorTypeAttr::get(parser.getContext(),
+                                             utils::IteratorType::parallel));
   laGeneric.setIteratorTypesAttr(ArrayAttr::get(ctx, iteratorTypes));
   return laOut;
 }
