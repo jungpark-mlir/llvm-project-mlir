@@ -251,10 +251,9 @@ static Value reconfigureLAGeneric(PatternRewriter &b,
   laGeneric.setIndexingMapsAttr(b.getAffineMapArrayAttr(laGenericAMaps));
 
   // 2.3. Reset iterator types
-  SmallVector<StringAttr, 5> laGenericIteratorArr(regType.getRank(),
-                                                  b.getStringAttr("parallel"));
-  laGeneric.setIteratorTypesAttr(b.getArrayAttr(ArrayRef<Attribute>(
-      laGenericIteratorArr.begin(), laGenericIteratorArr.end())));
+  SmallVector<utils::IteratorType, 5> iteratorTypes;
+  iteratorTypes.resize(regType.getRank(), utils::IteratorType::parallel);
+  laGeneric.setIteratorTypesAttr(iteratorTypes);
   return laOut;
 }
 
@@ -320,10 +319,8 @@ LogicalResult MILARewritePattern::matchAndRewrite(linalg::GenericOp laGeneric,
 
   // 0. Test compatibility
   // 0.0. Only fully parallel for now
-  for (StringRef iterType :
-       laGeneric.getIteratorTypes().getAsValueRange<StringAttr>())
-    if (iterType != "parallel")
-      return failure();
+  if (!llvm::all_of(laGeneric.getIteratorTypesArray(), isParallelIterator))
+    return failure();
 
   Value out = *laGeneric.getOutputs().begin(); // may be another arg
   // 0.1. Test compatibility,  Only 1 output supported
