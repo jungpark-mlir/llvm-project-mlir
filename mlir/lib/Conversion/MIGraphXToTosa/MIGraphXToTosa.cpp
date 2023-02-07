@@ -411,10 +411,33 @@ public:
   }
 };
 
+class ReshapeConverter final : public OpConversionPattern<migraphx::ReshapeOp> {
+public:
+  using OpConversionPattern<migraphx::ReshapeOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(migraphx::ReshapeOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const final {
+    ArrayAttr dims = op->getDims();
+    Location loc = op->getLoc();
+    auto result = op->getOutput();
+    ShapedType outputTy = result.getType().cast<ShapedType>();
+    SmallVector<int64_t, 5> newShape for (auto dim : dims) {
+      newShape.push_back(dim.dyn_cast<IntegerAttr>().getInt());
+    }
+
+    auto rop = rewriter.create<tosa::ReshapeOp>(
+        loc, outputTy, result, rewriter.getDenseI64ArrayAttr(newShape));
+
+    rewriter.replaceOp(op, {rop});
+    return success();
+  }
+};
+
 } // namespace
 
 void migraphx::populateMIGraphXToTosaConversionPatterns(
     MLIRContext *context, RewritePatternSet &patterns) {
   patterns.add<ConvConverter, BroadcastConverter, MultiBroadcastConverter,
-               SoftmaxConverter, DotConverter>(context);
+               ReshapeConverter, SoftmaxConverter, DotConverter>(context);
 }

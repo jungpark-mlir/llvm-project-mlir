@@ -44,6 +44,4 @@ def ConvertI64ArrayAttrtoDenseElementsAttr : NativeCodeCall<
 def : Pat<(MIGraphX_TransposeOp $input1, $permAttr), 
   (Tosa_TransposeOp $input1, (Arith_ConstantOp (ConvertI64ArrayAttrtoDenseElementsAttr $permAttr)))>;
 
-def : Pat<(MIGraphX_ReshapeOp $input1, $newshape), (Tosa_ReshapeOp $input1, $newshape)>;
-
 #endif // MLIR_CONVERSION_MIGRAPHX_TO_TOSA

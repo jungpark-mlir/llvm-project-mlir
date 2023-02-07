@@ -1,5 +1,5 @@
 // MLIR#765: Bug in TosaMakeBroadcastable, or LinalgElementwiseOpFusion
-// RUN: rocmlir-driver -host-pipeline partition -targets %arch %s | FileCheck %s
+// RUN-DISABLE: rocmlir-driver -host-pipeline partition -targets %arch %s | FileCheck %s
 // RUN-DISABLE: rocmlir-driver -host-pipeline partition,highlevel -targets %arch %s | rocmlir-gen -ph -print-results -verifier clone -fut forward - | rocmlir-driver -host-pipeline xmodel -kernel-pipeline full | xmir-runner --shared-libs=%linalg_test_lib_dir/libmlir_rocm_runtime%shlibext,%conv_validation_wrapper_library_dir/libconv-validation-wrappers %shlibext,%linalg_test_lib_dir/libmlir_runner_utils%shlibext,%linalg_test_lib_dir/libmlir_c_runner_utils%shlibext,%linalg_test_lib_dir/libmlir_async_runtime%shlibext --entry-point-result=void | FileCheck %s
 // COM: CHECK: [1 1 1]
 // CHECK: forward__part_13
@@ -44,6 +44,8 @@ module attributes {torch.debug_module_name = "BertTinyWrapper"} {
     %35 = "tosa.reshape"(%34) {new_shape = array<i64: 2, 128, 128>} : (tensor<1x256x128xf32>) -> tensor<2x128x128xf32>
     %36 = "tosa.reshape"(%7) {new_shape = array<i64: 1, 2, 128>} : (tensor<2x128xf32>) -> tensor<1x2x128xf32>
     %37 = "tosa.gather"(%36, %26) : (tensor<1x2x128xf32>, tensor<1x128xi32>) -> tensor<1x128x128xf32>
+    
+    // FIXME : invalid reshape
     %38 = "tosa.reshape"(%37) {new_shape = array<i64: 2, 128, 128>} : (tensor<1x128x128xf32>) -> tensor<2x128x128xf32>
     %39 = "tosa.add"(%35, %38) : (tensor<2x128x128xf32>, tensor<2x128x128xf32>) -> tensor<2x128x128xf32>
     %40 = "tosa.reshape"(%4) {new_shape = array<i64: 1, 512, 128>} : (tensor<512x128xf32>) -> tensor<1x512x128xf32>
