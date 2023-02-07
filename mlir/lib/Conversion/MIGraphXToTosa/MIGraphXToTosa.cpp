@@ -418,11 +418,12 @@ public:
   LogicalResult
   matchAndRewrite(migraphx::ReshapeOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const final {
-    ArrayAttr dims = adaptor->getDims();
+    ArrayAttr dims = adaptor.getDims();
     Location loc = op->getLoc();
-    auto result = adaptor->getOutput();
-    ShapedType outputTy = result.getType().cast<ShapedType>();
-    SmallVector<int64_t, 5> newShape for (auto dim : dims) {
+    auto results = op->getResults();
+    ShapedType outputTy = results[0].getType().cast<ShapedType>();
+    SmallVector<int64_t, 5> newShape;
+    for (auto dim : dims) {
       newShape.push_back(dim.dyn_cast<IntegerAttr>().getInt());
     }
 
