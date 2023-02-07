@@ -420,6 +420,7 @@ public:
                   ConversionPatternRewriter &rewriter) const final {
     ArrayAttr dims = adaptor.getDims();
     Location loc = op->getLoc();
+    auto input = adaptor.getInput();
     auto results = op->getResults();
     ShapedType outputTy = results[0].getType().cast<ShapedType>();
     SmallVector<int64_t, 5> newShape;
@@ -428,7 +429,7 @@ public:
     }
 
     auto rop = rewriter.create<tosa::ReshapeOp>(
-        loc, outputTy, result, rewriter.getDenseI64ArrayAttr(newShape));
+        loc, outputTy, input, rewriter.getDenseI64ArrayAttr(newShape));
 
     rewriter.replaceOp(op, {rop});
     return success();
