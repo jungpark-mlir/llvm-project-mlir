@@ -135,7 +135,7 @@ void LaunchOp::print(OpAsmPrinter &p) {
     p << " [" << getDependencies() << "]";
 
   // (%value, ...)
-  p << " (" << getOperands() << ")";
+  p << " (" << getLaunchOperands() << ")";
 
   p.printOptionalAttrDictWithKeyword(
       (*this)->getAttrs(),
