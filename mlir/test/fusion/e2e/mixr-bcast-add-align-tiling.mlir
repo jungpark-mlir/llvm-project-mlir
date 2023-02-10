@@ -7,7 +7,7 @@ module {
     // CHECK-SAME: bounds [1, 1, 1, 4]
     // CHECK-SAME: strides [1, 1, 1, 1]
     // CHECK-NEXT: rock.global_load %arg0[%[[loadCoord]]]
-    // CHECK: linalg.generic{{.*}} outs(%[[outBuf:.*]] : memref<4xf32, 5>)
+    // CHECK: linalg.generic{{.*}} outs(%[[outBuf:.*]] : memref<4xf32, #gpu.address_space<private>>)
     // CHECK: global_store %[[outBuf]]{{.*}} -> %arg3
     func.func @test(%arg0: tensor<64xf32>, %arg1: tensor<1x3x224x224xf32>, %arg2: tensor<64x3x7x7xf32>) -> tensor<1x64x112x112xf32> attributes{kernel, arch = ""} {
         %0 = migraphx.broadcast(%arg0) {axis = 1:i64, out_lens= [1:i64, 64:i64, 112:i64, 112:i64] } : (tensor<64xf32>)-> tensor<1x64x112x112xf32>
