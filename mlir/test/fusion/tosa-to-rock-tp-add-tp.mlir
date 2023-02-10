@@ -2,7 +2,8 @@
 // CHECK-DAG: #[[MAP1:.*]] = #rock.transform_map<{{.*}} by [<PassThrough ["dim0", "dim1", "dim2", "dim3"] at [0, 1, 2, 3] -> ["dim0", "dim1", "dim2", "dim3"] at [0, 1, 2, 3]>, <AddDim{1} ["g"] at [4] -> [] at []>] bounds = [256, 28, 28, 64, 1] -> [256, 28, 28, 64]>
 // CHECK-DAG: #[[MAP2:.*]] = #rock.transform_map<{{.*}} by [<PassThrough ["dim0", "dim2", "dim3", "dim1"] at [0, 1, 2, 3] -> ["dim0", "dim2", "dim3", "dim1"] at [0, 2, 3, 1]>] bounds = [256, 28, 28, 64] -> [256, 64, 28, 28]>
 // CHECK: rock.transforming_for{{.*}} #[[MAP1]], #[[MAP2]]
-// CHECK: linalg.generic{{.*}} outs(%[[outBuf:.*]] : memref<4xf32, 5>)
+// CHECK: linalg.generic
+// CHECK-SAME: outs(%[[outBuf:.*]] : memref<4xf32, #gpu.address_space<private>>)
 // CHECK: global_store %[[outBuf]]{{.*}} -> %arg3
 // to test transpose is converted as transform and fused.
 
