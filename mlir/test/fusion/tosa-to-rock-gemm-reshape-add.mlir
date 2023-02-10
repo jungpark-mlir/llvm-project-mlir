@@ -8,8 +8,7 @@
 // RUN: rocmlir-driver --host-pipeline highlevel %s | rocmlir-opt --rock-fold-transpose --rock-affix-params --rock-conv-to-gemm --rock-gemm-to-gridwise --rock-gridwise-gemm-to-blockwise --rock-linalg-align | FileCheck %s --check-prefix=CHECK_LINALG_ALIGN
 
 // CHECK_LINALG_ALIGN: #[[AMAP:.*]] = affine_map<(d0, d1, d2) -> (d1, d2)>
-// CHECK_LINALG_ALIGN: #[[MAP1:.*]] = #rock.transform_map
-// CHECK_LINALG_ALIGN-SAME: <#[[AMAP]] by [<AddDim{1} ["exp0"] at [0] -> [] at []>, <PassThrough ["dim0"] at [1] -> ["dim0"] at [0]>, <PassThrough ["dim1"] at [2] -> ["dim1"] at [1]>] bounds = [1, 1, 1000] -> [1, 1000]>
+// CHECK_LINALG_ALIGN: #[[MAP1:.*]] = #rock.transform_map<#[[AMAP]] by [<AddDim{1} ["exp0"] at [0] -> [] at []>, <PassThrough ["dim0"] at [1] -> ["dim0"] at [0]>, <PassThrough ["dim1"] at [2] -> ["dim1"] at [1]>] bounds = [1, 1, 1000] -> [1, 1000]>
 // CHECK_LINALG_ALIGN: rock.transforming_for{{.*}}#[[MAP1]]
 // CHECK_LINALG_ALIGN: rock.global_load %arg2
 // CHECK_LINALG_ALIGN: linalg.generic
