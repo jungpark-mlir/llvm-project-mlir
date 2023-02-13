@@ -93,7 +93,9 @@ CallInterfaceCallable LaunchOp::getCallableForCallee() {
 }
 
 /// Return the operands passed to the callee.
-Operation::operand_range LaunchOp::getCallOperands() { return getOperands(); }
+Operation::operand_range LaunchOp::getCallOperands() {
+  return getLaunchOperands();
+}
 
 /// Return the callee results.
 Operation::result_range LaunchOp::getCallResults() {
