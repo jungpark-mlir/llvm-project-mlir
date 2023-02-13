@@ -105,6 +105,8 @@ void xmodel::buildRunnerPipeline(OpPassManager &pm,
   auto &funcPm1 = pm.nest<func::FuncOp>();
   funcPm1.addPass(createConvertLinalgToAffineLoopsPass());
   funcPm1.addPass(createLowerAffinePass());
+  funcPm1.addPass(memref::createExpandStridedMetadataPass());
+
   funcPm1.addPass(createConvertSCFToCFPass());
 
   // Target async.launch to cpu.coro or gpu.launch_func
