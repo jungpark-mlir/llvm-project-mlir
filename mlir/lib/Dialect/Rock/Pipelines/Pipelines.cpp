@@ -157,9 +157,10 @@ void rock::buildKernelPipeline(OpPassManager &pm,
 
     // lowering linalg to cf
     /* rocmlir-opt --convert-linalg-to-affine-loops --lower-affine
-     * --convert-scf-to-cf
+     * --expand-stride-metadata --convert-scf-to-cf
      */
     pm.addPass(createConvertLinalgToAffineLoopsPass());
+    pm.addPass(memref::createExpandStridedMetadataPass());
     pm.addPass(createLowerAffinePass());
     pm.addPass(createConvertSCFToCFPass());
   }
